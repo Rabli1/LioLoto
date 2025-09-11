@@ -1,28 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LioLoto</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lio Loto</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
   <style>
-    body {
-      background-color: #000;
-      color: #fff;
-    }
-    .leaderboard-card {
-      background: #111;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    }
-    .list-group-item {
-      border: none;
-    }
-    .carousel-inner img {
-      object-fit: cover;
-      height: 400px;
-    }
+    body { background-color: #000; color: #fff; }
+    .leaderboard-card { background: #111; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,.5); }
+    .list-group-item { border: none; }
+    .carousel-inner img { object-fit: cover; height: 400px; }
   </style>
 </head>
 <body>
@@ -30,8 +19,16 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="#">LioLoto</a>
-      <div class="collapse navbar-collapse">
+      <a class="navbar-brand fw-bold" href="#">Lio Loto</a>
+
+      <!-- Mobile toggler -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Collapsible nav -->
+      <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Games</a></li>
@@ -61,11 +58,13 @@
         <img src="https://via.placeholder.com/1200x400/000000/e63946?text=Plinko" class="d-block w-100" alt="Plinko">
       </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon"></span>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev" aria-label="Previous">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#gameCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon"></span>
+    <button class="carousel-control-next" type="button" data-bs-target="#gameCarousel" data-bs-slide="next" aria-label="Next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
     </button>
   </div>
 
@@ -103,7 +102,6 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
