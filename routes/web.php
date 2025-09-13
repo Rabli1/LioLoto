@@ -6,4 +6,4 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('index');
 });
-Route::get('/user/signIn', [UserController::class, 'signIn' ]);
+Route::get('user/signIn', [UserController::class, 'signIn' ]);
