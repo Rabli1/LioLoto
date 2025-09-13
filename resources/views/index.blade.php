@@ -33,7 +33,7 @@
           <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Games</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Leaderboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="/user/signIn">Profile</a></li>
         </ul>
       </div>
     </div>
