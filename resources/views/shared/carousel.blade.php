@@ -1,19 +1,19 @@
   <div id="gameCarousel" class="carousel slide mt-4 container" data-bs-ride="carousel">
     <div class="carousel-inner rounded-4 shadow-lg">
       <div class="carousel-item active">
-        <img src="https://via.placeholder.com/1200x400/000000/e63946?text=Blackjack" class="d-block w-100" alt="Blackjack">
+        <img src="{{ asset('img/gaben.jpg') }}" class="d-block w-100" alt="Blackjack">
       </div>
       <div class="carousel-item">
-        <img src="https://via.placeholder.com/1200x400/000000/e63946?text=Mines" class="d-block w-100" alt="Mines">
+        <img src="{{ asset('img/silver-medal.png') }}" class="d-block w-100" alt="Mines">
       </div>
       <div class="carousel-item">
-        <img src="https://via.placeholder.com/1200x400/000000/e63946?text=Roulette" class="d-block w-100" alt="Roulette">
+        <img src="{{ asset('img/gaben.jpg') }}" class="d-block w-100" alt="Roulette">
       </div>
       <div class="carousel-item">
-        <img src="https://via.placeholder.com/1200x400/000000/e63946?text=Coinflip" class="d-block w-100" alt="Coinflip">
+        <img src="{{ asset('img/gaben.jpg') }}" class="d-block w-100" alt="Coinflip">
       </div>
       <div class="carousel-item">
-        <img src="https://via.placeholder.com/1200x400/000000/e63946?text=Plinko" class="d-block w-100" alt="Plinko">
+        <img src="{{ asset('img/gaben.jpg') }}" class="d-block w-100" alt="Plinko">
       </div>
     </div>
 
