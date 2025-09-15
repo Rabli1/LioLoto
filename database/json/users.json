@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "nom": "Joe Nuts",
+    "motDePasse": "$2y$10$exampleHashAlice",
+    "points": 1200,
+    "imageProfil": "fa-slab fa-regular fa-circle-user",
+    "couleurProfil": "lightblue",
+    "or": 5,
+    "argent": 10,
+    "bronze": 20,
+    "pointPerdu": 2,
+    "bio": "J'adore les jeux de loto.",
+    "confirme": true,
+    "banni": false
+  },
+  {
+    "id": 2,
+    "nom": "Six Seven",
+    "motDePasse": "$2y$10$exampleHashBob",
+    "points": 800,
+    "imageProfil": "fa-slab fa-regular fa-circle-user",
+    "couleurProfil": "lightgreen",
+    "or": 2,
+    "argent": 5,
+    "bronze": 15,
+    "pointPerdu": 0,
+    "bio": "Si tu veux de l'argent facile, joue au loto !",
+    "confirme": false,
+    "banni": false
+  },
+  {
+    "id": 3,
+    "nom": "Big Chungus",
+    "motDePasse": "$2y$10$exampleHashChloe",
+    "points": 1500,
+    "imageProfil": "fa-slab fa-regular fa-circle-user",
+    "couleurProfil": "pink",
+    "or": 10,
+    "argent": 20,
+    "bronze": 30,
+    "pointPerdu": 5,
+    "bio": "Hélas, je n'ai jamais gagné...",
+    "confirme": true,
+    "banni": true
+  }
+]
