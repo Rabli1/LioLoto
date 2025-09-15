@@ -28,14 +28,13 @@
 <script>
     $(document).ready(function () {
         let validInput = [false, false, false, false]
-        let errors = $("span");
-        $("#username").on("change", function () {
+        let errors = $("form span");
+        $("#username").on("change", async function () {
+            errors.eq(0).text("");
             validInput[0] = false
             var username = $("#username").val();
             try {
-                let response = await fetch('users.json');
-                let users = await response.json();
-                let userExists = users.find(u => u.username === username);
+                const userExists = await fetch(`/check-username?username=${encodeURIComponent(username)}`);
                 if (username.length < 4) {
                     errors.eq(0).text("nom d'utilisateur trop court. Au moins 4 caractères")
                 }
@@ -50,7 +49,7 @@
             } catch (error) {
                 errors.eq(0).text("Erreur lors de la vérification du nom d'utilisateur");
             }
-            if(validInput = [true, true, true, true]){
+            if (validInput.every(v => v === true)) {
                 $('#submit').prop('disabled', false);
             }
             else{
