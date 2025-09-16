@@ -46,11 +46,4 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    function usernameExists($username){
-        $json = Storage::get("users.json");
-        $data = json_decode($json, true);
-        $collectedData = collect($data);
-        var_dump("gvsdbhkzfnvjlmk;ls,kdf`gkjK:AEHFJGHVILF KJGSBLNFj");
-        return $collectedData->contains("username", value:$username);
-    }
 }

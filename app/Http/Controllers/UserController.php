@@ -8,8 +8,10 @@ use App\Http\Controllers\Controller;
  
 class UserController extends Controller
 {
-    public function signIn(): View
-    {
+    public function signIn(): View{
         return view('user.signIn');
+    }
+    public function connection(): View{
+        return view('user.connection');
     }
 }
