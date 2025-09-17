@@ -14,8 +14,8 @@
           <li class="nav-item"><a class="nav-link" href="#">Jeux</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Classement</a></li>
           <li class="nav-item"><a class="nav-link" href="/user/profile?id=3">Profil</a></li>
-          <li class="nav-item"><a class="nav-link" href="/user/signIn">Connexion</a></li>
-
+          <li class="nav-item"><a class="nav-link" href='/user/connection?message='>Connexion</a></li>
+          <li class="nav-item"><a class="nav-link" href="/user/signIn">Inscription</a></li>
         </ul>
       </div>
     </div>

@@ -51,8 +51,27 @@ Route::post('/addUser', function(Request $request){
     ];
     $users[] = $newUser;
     file_put_contents('../database/json/users.json', json_encode($users));
-    return redirect('user/connection');
+    return redirect('user/connection?message="votre compte à été créé"');
 });
 
 Route::get('user/connection', [UserController::class, 'connection']);
+Route::post('user/connection', function(Request $request) {
+    $username = $request->input("username");
+    $password = $request->input("password");
+    $json = storage_path('../database/json/users.json');
+    $users = json_decode(file_get_contents($json), true);
+    $userId = null;
+    foreach( $users as $user){
+        if($user['nom'] == $username){
+            if($user['password'] == password_hash($password, PASSWORD_BCRYPT)){
+                $userId = $user['id'];
+                break;
+            }
+        }
+    }
+    if($userId == null){
+        return redirect('user/connection?message="le nom d\'utilisateur ou le mot de passe est incorrect"');
+    }
+});
+
 Route::get('user/profile', [ProfileController::class, 'profile']);
