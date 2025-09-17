@@ -16,8 +16,8 @@
         </div>
 
         <div class="d-flex justify-content-center">
-            <button type="submit" class="btn btn-danger mt-4 w-50" id="submit" disabled>
-                S'inscrire
+            <button type="submit" class="btn btn-danger mt-4 w-50" id="submit">
+                Connexion
             </button>
         </div>
     </form>
