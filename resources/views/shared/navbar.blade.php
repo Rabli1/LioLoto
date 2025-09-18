@@ -1,3 +1,9 @@
+<?php
+$userConnected = session()->exists("userId");
+if($userConnected){
+  $userId = session("userId");
+}
+?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
     <div class="container">
       <a class="navbar-brand fw-bold" href="/">Lio Loto</a>
@@ -13,9 +19,12 @@
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="#">Jeux</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Classement</a></li>
-          <li class="nav-item"><a class="nav-link" href="/user/profile?id=3">Profil</a></li>
-          <li class="nav-item"><a class="nav-link" href='/user/connection?message='>Connexion</a></li>
-          <li class="nav-item"><a class="nav-link" href="/user/signIn">Inscription</a></li>
+          @if($userConnected)
+            <li class="nav-item"><a class="nav-link" href="/user/profile?id=3">Profil</a></li>
+          @else
+            <li class="nav-item"><a class="nav-link" href='/user/connection?message='>Connexion</a></li>
+            <li class="nav-item"><a class="nav-link" href="/user/signIn">Inscription</a></li>
+          @endif
         </ul>
       </div>
     </div>
