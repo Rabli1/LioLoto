@@ -59,7 +59,7 @@
               @foreach($topUsers as $user)
                   <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white">
                       <a href="/user/profile?id={{ $user['id'] }}" class="fw-bold text-white text-decoration-underline">
-                          {{ $user['nom'] }}
+                          {{ $user['name'] }}
                       </a>
                       <span class="badge bg-success">{{ $user['points'] }} pts</span>
                   </li>
