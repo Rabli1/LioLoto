@@ -2,6 +2,7 @@
 use App\Models\User;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\GameController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +27,7 @@ Route::get('/check-email', function (Request $request) {
     $exists = $collectedData->contains("email", $email);
     return response()->json(["exists" => $exists]);
 });
-Route::post('/addUser', function(Request $request){
+Route::post('/addUser', function (Request $request) {
     $username = $request->input("username");
     $email = $request->input("email");
     $password = $request->input("password");
@@ -45,7 +46,7 @@ Route::post('/addUser', function(Request $request){
         "argent" => 0,
         "bronze" => 0,
         "pointPerdu" => 0,
-        "bio" => "",    
+        "bio" => "",
         "confirme" => true,
         "banni" => false
     ];
@@ -56,3 +57,8 @@ Route::post('/addUser', function(Request $request){
 
 Route::get('user/connection', [UserController::class, 'connection']);
 Route::get('user/profile', [ProfileController::class, 'profile']);
+
+Route::get('/game', function () {
+    return view('game.index');
+});
+Route::get('game/blackjack', [GameController::class, 'blackjack']);

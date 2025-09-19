@@ -11,7 +11,7 @@
       <!-- Collapsible nav -->
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#">Jeux</a></li>
+          <li class="nav-item"><a class="nav-link" href="/game">Jeux</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Classement</a></li>
           <li class="nav-item"><a class="nav-link" href="/user/profile?id=3">Profil</a></li>
           <li class="nav-item"><a class="nav-link" href="/user/signIn">Connexion</a></li>
