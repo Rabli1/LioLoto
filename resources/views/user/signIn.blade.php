@@ -2,7 +2,7 @@
 @include('shared.navbar')
 <div class="form-container mt-5">
     <h3 class="text-center mb-4">Inscription</h3>
-    <form action="{{ url('/addUser') }}" method="post">
+    <form action="{{ url('/user/addUser') }}" method="post">
         @csrf
         <div class="mb-3">
             <label for="username" class="form-label">Nom d'utilisateur</label>

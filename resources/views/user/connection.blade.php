@@ -3,7 +3,7 @@
 <div class="form-container mt-5">
     <h3 class="text-center mb-4">Connexion</h3>
     <span class="text-center text-danger"><?=$message?></span>
-    <form action="{{ url('/connection') }}" method="post">
+    <form action="{{ url('/user/connection') }}" method="post">
         @csrf
         <div class="mb-3">
             <label for="username" class="form-label">Nom d'utilisateur</label>
