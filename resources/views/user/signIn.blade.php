@@ -1,8 +1,8 @@
 @include('shared.header')
 @include('shared.navbar')
 <div class="form-container mt-5">
-    <h3 class="text-center mb-4">Inscryption</h3>
-    <form action="{{ url('/addUser') }}" method="post">
+    <h3 class="text-center mb-4">Inscription</h3>
+    <form action="{{ url('/user/addUser') }}" method="post">
         @csrf
         <div class="mb-3">
             <label for="username" class="form-label">Nom d'utilisateur</label>
@@ -53,11 +53,9 @@
                     const userExists = data.exists;
                     if (userExists) {
                         errors.eq(0).text("Nom d'utilisateur déjà utilisé");
-                        console.log("tout est pas good")
                     } else {
                         errors.eq(0).text("");
                         validInput[0] = true
-                        console.log("tout est good")
                     }
                 }
             } catch (error) {
