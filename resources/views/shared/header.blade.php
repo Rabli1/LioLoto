@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{{ asset('css/form.css') }}">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-
+@session_start();
   <style>
     body { background-color: #141414; color: #FCF0F0; }
     .leaderboard-card { background: #111; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,.5); }

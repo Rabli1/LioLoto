@@ -22,15 +22,6 @@
 
   @include('shared.carousel')
 
-    <!-- Controls -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev" aria-label="Previous">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#gameCarousel" data-bs-slide="next" aria-label="Next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    </button>
-  </div>
-
   <!-- Profile + Leaderboard -->
    
   <div class="container mt-5">
@@ -38,10 +29,18 @@
       <!-- Player Profile -->
       <div class="col-lg-4 mb-4">
         <div class="leaderboard-card text-center">
+          @if (session()->has('user'))
+
           <img src="https://via.placeholder.com/100/ffffff/000000?text=User" class="rounded-circle mb-3" alt="Profile">
-          <h4 class="fw-bold">Player Name</h4>
-          <p>Balance: <span class="fw-bold text-danger">$250.00</span></p>
-          <button class="btn btn-danger w-100">Deposit</button>
+          <h4 class="fw-bold">
+                {{ session('user.nom') }}
+              <p>Balance: <span class="fw-bold text-danger">{{ session('user.points') }}</span></p>
+
+          </h4>
+            @else
+              <h4>Veuillez vous connecter</h4>
+                <a href="/user/connection" class="btn btn-danger btn-md">Connexion</a>
+            @endif
         </div>
       </div>
 
