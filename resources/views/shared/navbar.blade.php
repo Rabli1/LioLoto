@@ -13,7 +13,7 @@
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="#">Jeux</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Classement</a></li>
+          <li class="nav-item"><a class="nav-link" href="/leaderboard">Classement</a></li>
           @if($userConnected)
             <li class="nav-item"><a class="nav-link" href="/user/profile?id=3">Profil</a></li>
             <li class="nav-item"><a class="nav-link" href="/user/deconnection">Déconnexion</a></li>

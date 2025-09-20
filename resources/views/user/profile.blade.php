@@ -11,7 +11,7 @@
     <div class="container py-5">
         <div class="card mx-auto shadow" style="max-width: 400px;">
             <div class="card-body text-center" style="background: {{ $user->profileColor }};">
-                <i class="{{ $user->profileImage }} fa-5x mb-3"></i>
+                <i class="fa-solid {{ $user->profileImage }} fa-5x mb-3"></i>
                 <h2 class="fw-bold">{{ $user->name }}</h2>
                 <p>{{ $user['bio'] }}</p>
                 <hr>

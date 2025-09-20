@@ -3,9 +3,14 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Services\UserServices;
 
 Route::get('/', function () {
     return view('index');
+});
+Route::get('/leaderboard', function () {
+    $users = json_decode(file_get_contents('../database/json/users.json'), true);
+    return view('leaderboard', ["users" => collect($users ?? [])]);
 });
 
 Route::get('user/signIn', [UserController::class, 'signIn']);
