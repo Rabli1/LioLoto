@@ -84,4 +84,7 @@ class UserController extends Controller
             'exists' => (bool) $this->userService->findByEmail($request->query('email'))
         ]);
     }
+    public function profile(Request $request){
+        return view('user.profile', ['user' => $this->userService->findById($request->input('id'))]);
+    }
 }

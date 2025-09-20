@@ -1,0 +1,49 @@
+a {
+color: #FCF0F0 !important; /* Change default color to white */
+text-decoration: none; /* Remove underline */
+cursor: default; /* Change cursor to default */
+}
+.pfp-black { color: black; }
+.pfp-red { color: red; }
+.pfp-blue { color: blue; }
+.pfp-green { color: green; }
+.pfp-yellow { color: yellow; }
+.pfp-orange { color: orange; }
+.pfp-purple { color: purple; }
+.pfp-pink { color: #ff4d94; }
+.pfp-brown { color: brown; }
+.pfp-gray { color: gray; }
+.pfp-cyan { color: cyan; }
+.pfp-white { color: white; }
+
+.bg-black { background-color: #666666 !important; }
+.bg-red { background-color: #ff4d4d !important; }
+.bg-blue { background-color: #4da6ff !important; }
+.bg-green { background-color: #4dff4d !important; }
+.bg-yellow { background-color: #ffff4d !important; }
+.bg-orange { background-color: #ff944d !important; }
+.bg-purple { background-color: #944dff !important; }
+.bg-pink { background-color: pink !important; }
+.bg-brown { background-color: #a0522d !important; }
+.bg-gray { background-color: #999999 !important; }
+.bg-cyan { background-color: #4dffff !important; }
+.bg-white { background-color: #e6e6e6 !important; }
+
+.user-modal{
+    position: absolute;
+    border-radius: 3px;
+    padding: 5px;
+    transform: translate(0, 0.5em);
+}
+.hidden {
+    display: none;
+}
+.text-gold{
+    color:#C9B037 !important
+}
+.text-silver{
+    color:#B4B4B4 !important
+}
+.text-bronze{
+    color:#6A3805 !important
+} 

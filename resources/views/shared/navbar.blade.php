@@ -14,7 +14,7 @@
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link @if($currentPage == "game") active @endif" href="/game">Jeux</a></li>
-          <li class="nav-item"><a class="nav-link @if($currentPage == "#") active @endif" href="#">Classement</a></li>
+          <li class="nav-item"><a class="nav-link @if($currentPage == "leaderboard") active @endif" href="/leaderboard">Classement</a></li>
           @if($userConnected)
             <li class="nav-item"><a class="nav-link @if($currentPage == "user/profile") active @endif" href="/user/profile?id=3">Profil</a></li>
             <li class="nav-item"><a class="nav-link @if($currentPage == "user/deconnection") active @endif" href="/user/deconnection">Déconnexion</a></li>

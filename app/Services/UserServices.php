@@ -19,7 +19,10 @@ class UserServices
         $users = json_decode(file_get_contents($this->file), true);
         return collect($users ?? []);
     }
-
+    public function findById(int $id): ?array
+    {
+        return $this->all()->first(fn($u) => $u['id'] === $id);
+    }
     public function findByUsername(string $username): ?array
     {
         return $this->all()->first(fn($u) => $u['name'] === $username);
@@ -29,8 +32,6 @@ class UserServices
     {
         return $this->all()->first(fn($u) => $u['email'] === $email);
     }
-
-
     public function verifyCredentials(string $username, string $password): ?User
     {
         $user = $this->findByUsername($username);
