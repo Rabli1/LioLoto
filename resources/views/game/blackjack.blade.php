@@ -8,7 +8,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset("resources/js/blackjack.js") }}"></script>
+    <script src="{{ asset("js/blackjack.js") }}"></script>
 
     <style>
         body {
@@ -19,7 +19,7 @@
 </head>
 
 <body>
-
+    
     <!-- Navbar -->
     @include('shared.header')
     @include('shared.navbar')
