@@ -46,15 +46,15 @@ if ($userConnected = session()->has("user")) {
                         <td colspan="3" class="text-center">...</td>
                     </tr>
                     <tr class="fw-bold">
-                        <th class="pe-5 bg-{{ $apartUser->profileColor}}" scope="row">{{ $position }}</th>
-                        <td class="user-cell text-start ps-5 bg-{{ $apartUser->profileColor }}">
+                        <th class="pe-5"  scope="row">{{ $position }}</th>
+                        <td class="user-cell text-start ps-5 }">
                             <i
                                 class="fa-solid {{ $apartUser->profileImage }} pfp-{{ $apartUser->profileColor }} fs-4 me-2"></i>
                             <a class="text-decoration-none"
                                 href="/user/profile?id={{ $apartUser->id }}">{{ $apartUser->name }}</a>
                             <div class="user-modal hidden">{{ $apartUser->bio != "" ? $apartUser->bio : "Pas de bio"}}</div>
                         </td>
-                        <td class="bg-{{ $apartUser->profileColor}}">{{ $apartUser->points }}</td>
+                        <td>{{ $apartUser->points }}</td>
                     </tr>
                 @endif
             </tbody>

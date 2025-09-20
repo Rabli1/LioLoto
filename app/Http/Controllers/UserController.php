@@ -43,10 +43,10 @@ class UserController extends Controller
             "banned" => false,
             "lvl" => 1,
             "exp" => 0
-    ];
-    $users[] = $newUser;
-    file_put_contents('../database/json/users.json', json_encode($users));
-    return redirect('user/connection?message=votre compte à été créé');
+        ];
+        $users[] = $newUser;
+        file_put_contents('../database/json/users.json', json_encode($users));
+        return redirect('user/connection?message=votre compte à été créé');
     }
 
     public function connection(Request $request)
@@ -84,7 +84,35 @@ class UserController extends Controller
             'exists' => (bool) $this->userService->findByEmail($request->query('email'))
         ]);
     }
-    public function profile(Request $request){
+    public function profile(Request $request)
+    {
         return view('user.profile', ['user' => $this->userService->findById($request->input('id'))]);
+    }
+    public function leaderboard()
+    {
+        $users = json_decode(file_get_contents('../database/json/users.json'), true);
+        array_multisort(array_column($users, 'points'), SORT_DESC, $users);
+        $top10 = collect($users)->take(10);
+        $apartUser = null;
+        $isInTop10 = false;
+        $userConnected = session()->has('user');
+        if ($userConnected) {
+            foreach ($top10 as $user) {
+                if ($user['id'] == session('user')->id) {
+                    $isInTop10 = true;
+                    break;
+                }
+            }
+        }
+        $position = 0;
+        if ($userConnected && !$isInTop10) {
+            $apartUser = session('user');
+            for ($i = 0; $i < count($users); $i++) {
+                if ($users[$i]['id'] == $apartUser->id) {
+                    $position = $i + 1;
+                }
+            }
+        }
+        return view('leaderboard', ["top10" => $top10, "apartUser" => $apartUser, "position" => $position]);
     }
 }
