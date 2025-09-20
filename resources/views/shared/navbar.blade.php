@@ -1,5 +1,6 @@
 <?php
- $userConnected = session()->has("user")
+ $userConnected = session()->has("user");
+ $currentPage = request() -> path();
 ?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
     <div class="container">
@@ -12,14 +13,14 @@
 
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#">Jeux</a></li>
-          <li class="nav-item"><a class="nav-link" href="/leaderboard">Classement</a></li>
+          <li class="nav-item"><a class="nav-link @if($currentPage == "game") active @endif" href="/game">Jeux</a></li>
+          <li class="nav-item"><a class="nav-link @if($currentPage == "#") active @endif" href="#">Classement</a></li>
           @if($userConnected)
-            <li class="nav-item"><a class="nav-link" href="/user/profile?id=3">Profil</a></li>
-            <li class="nav-item"><a class="nav-link" href="/user/deconnection">Déconnexion</a></li>
+            <li class="nav-item"><a class="nav-link @if($currentPage == "user/profile") active @endif" href="/user/profile?id=3">Profil</a></li>
+            <li class="nav-item"><a class="nav-link @if($currentPage == "user/deconnection") active @endif" href="/user/deconnection">Déconnexion</a></li>
           @else
-            <li class="nav-item"><a class="nav-link" href='/user/connection?message='>Connexion</a></li>
-            <li class="nav-item"><a class="nav-link" href="/user/signIn">Inscription</a></li>
+            <li class="nav-item"><a class="nav-link @if($currentPage == "user/connection") active @endif" href='/user/connection?message='>Connexion</a></li>
+            <li class="nav-item"><a class="nav-link @if($currentPage == "user/signIn") active @endif" href="/user/signIn">Inscription</a></li>
           @endif
         </ul>
       </div>
