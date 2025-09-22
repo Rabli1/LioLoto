@@ -47,7 +47,7 @@
         <ul class="list-unstyled">
           <li><a href="https://github.com/mousieur" target="_blank" class="text-decoration-none text-light">
             <i class="fab fa-github"></i> GitHub</a></li>
-          <li><a href="mailto:createur4@email.com" class="text-decoration-none text-light">
+          <li><a href="mailto:gabmasse0504@gmail.com" class="text-decoration-none text-light">
             <i class="fas fa-envelope"></i> Email</a></li>
           <li><a href="https://www.linkedin.com/in/gabriel-mass%C3%A9-780a7b385/" target="_blank" class="text-decoration-none text-light">
             <i class="fab fa-linkedin"></i> LinkedIn</a></li>
@@ -57,7 +57,7 @@
 
     <!-- Bas du footer -->
     <div class="text-center mt-4 border-top pt-3">
-      <small> 2025 Lioto - Tous droits réservés</small>
+      <small>2025 Lioto</small>
     </div>
   </div>
 </footer>

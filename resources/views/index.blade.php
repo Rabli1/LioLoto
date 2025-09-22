@@ -57,7 +57,6 @@
     @include('shared.carousel')
 
     @php
-        $users = json_decode(file_get_contents(base_path('database/json/users.json')), true);
         $topUsers = collect($users)->sortByDesc('points')->take(3);
     @endphp
 
