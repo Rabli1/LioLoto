@@ -1,7 +1,6 @@
 a {
 color: #FCF0F0 !important; /* Change default color to white */
 text-decoration: none; /* Remove underline */
-cursor: default; /* Change cursor to default */
 }
 .pfp-black { color: black; }
 .pfp-red { color: red; }
