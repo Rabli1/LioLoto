@@ -1,9 +1,9 @@
 a {
-color: #FCF0F0 !important; /* Change default color to white */
-text-decoration: none; /* Remove underline */
-cursor: default; /* Change cursor to default */
+color: #FCF0F0 !important;
+text-decoration: none;
+cursor: default;
 }
-.pfp-black { color: black; }
+.pfp-blacke { color: black !important; }
 .pfp-red { color: red; }
 .pfp-blue { color: blue; }
 .pfp-green { color: green; }
@@ -16,7 +16,7 @@ cursor: default; /* Change cursor to default */
 .pfp-cyan { color: cyan; }
 .pfp-white { color: white; }
 
-.bg-black { background-color: #666666 !important; }
+.bg-blacke { background-color: #252525 !important; }
 .bg-red { background-color: #ff4d4d !important; }
 .bg-blue { background-color: #4da6ff !important; }
 .bg-green { background-color: #4dff4d !important; }

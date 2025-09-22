@@ -6,7 +6,7 @@
         "password": "$2y$10$exampleHashAlice",
         "points": 1200,
         "profileImage": "fa-user",
-        "profileColor": "black",
+        "profileColor": "blacke",
         "gold": 5,
         "silver": 10,
         "bronze": 20,
