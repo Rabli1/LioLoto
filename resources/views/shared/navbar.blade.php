@@ -16,12 +16,14 @@
           <li class="nav-item"><a class="nav-link @if($currentPage == "game") active @endif" href="/game">Jeux</a></li>
           <li class="nav-item"><a class="nav-link @if($currentPage == "leaderboard") active @endif" href="/leaderboard">Classement</a></li>
           @if($userConnected)
-            <li class="nav-item"><a class="nav-link @if($currentPage == "user/profile") active @endif" href="/user/profile?id=3">Profil</a></li>
+            <li class="nav-item"></li><a class="nav-link @if($currentPage == "user/profile") active @endif" href="/user/profile?id={{ session()->get('user')->id }}">Profil</a></li>
             <li class="nav-item"><a class="nav-link @if($currentPage == "user/deconnection") active @endif" href="/user/deconnection">Déconnexion</a></li>
           @else
             <li class="nav-item"><a class="nav-link @if($currentPage == "user/connection") active @endif" href='/user/connection?message='>Connexion</a></li>
             <li class="nav-item"><a class="nav-link @if($currentPage == "user/signIn") active @endif" href="/user/signIn">Inscription</a></li>
           @endif
+          <li class="nav-item"><a class="nav-link @if($currentPage == "support") active @endif" href="/support">Support</a></li>
+
         </ul>
       </div>
     </div>

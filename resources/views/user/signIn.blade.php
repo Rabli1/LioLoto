@@ -110,10 +110,10 @@
                 var special = /[-+_!@#$%^&*.,?]/;
                 var message = "";
                 if (!uppercase.test(password)) {
-                    message += "-une lettre minuscule<br>"
+                    message += "-une lettre majuscule<br>"
                 }
                 if (!lowercase.test(password)) {
-                    message += "-une lettre majuscule<br>"
+                    message += "-une lettre minuscule<br>"
                 }
                 if (!number.test(password)) {
                     message += "-un chiffre<br>"
