@@ -53,7 +53,7 @@
 </div>
 @endif
 
-     <h1 style="text-align: center; margin-top: 100px;">Jeux en vedette      <svg data-ds-icon="Trending" width="30" height="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" class="inline-block shrink-0" style="color: rgb(177, 186, 211) !important;"><!--[!--><!--]--><path fill="currentColor" d="M12 1C5.92 1 1 5.92 1 12s4.92 11 11 11 11-4.92 11-11S18.08 1 12 1m7 12.23c-.55 0-1-.45-1-1V9.98l-5.88 5.88a.996.996 0 0 1-1.41 0l-2.29-2.29-2.71 2.71c-.2.2-.45.29-.71.29s-.51-.1-.71-.29a.996.996 0 0 1 0-1.41l3.42-3.42a.996.996 0 0 1 1.41 0l2.29 2.29 5.17-5.17h-2.25c-.55 0-1-.45-1-1s.45-1 1-1H19c.55 0 1 .45 1 1v4.67c0 .55-.45 1-1 1z"></path></svg><div class="container mt-4"></h1>
+     <h1 style="text-align: center; margin-top: 70px;">Jeux en vedette      <svg data-ds-icon="Trending" width="30" height="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" class="inline-block shrink-0" style="color: rgb(177, 186, 211) !important;"><!--[!--><!--]--><path fill="currentColor" d="M12 1C5.92 1 1 5.92 1 12s4.92 11 11 11 11-4.92 11-11S18.08 1 12 1m7 12.23c-.55 0-1-.45-1-1V9.98l-5.88 5.88a.996.996 0 0 1-1.41 0l-2.29-2.29-2.71 2.71c-.2.2-.45.29-.71.29s-.51-.1-.71-.29a.996.996 0 0 1 0-1.41l3.42-3.42a.996.996 0 0 1 1.41 0l2.29 2.29 5.17-5.17h-2.25c-.55 0-1-.45-1-1s.45-1 1-1H19c.55 0 1 .45 1 1v4.67c0 .55-.45 1-1 1z"></path></svg><div class="container mt-4"></h1>
     @include('shared.carousel')
 
     @php

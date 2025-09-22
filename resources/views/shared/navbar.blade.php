@@ -39,6 +39,9 @@ $currentPage = request()->path();
             <a class="nav-link @if($currentPage == 'user/signIn') active @endif" href="/user/signIn">Inscription</a>
           </li>
         @endif
+        <li class="nav-item">
+          <a class="nav-link @if($currentPage == 'support') active @endif" href="/support">Support</a>
+        </li>
 
         <li class="nav-item d-flex align-items-center ms-2 position-relative">
           <button id="searchToggle" class="btn btn-link p-0 text-white">
@@ -57,7 +60,7 @@ $currentPage = request()->path();
           <div id="searchBox"
                class="d-none position-absolute end-0 top-100 mt-2 bg-white rounded shadow p-2"
                style="width: 250px; z-index: 1000;">
-            <input id="searchInput" type="text" class="form-control border-0 shadow-none mb-1" placeholder="Rechercher">
+            <input a id="searchInput" type="text" class="form-control border-0 shadow-none mb-1" placeholder="Rechercher utilisateur">
             <div id="searchResults" class="w-100" style="max-height: 250px; overflow-y: auto;"></div>
             <button id="searchClose" type="button" class="btn btn-link p-0 position-absolute" style="top: 10px; right: 5px;">
               <svg width="16" height="16" viewBox="0 0 14 14" fill="black" xmlns="http://www.w3.org/2000/svg">
