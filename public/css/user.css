@@ -6,7 +6,7 @@ text-decoration: none; /* Remove underline */
 .pfp-red { color: red; }
 .pfp-blue { color: blue; }
 .pfp-green { color: green; }
-.pfp-yellow { color: yellow; }
+.pfp-yellow { color: rgb(157, 157, 1); }
 .pfp-orange { color: orange; }
 .pfp-purple { color: purple; }
 .pfp-pink { color: #ff4d94; }
@@ -22,7 +22,7 @@ text-decoration: none; /* Remove underline */
 .bg-yellow { background-color: #f7f7b5 !important; }
 .bg-orange { background-color: #ff944d !important; }
 .bg-purple { background-color: #944dff !important; }
-.bg-pink { background-color: pink !important; }
+.bg-pink { background-color: pink !important; } 
 .bg-brown { background-color: #a0522d !important; }
 .bg-gray { background-color: #999999 !important; }
 .bg-cyan { background-color: #4dffff !important; }
@@ -48,4 +48,9 @@ text-decoration: none; /* Remove underline */
 } 
 .force-dark {
   color: #212529 !important;
+}
+#searchBox input:focus {
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
 }
