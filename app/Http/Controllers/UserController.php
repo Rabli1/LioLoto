@@ -33,7 +33,7 @@ class UserController extends Controller
             "password" => password_hash($password, PASSWORD_BCRYPT),
             "points" => 1000,
             "profileImage" => "fa-user",
-            "profileColor" => "black",
+            "profileColor" => "blackx",
             "gold" => 0,
             "silver" => 0,
             "bronze" => 0,
