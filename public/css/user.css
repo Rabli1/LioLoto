@@ -2,7 +2,7 @@ a {
 color: #FCF0F0 !important; /* Change default color to white */
 text-decoration: none; /* Remove underline */
 }
-.pfp-blacke { color: black !important; }
+.pfp-blackx { color: black }
 .pfp-red { color: red; }
 .pfp-blue { color: blue; }
 .pfp-green { color: green; }
@@ -13,20 +13,20 @@ text-decoration: none; /* Remove underline */
 .pfp-brown { color: brown; }
 .pfp-gray { color: gray; }
 .pfp-cyan { color: cyan; }
-.pfp-white { color: white; }
+.pfp-whitex { color: white; }
 
-.bg-blacke { background-color: #252525 !important; }
+.bg-blackx { background-color: #252525 !important; }
 .bg-red { background-color: #ff4d4d !important; }
 .bg-blue { background-color: #4da6ff !important; }
 .bg-green { background-color: #4dff4d !important; }
-.bg-yellow { background-color: #ffff4d !important; }
+.bg-yellow { background-color: #f7f7b5 !important; }
 .bg-orange { background-color: #ff944d !important; }
 .bg-purple { background-color: #944dff !important; }
 .bg-pink { background-color: pink !important; }
 .bg-brown { background-color: #a0522d !important; }
 .bg-gray { background-color: #999999 !important; }
 .bg-cyan { background-color: #4dffff !important; }
-.bg-white { background-color: #e6e6e6 !important; }
+.bg-whitex { background-color: #969696 !important; }
 
 .user-modal{
     position: absolute;
@@ -46,4 +46,6 @@ text-decoration: none; /* Remove underline */
 .text-bronze{
     color:#6A3805 !important
 } 
-
+.force-dark {
+  color: #212529 !important;
+}
