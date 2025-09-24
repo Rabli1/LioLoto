@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     function toInteger(value) {
         const n = Number(value);
         if (!Number.isFinite(n)) return 0;
@@ -46,7 +46,7 @@
             this._state.balance -= value;
             this._render();
             if (options.persist !== false) {
-                this._persist();
+                this.ajouterMontantJSON();
             }
             return true;
         },
@@ -57,7 +57,7 @@
             this._state.balance += value;
             this._render();
             if (options.persist !== false) {
-                this._persist();
+                this.ajouterMontantJSON();
             }
         },
 
@@ -65,12 +65,12 @@
             this._state.balance = toInteger(amount);
             this._render();
             if (options.persist !== false) {
-                this._persist();
+                this.ajouterMontantJSON();
             }
         },
 
         _render() {
-            const formatted = formatAmount(this._state.balance);
+            const formatted = formatAmount(this._state.balance); //Va changer tous les #blackjack-balance et [data-balance] dans tout le DOM 
             this._state.displays.forEach((node) => {
                 if (node) {
                     node.textContent = formatted;
@@ -78,19 +78,18 @@
             });
         },
 
-        _collectDisplays(selectors) {
+        _collectDisplays(selectors) { 
             const nodes = new Set();
             selectors.forEach((selector) => {
                 document.querySelectorAll(selector).forEach((node) => nodes.add(node));
             });
-            return Array.from(nodes);
+            return Array.from(nodes); //Va selectionner le solde dans tous les éléments correspondants
         },
 
-        _persist() {
+        ajouterMontantJSON() {
             if (!this._state.userId || !this._state.saveUrl) return;
             const payload = {
                 balance: toInteger(this._state.balance),
-                game: this._inferGameName(),
             };
 
             fetch(this._state.saveUrl, {
@@ -106,15 +105,8 @@
         },
 
         _findCsrfToken() {
-            const meta = document.querySelector('meta[name="csrf-token"]');
+            const meta = document.querySelector('meta[name="csrf-token"]'); //Doit utiliser le token pas applicable dans JSON
             return meta ? meta.content : null;
-        },
-
-        _inferGameName() {
-            const path = window.location.pathname || '';
-            if (path.includes('blackjack')) return 'blackjack';
-            if (path.includes('plinko')) return 'plinko';
-            return 'game';
         },
     };
 
