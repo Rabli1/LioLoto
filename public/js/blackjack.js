@@ -142,7 +142,7 @@ function hit() {
     if (canHit) {
         playerHand.push(deck.pop());
         playerSum += getCardValue(playerHand[playerHand.length - 1]);
-        playerSum = aceAdjustment(playerHand, playerSum); // Ajout
+        playerSum = aceAdjustment(playerHand, playerSum); 
         document.getElementById("playerContainer").innerHTML += `<img src="/img/cards/${playerHand[playerHand.length - 1]}.png" alt="${playerHand[playerHand.length - 1]}">`;
         document.getElementById("playerSum").innerText = playerSum;
         if (playerSum > 21) {
