@@ -21,6 +21,7 @@ Route::get('/game', function () {
     return view('game.index');
 });
 Route::get('game/blackjack', [GameController::class, 'blackjack']);
+Route::get('game/plinko', [GameController::class, 'plinko']);
 Route::post('game/balance', [GameController::class, 'saveBalance']);
 
 

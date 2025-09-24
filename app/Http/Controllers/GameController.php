@@ -21,6 +21,19 @@ class GameController extends Controller
         ]);
     }
 
+    public function plinko(): View
+    {
+        BalanceResetController::resetPoint();
+
+        $player = session('user');
+        $balance = $player?->points ?? 0;
+
+        return view('game.plinko', [
+            'playerBalance' => $balance,
+        ]);
+    }
+
+
     public function saveBalance(Request $request): JsonResponse
     {
         BalanceResetController::resetPoint();
