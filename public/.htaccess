@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # --- Allow Let's Encrypt ACME challenge ---
+    RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
+    RewriteRule ^ - [L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

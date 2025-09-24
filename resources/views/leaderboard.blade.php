@@ -11,7 +11,7 @@ if ($userConnected = session()->has("user")) {
 
 <div class="container mt-5">
     <div>
-        <table class="table table-dark table-striped text-center align-middle">
+        <table class="table table-dark text-center align-middle">
             <thead>
                 <tr>
                     <th class="pe-5" scope="col">#</th>
@@ -21,23 +21,33 @@ if ($userConnected = session()->has("user")) {
             </thead>
             <tbody>
                 @foreach ($top10 as $index => $user)
-                <?php
+                @php
                     $medalColor = "";
                     if($index + 1 == 1){ $medalColor = "text-gold";}
                     if($index + 1 == 2){ $medalColor = "text-silver";}
                     if($index + 1 == 3){ $medalColor = "text-bronze";}
-                ?>
+                    $idMatching = $connectedUserId == $user['id'];
+                    $textColors = [
+                    'yellow' => 'text-dark',
+                    'white' => 'text-dark',
+                    'pink' => 'text-dark',
+                ];
+                $textColor = 'text-white';
+                if($idMatching){
+                    $textColor = $textColors[$user['profileColor']] ?? 'text-white';
+                }
+                @endphp
                     <tr>
-                        <th class="pe-5 {{ $connectedUserId == $user['id'] ? "bg-" . $user['profileColor'] : ""}} {{ $medalColor }}"
+                        <th class="pe-5 {{ $idMatching ? "bg-" . $user['profileColor'] . " " . $textColor : ""}} {{ $medalColor }}"
                             scope="row">{{ $index + 1 }}</th>
                         <td
-                            class="user-cell text-start ps-5 {{ $connectedUserId == $user['id'] ? "bg-" . $user['profileColor'] : ""}}">
+                            class="user-cell text-start ps-5 {{ $idMatching ? "bg-" . $user['profileColor'] . " " . $textColor : ""}}">
                             <i class="fa-solid {{ $user['profileImage'] }} pfp-{{ $user['profileColor'] }} fs-4 me-2"></i>
-                            <a class="text-decoration-none"
+                            <a class="text-decoration-none {{ $textColor }}"
                                 href="/user/profile?id={{ $user['id'] }}">{{ $user['name'] }}</a>
                             <div class="user-modal hidden">{{ $user['bio'] != "" ? $user['bio'] : "Pas de bio"}}</div>
                         </td>
-                        <td class="{{ $connectedUserId == $user['id'] ? "bg-" . $user['profileColor'] : ""}}">
+                        <td class="{{ $idMatching ? "bg-" . $user['profileColor'] . " " . $textColor : ""}}">
                             {{ $user['points'] }}</td>
                     </tr>
                 @endforeach

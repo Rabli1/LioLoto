@@ -1,6 +1,8 @@
 @include('shared.header')
 @include('shared.navbar')
-
+@php
+    $textColorChanges = $user['profileColor'] == "whitex" || $user['profileColor'] == "yellow" ? "force-dark" : "text-white"
+@endphp
 <h1 style="text-align: center; margin-top: 20px;">Carte du joueur</h1>
 
 <body style="min-height: 100vh;">
