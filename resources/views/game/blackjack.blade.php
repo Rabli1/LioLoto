@@ -80,8 +80,8 @@
 
         <div id="playerContainer"></div>
 
-        <button id="hit" class="btn btn-primary mt-3">Hit</button>
-        <button id="stay" class="btn btn-danger mt-3">Stay</button>
+        <button id="hitButton" class="btn btn-primary mt-3">Hit</button>
+        <button id="stayButton" class="btn btn-danger mt-3">Stay</button>
     </div>
     <div id="betAmount"></div>
 </body>
