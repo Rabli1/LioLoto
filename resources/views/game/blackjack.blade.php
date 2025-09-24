@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8" />
@@ -15,15 +15,75 @@
             background-color: #000;
             color: #fff;
         }
+
+        div{
+            text-align: center;
+        }
+
+        #dealerContainer img {
+            height: 175px;
+            width: 125px;
+            margin: 1px;
+        }
+
+        #dealerContainer {
+            margin-bottom: 300px;
+        }
+
+        #playerContainer img {
+            height: 175px;
+            width: 125px;
+            margin: 1px;
+        }
+
+        #hit {
+            width: 100px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        #stay {
+            width: 100px;
+            height: 50px;
+            font-size: 20px;
+        }
     </style>
 </head>
 
 <body>
-    
+
     <!-- Navbar -->
     @include('shared.header')
     @include('shared.navbar')
 
+    <div id="betContainer" class="mb-3">
+        <label class="form-label">Votre mise :</label>
+        <div id="betTokens">
+            <button class="btn btn-warning betToken" data-value="25">25</button>
+            <button class="btn btn-primary betToken" data-value="50">50</button>
+            <button class="btn btn-success betToken" data-value="100">100</button>
+        </div>
+        <div class="mt-2">
+            <span id="selectedBet" class="fw-bold"></span>
+            <button id="placeBet" class="btn btn-success ms-2">Valider la mise</button>
+        </div>
+    </div>
+
+    <div id="gameMat">
+        <h2>Main du Croupier: <span id="dealerSum"></span></h2>
+
+        <div id="dealerContainer"></div>
+
+        
+
+        <h2>Votre Main: <span id="playerSum"></span></h2>
+
+        <div id="playerContainer"></div>
+
+        <button id="hit" class="btn btn-primary mt-3">Hit</button>
+        <button id="stay" class="btn btn-danger mt-3">Stay</button>
+    </div>
+    <div id="betAmount"></div>
 </body>
 
 </html>
