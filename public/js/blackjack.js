@@ -1,189 +1,298 @@
-let dealerSum = 0;
-let playerSum = 0;
+(function () {
+    const CARD_PATH = '/img/cards/';
 
-let hiddenCard;
-let deck;
-let canHit = true;
-let betAmount = null;
+    let dealerSum = 0;
+    let playerSum = 0;
+    let hiddenCard;
+    let deck = [];
+    let canHit = true;
+    let betAmount = null;
 
-let playerHand = [];
-let dealerHand = [];
+    let playerHand = [];
+    let dealerHand = [];
 
+    function dispatchGameEvent(name, detail = {}) {
+        document.dispatchEvent(new CustomEvent(name, { detail }));
+    }
 
-window.onload = function () {
-    buildDeck();
-    shuffleDeck();
-    document.getElementById("hitButton").addEventListener("click", hit);
-    document.getElementById("stayButton").addEventListener("click", stay);
-    document.getElementById("gameMat").style.display = "none";
+    function buildDeck() {
+        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const suits = ['C', 'D', 'H', 'S'];
+        deck = [];
 
-    document.querySelectorAll('.betToken').forEach(btn => {
-        btn.addEventListener('click', function () {
-            betAmount = parseInt(this.getAttribute('data-value'));
-            document.getElementById('selectedBet').textContent = `Mise sélectionnée : ${betAmount}`;
+        suits.forEach((suit) => {
+            values.forEach((value) => {
+                deck.push(`${value}-${suit}`);
+            });
         });
-    });
 
-    document.getElementById("placeBet").addEventListener("click", function () {
-        if (!betAmount) {
-            alert("Veuillez sélectionner un jeton de mise !");
-            return;
-        }
-        document.getElementById("betContainer").style.display = "none";
-        document.getElementById("gameMat").style.display = "block";
-        startGame();
-    });
-}
+        suits.forEach((suit) => {
+            values.forEach((value) => {
+                deck.push(`${value}-${suit}`);
+            });
+        });
+    }
 
-function buildDeck() {
-    let values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-    let types = ["C", "D", "H", "S"];
-    deck = [];
-
-    for (let i = 0; i < types.length; i++) {
-        for (let j = 0; j < values.length; j++) {
-            deck.push(values[j] + '-' + types[i]);
+    function shuffleDeck() {
+        for (let i = deck.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
         }
     }
 
-    for (let i = 0; i < types.length; i++) {
-        for (let j = 0; j < values.length; j++) {
-            deck.push(values[j] + '-' + types[i]);
+    function getCardValue(card) {
+        const value = card.split('-')[0];
+        if (value === 'A') return 11;
+        if (['K', 'Q', 'J'].includes(value)) return 10;
+        return parseInt(value, 10);
+    }
+
+    function ajusteAces(hand, sum) {
+        let adjustedSum = sum;
+        let aceCount = hand.filter((card) => card.startsWith('A')).length;
+        while (adjustedSum > 21 && aceCount > 0) {
+            adjustedSum -= 10;
+            aceCount -= 1;
+        }
+        return adjustedSum;
+    }
+
+    function afficheMains(showHidden = false) {
+        const dealerContainer = document.getElementById('dealerContainer');
+        const playerContainer = document.getElementById('playerContainer');
+
+        if (dealerContainer) {
+            dealerContainer.innerHTML = '';
+            dealerHand.forEach((card, index) => {
+                const img = document.createElement('img');
+                if (!showHidden && index === 1) {
+                    img.src = `${CARD_PATH}BACK.png`;
+                    img.alt = 'Carte cachée';
+                } else {
+                    img.src = `${CARD_PATH}${card}.png`;
+                    img.alt = card;
+                }
+                dealerContainer.appendChild(img);
+            });
+        }
+
+        if (playerContainer) {
+            playerContainer.innerHTML = '';
+            playerHand.forEach((card) => {
+                const img = document.createElement('img');
+                img.src = `${CARD_PATH}${card}.png`;
+                img.alt = card;
+                playerContainer.appendChild(img);
+            });
         }
     }
-}
 
-function shuffleDeck() {
-    for (let i = 0; i < deck.length; i++) {
-        let j = Math.floor(Math.random() * deck.length);
-        let shuffledCard = deck[i];
-        deck[i] = deck[j];
-        deck[j] = shuffledCard;
-    }
-}
+    function updateScore(showDealerTotal = false) {
+        const dealerSumLabel = document.getElementById('dealerSum');
+        const playerSumLabel = document.getElementById('playerSum');
 
-function getCardValue(card) {
-    let value = card.split('-')[0];
-    if (value === "A") return 11;
-    if (["K", "Q", "J"].includes(value)) return 10;
-    return parseInt(value);
-}
-
-function aceAdjustment(hand, sum) {
-    let aceCount = hand.filter(card => card.startsWith("A")).length;
-    while (sum > 21 && aceCount > 0) {
-        sum -= 10;
-        aceCount--;
-    }
-    return sum;
-}
-
-function startGame() {
-    playerHand = [];
-    dealerHand = [];
-    canHit = true;
-
-    playerHand.push(deck.pop());
-    dealerHand.push(deck.pop());
-    playerHand.push(deck.pop());
-    hiddenCard = deck.pop();
-    dealerHand.push(hiddenCard);
-
-    playerSum = getCardValue(playerHand[0]) + getCardValue(playerHand[1]);
-    playerSum = aceAdjustment(playerHand, playerSum);
-    dealerSum = getCardValue(dealerHand[0]) + getCardValue(hiddenCard);
-    dealerSum = aceAdjustment(dealerHand, dealerSum); 
-
-    document.getElementById("dealerContainer").innerHTML = `<img src="/img/cards/${dealerHand[0]}.png" alt="${dealerHand[0]}"> <img src="/img/cards/BACK.png" alt="Hidden Card">`;
-    document.getElementById("playerContainer").innerHTML = `<img src="/img/cards/${playerHand[0]}.png" alt="${playerHand[0]}"> <img src="/img/cards/${playerHand[1]}.png" alt="${playerHand[1]}">`;
-    document.getElementById("betAmount").innerHTML = `<h2>Votre mise: ${betAmount}</h2>`;
-    document.getElementById("playerSum").innerText = playerSum;
-
-    if (dealerSum == 21) {
-        document.getElementById("dealerContainer").innerHTML = `<img src="/img/cards/${dealerHand[0]}.png" alt="${dealerHand[0]}"> <img src="/img/cards/${dealerHand[1]}.png" alt="${dealerHand[1]}">`;
-        setTimeout(function () {
-            if (playerSum == 21) {
-                alert("Égalité !");
-            } else {
-                alert("Le croupier a un Blackjack ! Vous perdez.");
-            }
-            restartGame();
-        }, 500);
+        if (dealerSumLabel) {
+            dealerSumLabel.textContent = showDealerTotal ? dealerSum : getCardValue(dealerHand[0]);
+        }
+        if (playerSumLabel) {
+            playerSumLabel.textContent = playerSum;
+        }
     }
 
-    else if (playerSum == 21) {
-        setTimeout(function () {
-            alert("Blackjack ! Vous gagnez !");
-            restartGame();
-        }, 500);
-    }
-}
+    function startGame() {
+        playerHand = [];
+        dealerHand = [];
+        canHit = true;
 
-function restartGame() {
-    dealerSum = 0;
-    playerSum = 0;
-    playerHand = [];
-    dealerHand = [];
-    hiddenCard = null;
-    canHit = true;
-    betAmount = null;
-    document.getElementById("betContainer").style.display = "block";
-    document.getElementById("gameMat").style.display = "none";
-    document.getElementById('selectedBet').textContent = '';
-    document.getElementById("dealerContainer").innerHTML = "";
-    document.getElementById("playerContainer").innerHTML = "";
-    document.getElementById("betAmount").innerHTML = "";
-    document.getElementById("playerSum").innerText = "";
-    buildDeck();
-    shuffleDeck();
-}
-
-function hit() {
-    if (canHit) {
         playerHand.push(deck.pop());
-        playerSum += getCardValue(playerHand[playerHand.length - 1]);
-        playerSum = aceAdjustment(playerHand, playerSum); 
-        document.getElementById("playerContainer").innerHTML += `<img src="/img/cards/${playerHand[playerHand.length - 1]}.png" alt="${playerHand[playerHand.length - 1]}">`;
-        document.getElementById("playerSum").innerText = playerSum;
-        if (playerSum > 21) {
-            setTimeout(function () {
-                alert("Vous avez dépassé 21 ! Vous perdez.");
-                canHit = false;
+        dealerHand.push(deck.pop());
+        playerHand.push(deck.pop());
+        hiddenCard = deck.pop();
+        dealerHand.push(hiddenCard);
+
+        playerSum = ajusteAces(playerHand, getCardValue(playerHand[0]) + getCardValue(playerHand[1]));
+        dealerSum = ajusteAces(dealerHand, getCardValue(dealerHand[0]) + getCardValue(hiddenCard));
+
+        afficheMains();
+        updateScore();
+
+        const betAmountLabel = document.getElementById('betAmount');
+        if (betAmountLabel) {
+            betAmountLabel.innerHTML = `<h2>Votre mise : ${betAmount}</h2>`;
+        }
+
+        if (dealerSum === 21 || playerSum === 21) {
+            revealDealerHand();
+            setTimeout(() => {
+                if (dealerSum === 21 && playerSum === 21) {
+                    dispatchGameEvent('blackjack:result', { outcome: 'push' });
+                } else if (dealerSum === 21) {
+                    dispatchGameEvent('blackjack:result', { outcome: 'dealer-blackjack' });
+                } else {
+                    dispatchGameEvent('blackjack:result', { outcome: 'blackjack' });
+                }
                 restartGame();
             }, 500);
         }
     }
-}
 
-function stay() {
-    canHit = false;
-    document.getElementById("dealerContainer").innerHTML = `<img src="/img/cards/${dealerHand[0]}.png" alt="${dealerHand[0]}"> <img src="/img/cards/${dealerHand[1]}.png" alt="${dealerHand[1]}">`;
+    function revealDealerHand() {
+        afficheMains(true);
+        updateScore(true);
+    }
 
-    function dealerDraw(index) {
-        if (dealerSum < 17) {
-            let card = deck.pop();
-            dealerHand.push(card);
-            dealerSum += getCardValue(card);
-            dealerSum = aceAdjustment(dealerHand, dealerSum);
-            setTimeout(function () {
-                document.getElementById("dealerContainer").innerHTML += `<img src="/img/cards/${card}.png" alt="${card}">`;
-                dealerDraw(index + 1);
-            }, 700);
-        } else {
-            setTimeout(function () {
-                if (dealerSum > 21) {
-                    alert("Le croupier dépasse 21 ! Vous gagnez !");
-                } else if (dealerSum > playerSum) {
-                    alert("Le croupier gagne !");
-                } else if (dealerSum < playerSum) {
-                    alert("Vous gagnez !");
-                } else {
-                    alert("Égalité !");
-                }
-                restartGame();
-            }, 700);
+    function restartGame() {
+        dealerSum = 0;
+        playerSum = 0;
+        playerHand = [];
+        dealerHand = [];
+        hiddenCard = null;
+        canHit = true;
+        betAmount = null;
+        window.pendingBlackjackBet = 0;
+        window.currentBlackjackBet = 0;
+
+        const betContainer = document.getElementById('betContainer');
+        const gameMat = document.getElementById('gameMat');
+        const selectedBetLabel = document.getElementById('selectedBet');
+        const betAmountLabel = document.getElementById('betAmount');
+        const playerSumLabel = document.getElementById('playerSum');
+
+        if (betContainer) betContainer.style.display = 'block';
+        if (gameMat) gameMat.style.display = 'none';
+        if (selectedBetLabel) selectedBetLabel.textContent = '';
+        if (betAmountLabel) betAmountLabel.innerHTML = '';
+        if (playerSumLabel) playerSumLabel.textContent = '';
+
+        const dealerContainer = document.getElementById('dealerContainer');
+        const playerContainer = document.getElementById('playerContainer');
+        if (dealerContainer) dealerContainer.innerHTML = '';
+        if (playerContainer) playerContainer.innerHTML = '';
+
+        dispatchGameEvent('blackjack:bet-reset');
+
+        buildDeck();
+        shuffleDeck();
+    }
+
+    function settleAndRestart(outcome) {
+        dispatchGameEvent('blackjack:result', { outcome });
+        restartGame();
+    }
+
+    function hit() {
+        if (!canHit) return;
+
+        playerHand.push(deck.pop());
+        playerSum += getCardValue(playerHand[playerHand.length - 1]);
+        playerSum = ajusteAces(playerHand, playerSum);
+
+        afficheMains();
+        updateScore();
+
+        if (playerSum > 21) {
+            canHit = false;
+            setTimeout(() => {
+                settleAndRestart('lose');
+            }, 500);
         }
     }
 
-    dealerDraw(2);
-}
+    function stay() {
+        canHit = false;
+        revealDealerHand();
+
+        function dealerDraw() {
+            if (dealerSum < 17) {
+                const card = deck.pop();
+                dealerHand.push(card);
+                dealerSum += getCardValue(card);
+                dealerSum = ajusteAces(dealerHand, dealerSum);
+                afficheMains(true);
+                updateScore(true);
+                setTimeout(dealerDraw, 700);
+            } else {
+                setTimeout(() => {
+                    if (dealerSum > 21) {
+                        settleAndRestart(`win`);
+                    } else if (dealerSum > playerSum) {
+                        settleAndRestart('lose');
+                    } else if (dealerSum < playerSum) {
+                        settleAndRestart('win');
+                    } else {
+                        settleAndRestart('push');
+                    }
+                }, 700);
+            }
+        }
+
+        dealerDraw();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        buildDeck();
+        shuffleDeck();
+        initBlackjack();
+        window.blackjackHit = hit;
+        window.blackjackStay = stay;
+        window.restartGame = restartGame;
+    });
+
+    function initBlackjack() {
+        const hitButton = document.getElementById('hitButton');
+        const stayButton = document.getElementById('stayButton');
+        const gameMat = document.getElementById('gameMat');
+        const betContainer = document.getElementById('betContainer');
+        const selectedBetLabel = document.getElementById('selectedBet');
+        const placeBetButton = document.getElementById('placeBet');
+
+        if (!hitButton || !stayButton || !gameMat || !betContainer || !selectedBetLabel || !placeBetButton) {
+            console.warn('Blackjack UI is incomplete.');
+            return;
+        }
+
+        hitButton.addEventListener('click', hit);
+        stayButton.addEventListener('click', stay);
+        gameMat.style.display = 'none';
+
+        document.querySelectorAll('.betToken').forEach((btn) => {
+            btn.addEventListener('click', function onBetTokenClick() {
+                betAmount += parseInt(this.getAttribute('data-value'), 10);
+                window.pendingBlackjackBet = betAmount;
+                if (betAmount > 0){
+                selectedBetLabel.textContent = `Mise sélectionnée : ${betAmount}`;
+                } else {
+                selectedBetLabel.textContent = 'Aucune mise sélectionnée';
+                }
+            });
+        });
+        clearBet.addEventListener('click', function onClearBet() {
+            betAmount = 0;
+            window.pendingBlackjackBet = 0;
+            selectedBetLabel.textContent = 'Aucune mise sélectionnée';
+        });
+
+        placeBetButton.addEventListener('click', function onPlaceBet() {
+            if (!betAmount) {
+                alert('Veuillez sélectionner un jeton de mise !');
+                return;
+            }
+
+            if (window.Balance && !window.Balance.canMise(betAmount)) {
+                alert('Solde insuffisant.');
+                return;
+            }
+
+            if (window.Balance && !window.Balance.miser(betAmount)) {
+                alert('Solde insuffisant.');
+                return;
+            }
+
+            window.currentBlackjackBet = betAmount;
+            betContainer.style.display = 'none';
+            gameMat.style.display = 'block';
+            startGame();
+        });
+    }
+})();
+

@@ -6,7 +6,7 @@ use App\Models\User;
 
 class BalanceResetController extends Controller
 {
-    private const DATE_FILE = 'app/blackjack_last_reset.txt';
+    private const DATE_FILE = '/blackjack_last_reset.txt';
     private const USERS_FILE = 'database/json/users.json';
     private const RESET_AMOUT = 1000;
 
