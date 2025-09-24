@@ -282,7 +282,7 @@
                     <div class="row g-3 align-items-center">
                         <div class="col-lg-7">
                             <h1>Blackjack</h1>
-                            <p>Le but est d'atteindre 21 sans le d??passer. Le croupier tire sur 16 et reste sur 17.</p>
+                            <p>Le but est d'atteindre 21 sans le dépasser. Le croupier tire sur 16 et reste sur 17.</p>
                         </div>
                         <div class="col-lg-5 text-lg-end">
                             <span class="score-pill ms-2">Solde: $<span id="playerBalance">{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
@@ -354,7 +354,3 @@
 </body>
 
 </html>
-
-
-
-

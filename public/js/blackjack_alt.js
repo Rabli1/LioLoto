@@ -10,6 +10,7 @@
         hiddenCard: null,
         playerTotal: 0,
         dealerTotal: 0,
+        balance: 0,
         betAmount: 0,
         roundActive: false,
         dealerRevealed: false,
@@ -19,6 +20,8 @@
 
     function init() {
         cacheElements();
+        state.balance = deriveInitialBalance();
+        updateBalanceDisplay(state.balance);
         if (!elements.hit || !elements.stay) {
             console.warn('Blackjack UI not found for blackjack_alt.js');
             return;
@@ -133,6 +136,8 @@
         toggleActions(true);
 
         if (state.dealerTotal === 21 || state.playerTotal === 21) {
+            state.roundActive = false;
+            toggleActions(false);
             revealDealer();
             setTimeout(() => {
                 if (state.dealerTotal === 21 && state.playerTotal === 21) {
@@ -263,12 +268,17 @@
         state.dealerHand = [];
         state.playerTotal = 0;
         state.dealerTotal = 0;
+        state.hiddenCard = null;
         state.betAmount = 0;
         state.dealerRevealed = false;
 
         renderHands();
         updateTotals();
         updateBetDisplays();
+
+        if (Array.isArray(elements.betChips)) {
+            elements.betChips.forEach((btn) => btn.classList.remove('active'));
+        }
 
         if (elements.betPanel) elements.betPanel.style.display = 'block';
         if (elements.gameMat) elements.gameMat.style.display = 'none';
@@ -337,15 +347,35 @@
         return total;
     }
 
+    function parseBalanceFromLabel() {
+        if (!elements.balanceLabel) {
+            return 0;
+        }
+        const raw = elements.balanceLabel.textContent || '';
+        const normalized = raw.replace(/[^0-9-]/g, '');
+        return parseInt(normalized, 10) || 0;
+    }
+
+    function deriveInitialBalance() {
+        if (session && session.balance !== undefined && session.balance !== null) {
+            const numericBalance = Number(session.balance);
+            if (Number.isFinite(numericBalance)) {
+                return numericBalance;
+            }
+        }
+        return parseBalanceFromLabel();
+    }
+
     function getCurrentBalance() {
-        if (!elements.balanceLabel) return 0;
-        const raw = elements.balanceLabel.textContent.replace(/\s/g, '');
-        return parseInt(raw, 10) || 0;
+        return state.balance;
     }
 
     function updateBalanceDisplay(amount) {
+        const numericAmount = Number(amount);
+        const safeAmount = Number.isFinite(numericAmount) ? numericAmount : 0;
+        state.balance = safeAmount;
         if (elements.balanceLabel) {
-            elements.balanceLabel.textContent = amount.toLocaleString();
+            elements.balanceLabel.textContent = safeAmount.toLocaleString('fr-FR');
         }
     }
 
@@ -386,6 +416,9 @@
         if (elements.betPanel) elements.betPanel.style.display = 'block';
         if (elements.gameMat) elements.gameMat.style.display = 'none';
         state.betAmount = 0;
+        if (Array.isArray(elements.betChips)) {
+            elements.betChips.forEach((btn) => btn.classList.remove('active'));
+        }
         updateBetDisplays();
         toggleActions(false);
     }
