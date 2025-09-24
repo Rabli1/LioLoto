@@ -14,7 +14,7 @@
             <header class="mb-4">
                 <h1 class="mb-2">Blackjack</h1>
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
-                    Atteignez 21 sans dépasser le croupier
+                    Atteignez 21 sans dépasser et battez le croupier!
                 </p>
                 <span class="balance">Solde : $<span id="blackjack-balance" data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
             </header>
@@ -29,9 +29,10 @@
                     <button class="betToken btn btn-outline-light" data-value="500">500</button>
                 </div>
                 <p id="selectedBet" class="fw-semibold mt-3">Aucune mise sélectionnée</p>
-                <button id="placeBet" class="btn btn-success mt-2" type="button">Placer la mise</button>
-                <button id="clearBet" class="btn btn-danger mt-2" type="button">Effacer la mise</button>
-
+                <div class="d-flex flex-row justify-content-center">
+                    <button id="clearBet" class="btn btn-light mt-2 me-3" type="button">Effacer la mise</button>
+                    <button id="placeBet" class="btn btn-danger mt-2" type="button">Placer la mise</button>
+                </div>
             </section>
 
             <section id="gameMat" style="display: none;">
@@ -49,9 +50,9 @@
                     <p class="mt-3">Total : <span id="playerSum">0</span></p>
                 </div>
 
-                <div class="action-buttons d-flex flex-wrap justify-content-center gap-3">
-                    <button id="hitButton" class="btn btn-primary" type="button">Tirer</button>
-                    <button id="stayButton" class="btn btn-danger" type="button">Rester</button>
+                <div class="action-buttons d-flex flex-wrap justify-content-center">
+                    <button id="stayButton" class="btn btn-light mt-2 me-3" type="button">Rester</button>
+                    <button id="hitButton" class="btn btn-danger mt-2" type="button">Tirer</button>
                 </div>
 
                 <div id="resultMessage" class="mt-4 fw-semibold text-uppercase"></div>
