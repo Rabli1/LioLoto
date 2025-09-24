@@ -83,28 +83,28 @@
         <div class="row">
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src="{{ asset("img/blackjack.jpg") }}" alt="BlackJack"></div>
+                    <div class="row"><img src='{{ asset("img/blackjack.jpg") }}' alt="BlackJack"></div>
                     <div class="row"><h3>BlackJack</h3></div>
                     <div class="row"><a href="/game/blackjack" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src="{{ asset("img/plinko.webp") }}" alt="Plinko"></div>
+                    <div class="row"><img src='{{ asset("img/plinko.webp") }}' alt="Plinko"></div>
                     <div class="row"><h3>Plinko</h3></div>
                     <div class="row"><a href="/game/plinko" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src="{{ asset("img/mines.webp") }}" alt="Mines"></div>
+                    <div class="row"><img src='{{ asset("img/mines.webp") }}' alt="Mines"></div>
                     <div class="row"><h3>Mines</h3></div>
                     <div class="row"><a href="/game/mines" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src="{{ asset("img/gaben.jpg") }}" alt="Mines"></div>
+                    <div class="row"><img src='{{ asset("img/gaben.jpg") }}' alt="Mines"></div>
                     <div class="row"><h3>Gaben.exe</h3></div>
                     <div class="row"><a href="/game/mines" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>

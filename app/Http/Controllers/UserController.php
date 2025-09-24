@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Services\UserServices;
 use App\Models\User;
@@ -33,7 +34,7 @@ class UserController extends Controller
             "password" => password_hash($password, PASSWORD_BCRYPT),
             "points" => 1000,
             "profileImage" => "fa-user",
-            "profileColor" => "blackx",
+            "profileColor" => "black",
             "gold" => 0,
             "silver" => 0,
             "bronze" => 0,
