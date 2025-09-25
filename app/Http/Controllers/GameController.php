@@ -11,7 +11,6 @@ class GameController extends Controller
 {
     public function blackjack(): View
     {
-        BalanceResetController::resetPoint();
 
         $player = session('user');
         $balance = $player?->points ?? 0;
@@ -23,7 +22,6 @@ class GameController extends Controller
 
     public function plinko(): View
     {
-        BalanceResetController::resetPoint();
 
         $player = session('user');
         $balance = $player?->points ?? 0;
@@ -36,7 +34,6 @@ class GameController extends Controller
 
     public function saveBalance(Request $request): JsonResponse
     {
-        BalanceResetController::resetPoint();
 
         $user = session('user');
         if (!$user) {
