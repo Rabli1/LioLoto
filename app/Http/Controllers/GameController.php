@@ -14,8 +14,19 @@ class GameController extends Controller
     private function resolvePlayer(): ?User
     {
         $sessionUser = session('user');
-        if (!$sessionUser instanceof User) {
+
+        if (!$sessionUser) {
             return null;
+        }
+
+        if (!$sessionUser instanceof User) {
+            if (is_array($sessionUser)) {
+                $sessionUser = new User($sessionUser);
+            } elseif (is_object($sessionUser)) {
+                $sessionUser = new User((array) $sessionUser);
+            } else {
+                return null;
+            }
         }
 
         $path = base_path(self::USERS_PATH);
@@ -30,6 +41,8 @@ class GameController extends Controller
                 }
             }
         }
+
+        session(['user' => $sessionUser]);
 
         return $sessionUser;
     }
