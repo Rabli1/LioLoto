@@ -6,13 +6,13 @@ use App\Models\User;
 
 class BalanceResetController extends Controller
 {
-    private const DATE_FILE = '/blackjack_last_reset.txt';
+    private const DATE_FILE = 'blackjack_last_reset.txt';
     private const USERS_FILE = 'database/json/users.json';
     private const RESET_AMOUT = 1000;
 
     public static function resetPoint(): void
     {
-        $resetFile = storage_path(self::DATE_FILE);
+        $resetFile = base_path(self::DATE_FILE);
         $today = date('Y-m-d');
         $lastReset = null;
 
