@@ -94,14 +94,33 @@
 
             fetch(this._state.saveUrl, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': this._state.csrfToken || this._findCsrfToken(),
                 },
                 body: JSON.stringify(payload),
-            }).catch((err) => {
-                console.warn('Balance.persist failed', err);
-            });
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        return response
+                            .json()
+                            .catch(() => null)
+                            .then((error) => {
+                                console.warn('Balance.persist failed', { status: response.status, error });
+                            });
+                    }
+
+                    return response.json().then((data) => {
+                        if (data && typeof data.balance === 'number') {
+                            this._state.balance = toInteger(data.balance);
+                            this._render();
+                        }
+                    });
+                })
+                .catch((err) => {
+                    console.warn('Balance.persist failed', err);
+                });
         },
 
         _findCsrfToken() {
