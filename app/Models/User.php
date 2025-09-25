@@ -16,7 +16,8 @@ class User extends Authenticatable
     public $silver;
     public $bronze;
     public $pointsLost;
-
+    public $lvl;
+    public $exp;
     public $timestamps = false;
 
     protected $table = null;

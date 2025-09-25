@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Services\UserServices;
 use App\Models\User;
+use ValueError;
 
 class UserController extends Controller
 {
@@ -88,6 +89,51 @@ class UserController extends Controller
     public function profile(Request $request)
     {
         return view('user.profile', ['user' => $this->userService->findById($request->input('id'))]);
+    }
+    public function updateAvatar(Request $request)
+    {
+        $user = session('user');
+        $profileImage = $request->input('image') ?? 'fa-user';
+        $profileColor = $request->input('color') ?? 'black';
+        $path = base_path('database/json/users.json');
+        $users = json_decode(@file_get_contents($path), true) ?? [];
+        foreach ($users as &$entry) {
+            if ($entry['id'] === $user->id) {
+                $entry['profileImage'] = $profileImage;
+                $entry['profileColor'] = $profileColor;
+                $user->profileImage = $entry['profileImage'];
+                $user->profileColor = $entry['profileColor'];
+                break;
+            }
+        }
+        unset($entry);
+
+        file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        session(['user' => $user]);
+
+        return redirect('user/profile?id=' . $user->id);
+    }
+    public function updateBio(Request $request)
+    {
+        $user = session('user');
+        $validated = $request->validate([
+            'bio' => ['nullable', 'string', 'max:99'],
+        ]);
+        $path = base_path('database/json/users.json');
+        $users = json_decode(@file_get_contents($path), true) ?? [];
+        foreach ($users as &$entry) {
+            if (($entry['id'] ?? null) === $user->id) {
+                $entry['bio'] = $validated['bio'] ?? '';
+                $user->bio = $entry['bio'];
+                break;
+            }
+        }
+        unset($entry);
+
+        file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        session(['user' => $user]);
+
+        return redirect('user/profile?id=' . $user->id);
     }
     public function leaderboard()
     {
