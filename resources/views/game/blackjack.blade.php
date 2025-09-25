@@ -10,7 +10,7 @@
     </head>
 <main class="blackjack-page py-4">
     <div class="container">
-        <section class="blackjack-outline text-center">
+        <section class="game-outline text-center">
             <header class="mb-4">
                 <h1 class="mb-2">Blackjack</h1>
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
