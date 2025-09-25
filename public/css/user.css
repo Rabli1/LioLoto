@@ -2,7 +2,7 @@ a {
 color: #FCF0F0 !important; /* Change default color to white */
 text-decoration: none; /* Remove underline */
 }
-.pfp-black { color: rgb(73, 73, 73) !important; }
+.pfp-black { color: rgb(25, 25, 25) !important; }
 .pfp-red { color: rgb(172, 0, 0); }
 .pfp-blue { color: blue; }
 .pfp-green { color: green; }
@@ -14,7 +14,7 @@ text-decoration: none; /* Remove underline */
 .pfp-gray { color: gray; }
 .pfp-white { color: rgb(187, 187, 187); }
 
-.bg-black { background-color: #252525 !important; }
+.bg-black { background-color: #737373 !important; }
 .bg-red { background-color: #ff3d3d !important; }
 .bg-blue { background-color: #4da6ff !important; }
 .bg-green { background-color: #00a800 !important; }
