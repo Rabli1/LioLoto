@@ -15,8 +15,9 @@ Route::post('user/connection', [UserController::class, 'authenticate']);
 Route::post('user/addUser', [UserController::class, 'addUser']);
 Route::get('user/deconnection', [UserController::class, 'logout']);
 Route::get('user/profile', [UserController::class, 'profile']);
+Route::post('user/updateAvatar', [UserController::class, 'updateAvatar'])->name('user.updateAvatar');
+Route::post('user/updateBio', [UserController::class, 'updateBio']);
 Route::get('/leaderboard', [UserController::class, 'leaderboard']);
-
 Route::get('/game', function () {
     return view('game.index');
 });
@@ -28,3 +29,6 @@ Route::get('game/mines', [GameController::class, 'mines']);
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
 
+Route::post('/test-form', function (Request $request) {
+    dd($request);
+});
