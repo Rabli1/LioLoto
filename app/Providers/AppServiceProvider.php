@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\UserServices;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,22 +20,17 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot()
+    public function boot(UserServices $userServices): void
     {
-        View::composer('*', function ($view) {
-            $usersPath = database_path('json/users.json');
+        View::composer('*', function ($view) use ($userServices) {
             $users = [];
 
-            if (is_file($usersPath) && is_readable($usersPath)) {
-                $contents = file_get_contents($usersPath);
-
-                if ($contents !== false) {
-                    $decoded = json_decode($contents, true);
-
-                    if (is_array($decoded)) {
-                        $users = $decoded;
-                    }
-                }
+            try {
+                $users = $userServices->all()->toArray();
+            } catch (\Throwable $exception) {
+                Log::warning('Unable to share users with views.', [
+                    'exception' => $exception,
+                ]);
             }
 
             $view->with('users', $users);
