@@ -146,6 +146,7 @@
         "confirmed": true,
         "banned": false,
         "lvl": 1,
-        "exp": 0
+        "exp": 0,
+        "last_update": "2025-09-25"
     }
 ]

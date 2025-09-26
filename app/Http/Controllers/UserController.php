@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Services\UserServices;
 use App\Models\User;
 use ValueError;
-date_default_timezone_set('North America/Quebec');
 class UserController extends Controller
 {
     private UserServices $userService;
