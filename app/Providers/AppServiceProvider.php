@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Providers;
+
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,9 +21,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         View::composer('*', function ($view) {
-            $users = json_decode(file_get_contents(base_path('database/json/users.json')), true);
+            $usersPath = database_path('json/users.json');
+            $users = [];
+
+            if (is_file($usersPath) && is_readable($usersPath)) {
+                $contents = file_get_contents($usersPath);
+
+                if ($contents !== false) {
+                    $decoded = json_decode($contents, true);
+
+                    if (is_array($decoded)) {
+                        $users = $decoded;
+                    }
+                }
+            }
+
             $view->with('users', $users);
         });
     }
 }
-
