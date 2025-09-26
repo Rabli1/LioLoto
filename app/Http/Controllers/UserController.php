@@ -163,39 +163,39 @@ class UserController extends Controller
         return view('leaderboard', ["top10" => $top10, "apartUser" => $apartUser, "position" => $position]);
     }
     
-    public function resetDate(Request $request)
-    {
-        $user = session('user');
-        if (!$user) {
-            return response()->json(['error' => 'Not authenticated'], 401);
-        }
+    // public function resetDate(Request $request)
+    // {
+    //     $user = session('user');
+    //     if (!$user) {
+    //         return response()->json(['error' => 'Not authenticated'], 401);
+    //     }
 
-        $path = base_path('database/json/users.json');
-        $users = json_decode(@file_get_contents($path), true) ?? [];
-        $updated = false;
+    //     $path = base_path('database/json/users.json');
+    //     $users = json_decode(@file_get_contents($path), true) ?? [];
+    //     $updated = false;
 
-        foreach ($users as &$entry) {
-            if ($entry['id'] == $user->id) {
-                if ($entry['last_update'] !== date("Y-m-d")) {
-                    $entry['last_update'] = date("Y-m-d");
-                    $entry['points'] = 1000;
-                    $user->last_update = $entry['last_update'];
-                    $user->points = $entry['points'];
-                    session(['user' => $user]);
-                    $updated = true;
-                }
-                break;
-            }
-        }
-        unset($entry);
+    //     foreach ($users as &$entry) {
+    //         if ($entry['id'] == $user->id) {
+    //             if ($entry['last_update'] !== date("Y-m-d")) {
+    //                 $entry['last_update'] = date("Y-m-d");
+    //                 $entry['points'] = 1000;
+    //                 $user->last_update = $entry['last_update'];
+    //                 $user->points = $entry['points'];
+    //                 session(['user' => $user]);
+    //                 $updated = true;
+    //             }
+    //             break;
+    //         }
+    //     }
+    //     unset($entry);
 
-        if ($updated) {
-            file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-            return response()->json(['success' => true, 'points' => 1000]);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Already reset today or user not found']);
-        }
-    }
+    //     if ($updated) {
+    //         file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    //         return response()->json(['success' => true, 'points' => 1000]);
+    //     } else {
+    //         return response()->json(['success' => false, 'message' => 'Already reset today or user not found']);
+    //     }
+    // }
 
     public function updatePoints(Request $request)
     {
