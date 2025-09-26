@@ -44,7 +44,8 @@ class UserController extends Controller
             "confirmed" => true,
             "banned" => false,
             "lvl" => 1,
-            "exp" => 0
+            "exp" => 0,
+            "last_update" => date("Y-m-d"),
         ];
         $users[] = $newUser;
         file_put_contents('../database/json/users.json', json_encode($users));
