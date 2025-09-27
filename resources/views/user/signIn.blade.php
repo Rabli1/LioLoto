@@ -157,3 +157,4 @@
         });
     });
 </script>
+@include('shared.footer')

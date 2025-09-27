@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GameController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +28,8 @@ Route::get('game/mines', [GameController::class, 'mines']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
+
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 
 Route::post('/test-form', function (Request $request) {
     dd($request);
