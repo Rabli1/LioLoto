@@ -62,7 +62,9 @@ class UserController extends Controller
         if (!$user) {
             return redirect('user/connection?message=Nom d\'utilisateur ou mot de passe incorrect');
         }
-
+        if($user->banned){
+            return redirect('user/connection?message=Votre compte a été banni');
+        }
         session(['user' => $user]);
         return redirect('/');
     }
