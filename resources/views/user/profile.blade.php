@@ -158,7 +158,7 @@
             </form>
             <h3 class="text-center text-light mb-3 mt-5">Modifier mot de passe</h3>
             <div class="d-flex justify-content-center">
-                <a href="{{ url('/user/changePassword') }}" class="btn btn-warning">
+                <a href="{{ url('/user/changePassword') }}" class="btn btn-warning text-dark">
                     Modifier votre mot de passe
                 </a>
             </div>
