@@ -147,5 +147,23 @@
         "banned": false,
         "lvl": 1,
         "exp": 0
+    },
+    {
+        "id": 9,
+        "name": "Toto",
+        "email": "thomaslahaie04@gmail.com",
+        "password": "$2y$10$TRPVAO9Wh7ZNCJPhUVWk\/.au7fK7eEv\/Ueuja7L.yQHW.layvP1gm",
+        "points": 2,
+        "profileImage": "fa-user",
+        "profileColor": "black",
+        "gold": 0,
+        "silver": 0,
+        "bronze": 0,
+        "pointsLost": 0,
+        "bio": "",
+        "confirmed": true,
+        "banned": false,
+        "lvl": 1,
+        "exp": 0
     }
 ]
