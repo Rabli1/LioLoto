@@ -37,9 +37,14 @@
                     <div class="row"><h3>Plinko</h3></div>
                     <div class="row mt-auto"><a href="/game/plinko" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
+                <div class="leaderboard-card text-center d-flex flex-column ms-5 mw-100">
+                    <div class="row"><img src='{{ asset("img/Mines.webp") }}' alt="Plinko"></div>
+                    <div class="row"><h3>Mines</h3></div>
+                    <div class="row mt-auto"><a href="/game/mines" class="btn btn-danger btn-md">Jouer</a></div>
+                </div>
             </div>
         </div>
     </div>
 </body>
-
+@include('shared.footer')
 </html>

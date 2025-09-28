@@ -9,11 +9,48 @@ use App\Models\User;
 
 class GameController extends Controller
 {
+    private const USERS_PATH = 'database/json/users.json';
+
+    private function resolvePlayer(): ?User
+    {
+        $sessionUser = session('user');
+
+        if (!$sessionUser) {
+            return null;
+        }
+
+        if (!$sessionUser instanceof User) {
+            if (is_array($sessionUser)) {
+                $sessionUser = new User($sessionUser);
+            } elseif (is_object($sessionUser)) {
+                $sessionUser = new User((array) $sessionUser);
+            } else {
+                return null;
+            }
+        }
+
+        $path = base_path(self::USERS_PATH);
+        $users = json_decode(@file_get_contents($path), true);
+
+        if (is_array($users)) {
+            foreach ($users as $entry) {
+                if (($entry['id'] ?? null) === $sessionUser->id) {
+                    $freshUser = new User($entry);
+                    session(['user' => $freshUser]);
+                    return $freshUser;
+                }
+            }
+        }
+
+        session(['user' => $sessionUser]);
+
+        return $sessionUser;
+    }
+
     public function blackjack(): View
     {
-        BalanceResetController::resetPoint();
 
-        $player = session('user');
+        $player = $this->resolvePlayer();
         $balance = $player?->points ?? 0;
 
         return view('game.blackjack', [
@@ -23,9 +60,8 @@ class GameController extends Controller
 
     public function plinko(): View
     {
-        BalanceResetController::resetPoint();
 
-        $player = session('user');
+        $player = $this->resolvePlayer();
         $balance = $player?->points ?? 0;
 
         return view('game.plinko', [
@@ -33,12 +69,10 @@ class GameController extends Controller
         ]);
     }
 
-
     public function saveBalance(Request $request): JsonResponse
     {
-        BalanceResetController::resetPoint();
 
-        $user = session('user');
+        $user = $this->resolvePlayer();
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
@@ -48,7 +82,7 @@ class GameController extends Controller
             'game' => ['nullable', 'string'],
         ]);
 
-        $path = base_path('database/json/users.json');
+        $path = base_path(self::USERS_PATH);
         $users = json_decode(@file_get_contents($path), true) ?? [];
         $updated = false;
 

@@ -113,38 +113,40 @@
     </div>
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @include('shared.footer')
 
 
 <script>
 const profile = document.getElementById('profile')
-let startX = 0, startY = 0, offsetX = 0, offsetY = 0
+let startX = 0;
+let startY = 0;
+let offsetX = 0;
+let offsetY = 0;
 
 profile.addEventListener('mousedown', e => {
-    startX = e.clientX
-    startY = e.clientY
+    startX = e.clientX;
+    startY = e.clientY;
 
     const mouseMove = e => {
-        const dx = e.clientX - startX
-        const dy = e.clientY - startY
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
 
-        offsetX += dx
-        offsetY += dy
+        offsetX += dx;
+        offsetY += dy;
 
-        profile.style.top = (profile.offsetTop + dy) + 'px'
-        profile.style.left = (profile.offsetLeft + dx) + 'px'
+        profile.style.top = (profile.offsetTop + dy) + 'px';
+        profile.style.left = (profile.offsetLeft + dx) + 'px';
 
-        startX = e.clientX
-        startY = e.clientY
+        startX = e.clientX;
+        startY = e.clientY;
     }
 
     const mouseUp = () => {
-        document.removeEventListener('mousemove', mouseMove)
-        document.removeEventListener('mouseup', mouseUp)
+        document.removeEventListener('mousemove', mouseMove);
+        document.removeEventListener('mouseup', mouseUp);
     }
 
-    document.addEventListener('mousemove', mouseMove)
-    document.addEventListener('mouseup', mouseUp)
+    document.addEventListener('mousemove', mouseMove);
+    document.addEventListener('mouseup', mouseUp);
 })
 </script>

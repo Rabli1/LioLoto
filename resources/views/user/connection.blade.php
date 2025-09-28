@@ -22,3 +22,4 @@
         </div>
     </form>
 </div>
+@include('shared.footer')

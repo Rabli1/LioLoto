@@ -1,0 +1,79 @@
+﻿.blackjack-page {
+    padding: 3rem 0;
+}
+
+.blackjack-outline {
+    max-width: 760px;
+    margin: 0 auto;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 28px 50px rgba(0, 0, 0, 0.6);
+    padding: 2.5rem 2.25rem 2rem;
+}
+
+.balance {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.15rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+#betContainer,
+#gameMat {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 1.75rem 1.5rem;
+    margin-top: 2rem;
+}
+
+#dealerContainer,
+#playerContainer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    min-height: 140px;
+}
+
+#dealerContainer img,
+#playerContainer img {
+    width: 90px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    border: 2px solid rgba(0, 0, 0, 0.18);
+    background: #fefefe;
+}
+
+.betToken {
+    min-width: 78px;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.betToken:hover,
+.betToken:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.28);
+}
+
+#selectedBet {
+    min-height: 1.3rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.action-buttons button {
+    min-width: 140px;
+}
+
+#resultMessage {
+    min-height: 1.5rem;
+    letter-spacing: 0.06em;
+}

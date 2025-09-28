@@ -22,3 +22,5 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+blackjack_last_reset.txt
+/database/json/*.json
