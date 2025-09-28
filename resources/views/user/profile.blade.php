@@ -27,7 +27,7 @@
                 <div>
                     <i class="fa-solid {{ $user['profileImage'] }} pfp-{{ $user['profileColor'] }} fa-5x mb-3 pe-2"></i>
                     @if($connectedUserId == $user['id'])
-                        <i id="edit" class="fa-solid fa-pen position-absolute mt-5" ></i>
+                        <i id="edit" class="fa-solid fa-pen position-absolute mt-5" style="cursor: pointer;"></i>
                     @endif
                 </div>
 
