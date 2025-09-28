@@ -44,8 +44,8 @@
             validInput[0] = false
             var username = $("#username").val();
             try {
-                if (username.length < 4) {
-                    errors.eq(0).text("nom d'utilisateur trop court. Au moins 4 caractères")
+                if (username.length < 4 || username.length > 20) {
+                    errors.eq(0).text("Le nom d'utilisateur doit contenir entre 4 et 20 caractères")
                 }
                 else {
                     const response = await fetch(`/check-username?username=${encodeURIComponent(username)}`);
@@ -100,8 +100,8 @@
         $("#password").on("change", function () {
             validInput[2] = false
             var password = $("#password").val();
-            if (password.length < 8) {
-                errors.eq(2).html("le mot de passe doit contenir au moins 8 caractères")
+            if (password.length < 8 || password.length > 20) {
+                errors.eq(2).html("le mot de passe doit contenir entre 8 et 20 caractères")
             }
             else {
                 var uppercase = /[A-Z]/;
@@ -157,3 +157,4 @@
         });
     });
 </script>
+@include('shared.footer')

@@ -27,7 +27,7 @@
                 <div>
                     <i class="fa-solid {{ $user['profileImage'] }} pfp-{{ $user['profileColor'] }} fa-5x mb-3 pe-2"></i>
                     @if($connectedUserId == $user['id'])
-                        <i id="edit" class="fa-solid fa-pen position-absolute mt-5" ></i>
+                        <i id="edit" class="fa-solid fa-pen position-absolute mt-5" style="cursor: pointer;"></i>
                     @endif
                 </div>
 
@@ -39,15 +39,18 @@
                         <strong>Points :</strong> {{ $user['points'] }}
                     </li>
                     <li class="list-group-item bg-transparent {{ $textColor }}">
-                        <img src="{{ asset('img/gold-medal.png') }}" alt="Or" style="width:24px;vertical-align:middle;" />
+                        <img src="{{ asset('img/gold-medal.png') }}" alt="Or"
+                            style="width:24px;vertical-align:middle;" />
                         <strong>Or :</strong> {{ $user['gold'] }}
                     </li>
                     <li class="list-group-item bg-transparent {{ $textColor }}">
-                        <img src="{{ asset('img/silver-medal.png') }}" alt="Argent" style="width:24px;vertical-align:middle;" />
+                        <img src="{{ asset('img/silver-medal.png') }}" alt="Argent"
+                            style="width:24px;vertical-align:middle;" />
                         <strong>Argent :</strong> {{ $user['silver'] }}
                     </li>
                     <li class="list-group-item bg-transparent {{ $textColor }}">
-                        <img src="{{ asset('img/bronze-medal.png') }}" alt="Bronze" style="width:24px;vertical-align:middle;" />
+                        <img src="{{ asset('img/bronze-medal.png') }}" alt="Bronze"
+                            style="width:24px;vertical-align:middle;" />
                         <strong>Bronze :</strong> {{ $user['bronze'] }}
                     </li>
                     <li class="list-group-item bg-transparent {{ $textColor }}">
@@ -57,7 +60,7 @@
             </div>
         </div>
 
-        <div id="editForm" class="mx-auto mt-4 p-4 rounded shadow bg-dark text-dark hidden" style="max-width: 500px;">
+        <div id="editForm" class="mx-auto mt-4 p-4 rounded shadow bg-dark text-dark hidden" style="max-width: 1000px;">
             <form method="post" action="/user/updateAvatar">
                 @csrf
 
@@ -81,16 +84,10 @@
 
                     @foreach($images as $icon => $requiredLvl)
                         <div class="position-relative d-inline-block m-1">
-                            <input
-                                type="radio"
-                                class="btn-check"
-                                name="image"
-                                id="option-{{ $icon }}"
-                                autocomplete="off"
-                                value="{{ $icon }}"
-                                @if($user['lvl'] < $requiredLvl) disabled @endif
-                            >
-                            <label class="btn btn-secondary fs-2 @if($user['lvl'] < $requiredLvl) disabled @endif" for="option-{{ $icon }}">
+                            <input type="radio" class="btn-check" name="image" id="option-{{ $icon }}" autocomplete="off"
+                                value="{{ $icon }}" @if($user['lvl'] < $requiredLvl) disabled @endif>
+                            <label class="btn btn-secondary fs-2 @if($user['lvl'] < $requiredLvl) disabled @endif"
+                                for="option-{{ $icon }}">
                                 <i class="fas {{ $icon }}"></i>
                             </label>
 
@@ -122,16 +119,10 @@
 
                     @foreach($colors as $color => $requiredLvl)
                         <div class="position-relative d-inline-block m-1">
-                            <input
-                                type="radio"
-                                class="btn-check"
-                                name="color"
-                                id="color-{{ $color }}"
-                                value="{{ $color }}"
-                                autocomplete="off"
-                                @if($user['lvl'] < $requiredLvl) disabled @endif
-                            >
-                            <label class="btn btn-secondary fs-2 @if($user['lvl'] < $requiredLvl) disabled @endif" for="color-{{ $color }}">
+                            <input type="radio" class="btn-check" name="color" id="color-{{ $color }}" value="{{ $color }}"
+                                autocomplete="off" @if($user['lvl'] < $requiredLvl) disabled @endif>
+                            <label class="btn btn-secondary fs-2 @if($user['lvl'] < $requiredLvl) disabled @endif"
+                                for="color-{{ $color }}">
                                 <i class="fas fa-circle pfp-{{ $color }}"></i>
                             </label>
 
@@ -157,13 +148,20 @@
             <h3 class="text-center text-light mb-3 mt-5">Modifier bio</h3>
             <form method="post" action="/user/updateBio">
                 @csrf
-                <div class="mb-3">
-                    <textarea maxlength="99" id="bio" name="bio" class="form-control" rows="4" placeholder="bio">{{ $user['bio'] }}</textarea>
+                <div class="mb-3" style="width: 700px; margin-left: auto; margin-right: auto;">
+                    <textarea maxlength="99" id="bio" name="bio" class="form-control" rows="4"
+                        placeholder="bio">{{ $user['bio'] }}</textarea>
                 </div>
                 <div class="d-flex justify-content-center">
                     <button type="submit" class="btn btn-danger">Modifier votre bio</button>
                 </div>
             </form>
+            <h3 class="text-center text-light mb-3 mt-5">Modifier mot de passe</h3>
+            <div class="d-flex justify-content-center">
+                <a href="{{ url('/user/changePassword') }}" class="btn btn-warning text-dark">
+                    Modifier votre mot de passe
+                </a>
+            </div>
         </div>
     </div>
 
@@ -226,4 +224,6 @@
         });
     </script>
 </body>
+@include('shared.footer')
+
 </html>

@@ -1,6 +1,10 @@
 @php
 $userConnected = session()->has("user");
 $currentPage = request()->path();
+$admin = false;
+if($userConnected){
+  $admin = session('user')->admin;
+}
 @endphp
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
@@ -37,6 +41,11 @@ $currentPage = request()->path();
           </li>
           <li class="nav-item">
             <a class="nav-link @if($currentPage == 'user/signIn') active @endif" href="/user/signIn">Inscription</a>
+          </li>
+        @endif
+        @if($admin)
+          <li class="nav-item">
+            <a class="nav-link @if($currentPage == 'admin/dashboard') active @endif" href="/admin/dashboard">Admin</a>
           </li>
         @endif
         <li class="nav-item">

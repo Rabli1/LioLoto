@@ -105,3 +105,4 @@ if ($userConnected = session()->has("user")) {
         });
     });
 </script>
+@include('shared.footer')

@@ -71,4 +71,5 @@
 </script>
 <script defer src="{{ asset('js/blackjack_balance.js') }}"></script>
 <script defer src="{{ asset('js/blackjack.js') }}"></script>
+@include('shared.footer')
 </html>

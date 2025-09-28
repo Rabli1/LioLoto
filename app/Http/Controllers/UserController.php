@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Services\UserServices;
 use App\Models\User;
 use ValueError;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     private UserServices $userService;
@@ -56,13 +58,60 @@ class UserController extends Controller
         return view('user.connection', ['message' => $request->input('message')]);
     }
 
+    public function changePassword()
+    {
+        return view('user.changePassword');
+    }
+
+    public function updatePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => ['required'],
+        'new_password' => ['required', 'string'],
+        'new_password_confirmation' => ['required'],
+    ]);
+
+    $user = session('user');
+
+    if (!$user) {
+        return redirect('user/connection?message=Vous devez être connecté');
+    }
+
+    if ($request->new_password !== $request->new_password_confirmation) {
+        return back()->withErrors(['new_password' => 'Les deux mots de passe ne sont pas identiques.']);
+    }
+
+    if (!password_verify($request->current_password, $user->password)) { 
+        return back()->withErrors(['current_password' => 'L’ancien mot de passe est incorrect.']);
+    }
+
+    $path = base_path('database/json/users.json');
+    $users = json_decode(file_get_contents($path), true);
+
+    foreach ($users as &$entry) {
+        if ($entry['id'] === $user->id) {
+            $entry['password'] = password_hash($request->new_password, PASSWORD_BCRYPT);
+            $user->password = $entry['password'];
+            break;
+        }
+    }
+    unset($entry);
+
+    file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    session(['user' => $user]);
+
+    return redirect()->route('user.changePassword')->with('success', 'Mot de passe modifié avec succès.');
+}
+
     public function authenticate(Request $request)
     {
         $user = $this->userService->verifyCredentials($request->username, $request->password);
         if (!$user) {
             return redirect('user/connection?message=Nom d\'utilisateur ou mot de passe incorrect');
         }
-
+        if($user->banned){
+            return redirect('user/connection?message=Votre compte a été banni');
+        }
         session(['user' => $user]);
         return redirect('/');
     }
