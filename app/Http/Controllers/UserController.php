@@ -42,6 +42,7 @@ class UserController extends Controller
             "bronze" => 0,
             "pointsLost" => 0,
             "bio" => "",
+            "admin" => false,
             "confirmed" => true,
             "banned" => false,
             "lvl" => 1,
