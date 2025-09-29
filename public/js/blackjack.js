@@ -6,7 +6,7 @@
     let hiddenCard;
     let deck = [];
     let canHit = true;
-    let betAmount = null;
+    let betAmount = 0;
 
     let playerHand = [];
     let dealerHand = [];
@@ -111,45 +111,57 @@
     }
 
     function startGame() {
-    playerHand = [];
-    dealerHand = [];
-    canHit = true;
+        playerHand = [];
+        dealerHand = [];
+        canHit = true;
 
-    playerHand.push(deck.pop());
-    dealerHand.push(deck.pop());
-    playerHand.push(deck.pop());
-    hiddenCard = deck.pop();
-    dealerHand.push(hiddenCard);
+        afficheMains();
+        updateScore();
 
-    playerSum = SommeMain(playerHand);
-    dealerSum = SommeMain(dealerHand);
-
-    afficheMains();
-    updateScore();
-
-        const betAmountLabel = document.getElementById('betAmount');
-        if (betAmountLabel) {
-            betAmountLabel.innerHTML = `<h2>Votre mise : ${betAmount}</h2>`;
-        }
-
-        if (dealerSum === 21 || playerSum === 21) {
-            revealDealerHand();
+        function dealCard(toHand, show = true, delay = 0) {
             setTimeout(() => {
-                if (dealerSum === 21 && playerSum === 21) {
-                    dispatchGameEvent('blackjack:result', { outcome: 'push' });
-                } else if (dealerSum === 21) {
-                    dispatchGameEvent('blackjack:result', { outcome: 'dealer-blackjack' });
-                } else {
-                    dispatchGameEvent('blackjack:result', { outcome: 'blackjack' });
-                }
-                restartGame();
-            }, 500);
+                const card = deck.pop();
+                toHand.push(card);
+                afficheMains(show);
+                updateScore();
+            }, delay);
         }
+        dealCard(playerHand, true, 500);
+        dealCard(dealerHand, false, 1000);
+        dealCard(playerHand, true, 1500);
+        dealCard(dealerHand, true, 2000);
+
+        setTimeout(() => {
+            playerSum = SommeMain(playerHand);
+            dealerSum = SommeMain(dealerHand);
+
+            const betAmountLabel = document.getElementById('betAmount');
+            if (betAmountLabel) {
+                betAmountLabel.innerHTML = `<h2>Votre mise : ${betAmount}</h2>`;
+            }
+
+            // Vérifier blackjack immédiat
+            if (dealerSum === 21 || playerSum === 21) {
+                revealDealerHand();
+                setTimeout(() => {
+                    if (dealerSum === 21 && playerSum === 21) {
+                        dispatchGameEvent('blackjack:result', { outcome: 'push' });
+                    } else if (dealerSum === 21) {
+                        dispatchGameEvent('blackjack:result', { outcome: 'dealer-blackjack' });
+                    } else {
+                        dispatchGameEvent('blackjack:result', { outcome: 'blackjack' });
+                    }
+                    restartGame();
+                }, 500);
+            }
+        }, 2200);
     }
 
     function revealDealerHand() {
-        afficheMains(true);
-        updateScore(true);
+        setTimeout(() => {
+            afficheMains(true);
+            updateScore(true);
+        }, 500);
     }
 
     function restartGame() {
@@ -192,21 +204,21 @@
     }
 
     function hit() {
-    if (!canHit) return;
+        if (!canHit) return;
 
-    playerHand.push(deck.pop());
-    playerSum = SommeMain(playerHand);
+        playerHand.push(deck.pop());
+        playerSum = SommeMain(playerHand);
 
-    afficheMains();
-    updateScore();
+        afficheMains();
+        updateScore();
 
-    if (playerSum > 21) {
-        canHit = false;
-        setTimeout(() => {
-            settleAndRestart('lose');
-        }, 500);
+        if (playerSum > 21) {
+            canHit = false;
+            setTimeout(() => {
+                settleAndRestart('lose');
+            }, 500);
+        }
     }
-}
 
     function stay() {
         canHit = false;
@@ -214,12 +226,13 @@
 
         function dealerDraw() {
             if (dealerSum < 17) {
-                const card = deck.pop();
-                dealerHand.push(card);
-                dealerSum = SommeMain(dealerHand);
-                afficheMains(true);
-                updateScore(true);
-                setTimeout(dealerDraw, 700);
+                setTimeout(() => {
+                    const card = deck.pop();
+                    dealerHand.push(card);
+                    dealerSum = SommeMain(dealerHand);
+                    afficheMains(true);
+                    updateScore(true);
+                }, 700);
             } else {
                 setTimeout(() => {
                     if (dealerSum > 21) {
@@ -234,7 +247,6 @@
                 }, 700);
             }
         }
-
         dealerDraw();
     }
 
@@ -268,10 +280,10 @@
             btn.addEventListener('click', function onBetTokenClick() {
                 betAmount += parseInt(this.getAttribute('data-value'), 10);
                 window.pendingBlackjackBet = betAmount;
-                if (betAmount > 0){
-                selectedBetLabel.textContent = `Mise sélectionnée : ${betAmount}`;
+                if (betAmount > 0) {
+                    selectedBetLabel.textContent = `Mise sélectionnée : ${betAmount}`;
                 } else {
-                selectedBetLabel.textContent = 'Aucune mise sélectionnée';
+                    selectedBetLabel.textContent = 'Aucune mise sélectionnée';
                 }
             });
         });
