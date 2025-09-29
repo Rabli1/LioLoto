@@ -1,13 +1,20 @@
 @include('shared.header')
 @include('shared.navbar')
+@if (session()->has('user'))
+    <script>
+        window.location.href = "/";
+    </script>
+
+
+@endif
 <div class="form-container mt-5">
     <h3 class="text-center mb-4">Connexion</h3>
     @php
-    if ($message == "Nom d'utilisateur ou mot de passe incorrect" || $message == "Votre compte a été banni") {
-        $textColor = "text-danger";
-    } else {
-        $textColor = "text-success";
-    }
+        if ($message == "Nom d'utilisateur ou mot de passe incorrect" || $message == "Votre compte a été banni") {
+            $textColor = "text-danger";
+        } else {
+            $textColor = "text-success";
+        }
     @endphp
     <span class="text-center <?=$textColor?>" style="display: block;"><?=$message?></span>
     <form action="{{ url('/user/connection') }}" method="post">
