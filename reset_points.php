@@ -1,4 +1,5 @@
 <?php
+
 $log = __DIR__ . "/reset_log.txt";
 file_put_contents($log, "[" . date("Y-m-d H:i:s") . "] Reset script started\n", FILE_APPEND);
 

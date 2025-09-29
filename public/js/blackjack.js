@@ -47,14 +47,25 @@
         return parseInt(value, 10);
     }
 
-    function ajusteAces(hand, sum) {
-        let adjustedSum = sum;
-        let aceCount = hand.filter((card) => card.startsWith('A')).length;
-        while (adjustedSum > 21 && aceCount > 0) {
-            adjustedSum -= 10;
+    function SommeMain(hand) {
+        let sum = 0;
+        let aceCount = 0;
+        hand.forEach(card => {
+            const value = card.split('-')[0];
+            if (value === 'A') {
+                sum += 11;
+                aceCount += 1;
+            } else if (['K', 'Q', 'J'].includes(value)) {
+                sum += 10;
+            } else {
+                sum += parseInt(value, 10);
+            }
+        });
+        while (sum > 21 && aceCount > 0) {
+            sum -= 10;
             aceCount -= 1;
         }
-        return adjustedSum;
+        return sum;
     }
 
     function afficheMains(showHidden = false) {
@@ -100,21 +111,21 @@
     }
 
     function startGame() {
-        playerHand = [];
-        dealerHand = [];
-        canHit = true;
+    playerHand = [];
+    dealerHand = [];
+    canHit = true;
 
-        playerHand.push(deck.pop());
-        dealerHand.push(deck.pop());
-        playerHand.push(deck.pop());
-        hiddenCard = deck.pop();
-        dealerHand.push(hiddenCard);
+    playerHand.push(deck.pop());
+    dealerHand.push(deck.pop());
+    playerHand.push(deck.pop());
+    hiddenCard = deck.pop();
+    dealerHand.push(hiddenCard);
 
-        playerSum = ajusteAces(playerHand, getCardValue(playerHand[0]) + getCardValue(playerHand[1]));
-        dealerSum = ajusteAces(dealerHand, getCardValue(dealerHand[0]) + getCardValue(hiddenCard));
+    playerSum = SommeMain(playerHand);
+    dealerSum = SommeMain(dealerHand);
 
-        afficheMains();
-        updateScore();
+    afficheMains();
+    updateScore();
 
         const betAmountLabel = document.getElementById('betAmount');
         if (betAmountLabel) {
@@ -181,22 +192,21 @@
     }
 
     function hit() {
-        if (!canHit) return;
+    if (!canHit) return;
 
-        playerHand.push(deck.pop());
-        playerSum += getCardValue(playerHand[playerHand.length - 1]);
-        playerSum = ajusteAces(playerHand, playerSum);
+    playerHand.push(deck.pop());
+    playerSum = SommeMain(playerHand);
 
-        afficheMains();
-        updateScore();
+    afficheMains();
+    updateScore();
 
-        if (playerSum > 21) {
-            canHit = false;
-            setTimeout(() => {
-                settleAndRestart('lose');
-            }, 500);
-        }
+    if (playerSum > 21) {
+        canHit = false;
+        setTimeout(() => {
+            settleAndRestart('lose');
+        }, 500);
     }
+}
 
     function stay() {
         canHit = false;
@@ -206,8 +216,7 @@
             if (dealerSum < 17) {
                 const card = deck.pop();
                 dealerHand.push(card);
-                dealerSum += getCardValue(card);
-                dealerSum = ajusteAces(dealerHand, dealerSum);
+                dealerSum = SommeMain(dealerHand);
                 afficheMains(true);
                 updateScore(true);
                 setTimeout(dealerDraw, 700);
