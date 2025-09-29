@@ -6,7 +6,7 @@
     let hiddenCard;
     let deck = [];
     let canHit = true;
-    let betAmount = null;
+    let betAmount = 0;
 
     let playerHand = [];
     let dealerHand = [];
