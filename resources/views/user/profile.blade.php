@@ -30,8 +30,18 @@
                         <i id="edit" class="fa-solid fa-pen position-absolute mt-5" style="cursor: pointer;"></i>
                     @endif
                 </div>
-
                 <h2 class="fw-bold">{{ $user['name'] }}</h2>
+                <div>
+                    <span class="{{ $textColor }} me-3">niveau {{ $user['lvl'] }}</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" role="progressbar"
+                            style="width: {{ ($user['exp'] / ($user['lvl'] * 1000)) * 100 }}%;"
+                            aria-valuenow="{{ $user['exp'] }}" aria-valuemin="0"
+                            aria-valuemax="{{ $user['lvl'] * 1000 }}">
+                        </div>
+                    </div>
+                </div>
+
                 <p>{{ $user['bio'] }}</p>
                 <hr class="border-light">
                 <ul class="list-group list-group-flush text-start">

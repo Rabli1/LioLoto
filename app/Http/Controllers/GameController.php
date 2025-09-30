@@ -6,9 +6,16 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\User;
+use App\Services\GameServices;
 
 class GameController extends Controller
 {
+    private GameServices $gameServices;
+
+    public function __construct(GameServices $gameServices)
+    {
+        $this->gameServices = $gameServices;
+    }
     private const USERS_PATH = 'database/json/users.json';
 
     private function resolvePlayer(): ?User
@@ -88,6 +95,10 @@ class GameController extends Controller
 
         foreach ($users as &$entry) {
             if (($entry['id'] ?? null) === $user->id) {
+                $difference = ($validated['balance'] - $entry['points']) / 2; // divisé par deux pcq il redonne la mise
+                if($difference > 0){
+                    $this->gameServices->addExp($difference, $entry);
+                }
                 $entry['points'] = $validated['balance'];
                 $user->points = $entry['points'];
                 $updated = true;
