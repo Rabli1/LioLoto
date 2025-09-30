@@ -20,26 +20,44 @@ if ($userConnected = session()->has("user")) {
                 </tr>
             </thead>
             <tbody>
-                @foreach ($top10 as $index => $user)
                 @php
-                    $medalColor = "";
-                    if($index + 1 == 1){ $medalColor = "text-gold";}
-                    if($index + 1 == 2){ $medalColor = "text-silver";}
-                    if($index + 1 == 3){ $medalColor = "text-bronze";}
-                    $idMatching = $connectedUserId == $user['id'];
-                    $textColors = [
-                    'yellow' => 'text-dark',
-                    'white' => 'text-dark',
-                    'pink' => 'text-dark',
-                ];
-                $textColor = 'text-white';
-                if($idMatching){
-                    $textColor = $textColors[$user['profileColor']] ?? 'text-white';
-                }
+                    $lastPoints = null;
+                    $lastRank = 0;
                 @endphp
+
+                @foreach ($top10 as $index => $user)
+                    @php
+                        if ($lastPoints === $user['points']) {
+                            $rank = $lastRank;
+                        } else {
+                            $rank = $index + 1;
+                            $lastRank = $rank;
+                            $lastPoints = $user['points'];
+                        }
+
+                        $medalColor = "";
+                        if ($rank == 1) {
+                            $medalColor = "text-gold";
+                        }
+                        if ($rank == 2) {
+                            $medalColor = "text-silver";
+                        }
+                        if ($rank == 3) {
+                            $medalColor = "text-bronze";
+                        }
+
+                        $idMatching = $connectedUserId == $user['id'];
+                        $textColors = [
+                            'yellow' => 'text-dark',
+                            'white' => 'text-dark',
+                            'pink' => 'text-dark',
+                        ];
+                        $textColor = $idMatching ? ($textColors[$user['profileColor']] ?? 'text-white') : 'text-white';
+                    @endphp
+
                     <tr>
                         <th class="pe-5 {{ $idMatching ? "bg-" . $user['profileColor'] . " " . $textColor : ""}} {{ $medalColor }}"
-                            scope="row">{{ $index + 1 }}</th>
+                            scope="row">{{ $rank }}</th>
                         <td
                             class="user-cell text-start ps-5 {{ $idMatching ? "bg-" . $user['profileColor'] . " " . $textColor : ""}}">
                             <i class="fa-solid {{ $user['profileImage'] }} pfp-{{ $user['profileColor'] }} fs-4 me-2"></i>
@@ -48,7 +66,8 @@ if ($userConnected = session()->has("user")) {
                             <div class="user-modal hidden">{{ $user['bio'] != "" ? $user['bio'] : "Pas de bio"}}</div>
                         </td>
                         <td class="{{ $idMatching ? "bg-" . $user['profileColor'] . " " . $textColor : ""}}">
-                            {{ $user['points'] }}</td>
+                            {{ $user['points'] }}
+                        </td>
                     </tr>
                 @endforeach
                 @if($apartUser != null)
@@ -56,7 +75,7 @@ if ($userConnected = session()->has("user")) {
                         <td colspan="3" class="text-center">...</td>
                     </tr>
                     <tr class="fw-bold">
-                        <th class="pe-5"  scope="row">{{ $position }}</th>
+                        <th class="pe-5" scope="row">{{ $position }}</th>
                         <td class="user-cell text-start ps-5 }">
                             <i
                                 class="fa-solid {{ $apartUser->profileImage }} pfp-{{ $apartUser->profileColor }} fs-4 me-2"></i>
