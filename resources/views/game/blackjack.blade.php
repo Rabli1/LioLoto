@@ -1,4 +1,3 @@
-{{-- resources/views/game/blackjack.blade.php --}}
 <html>
     <head>
         @include('shared.header')
@@ -31,7 +30,7 @@
                 <p id="selectedBet" class="fw-semibold mt-3">Aucune mise sélectionnée</p>
                 <div class="d-flex flex-row justify-content-center">
                     <button id="clearBet" class="btn btn-light mt-2 me-3" type="button">Effacer la mise</button>
-                    <button id="placeBet" class="btn btn-danger mt-2" type="button">Placer la mise</button>
+                    <button id="placeBet" class="btn btn-danger mt-2" type="button" @if(!session()->has('user')) disabled @endif>Placer la mise</button>
                 </div>
             </section>
 
@@ -47,15 +46,15 @@
                 <div class="mb-4">
                     <h3 class="h6 text-uppercase mb-3">Joueur</h3>
                     <div id="playerContainer"></div>
-                    <p class="mt-3">Total : <span id="playerSum">0</span></p>
+                    <p id="sumContainer" class="mt-3">Total : <span id="playerSum">0</span></p>
                 </div>
 
                 <div class="action-buttons d-flex flex-wrap justify-content-center">
+                    <button id="split" class="btn btn-secondary mt-2 me-3" type="button">Séparer</button>
                     <button id="stayButton" class="btn btn-light mt-2 me-3" type="button">Rester</button>
-                    <button id="hitButton" class="btn btn-danger mt-2" type="button">Tirer</button>
+                    <button id="hitButton" class="btn btn-danger mt-2 me-3" type="button">Tirer</button>
+                    <button id="double" class="btn btn-secondary mt-2">Doubler</button>
                 </div>
-
-                <div id="resultMessage" class="mt-4 fw-semibold text-uppercase"></div>
             </section>
         </section>
     </div>

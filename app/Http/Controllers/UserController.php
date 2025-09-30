@@ -9,6 +9,9 @@ use App\Models\User;
 use ValueError;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PasswordChangedMail;
+
 class UserController extends Controller
 {
     private UserServices $userService;
@@ -42,6 +45,7 @@ class UserController extends Controller
             "bronze" => 0,
             "pointsLost" => 0,
             "bio" => "",
+            "admin" => false,
             "confirmed" => true,
             "banned" => false,
             "lvl" => 1,
@@ -99,6 +103,8 @@ class UserController extends Controller
 
     file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     session(['user' => $user]);
+
+     Mail::to($user->email)->send(new PasswordChangedMail($user));
 
     return redirect()->route('user.changePassword')->with('success', 'Mot de passe modifié avec succès.');
 }

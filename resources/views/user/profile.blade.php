@@ -30,8 +30,18 @@
                         <i id="edit" class="fa-solid fa-pen position-absolute mt-5" style="cursor: pointer;"></i>
                     @endif
                 </div>
-
                 <h2 class="fw-bold">{{ $user['name'] }}</h2>
+                <div>
+                    <span class="{{ $textColor }} me-3">niveau {{ $user['lvl'] }}</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" role="progressbar"
+                            style="width: {{ ($user['exp'] / ($user['lvl'] * 1000)) * 100 }}%;"
+                            aria-valuenow="{{ $user['exp'] }}" aria-valuemin="0"
+                            aria-valuemax="{{ $user['lvl'] * 1000 }}">
+                        </div>
+                    </div>
+                </div>
+
                 <p>{{ $user['bio'] }}</p>
                 <hr class="border-light">
                 <ul class="list-group list-group-flush text-start">
@@ -63,7 +73,7 @@
         <div id="editForm" class="mx-auto mt-4 p-4 rounded shadow bg-dark text-dark hidden" style="max-width: 1000px;">
             <form method="post" action="/user/updateAvatar">
                 @csrf
-
+                <input type="hidden" name="userLvl" value="{{ $user['lvl'] }}" id="userLvl">
                 <div id="imageChoices" class="d-flex flex-wrap gap-3 justify-content-center">
                     @php
                         $images = [
@@ -88,7 +98,7 @@
                                 value="{{ $icon }}" @if($user['lvl'] < $requiredLvl) disabled @endif>
                             <label class="btn btn-secondary fs-2 @if($user['lvl'] < $requiredLvl) disabled @endif"
                                 for="option-{{ $icon }}">
-                                <i class="fas {{ $icon }}"></i>
+                                <i class="fa-solid {{ $icon }}"></i>
                             </label>
 
                             @if($user['lvl'] < $requiredLvl)
@@ -195,7 +205,6 @@
             "white": 25
         };
 
-        const userLvl = parseInt($("input[name='userLvl']").val() || 0);
         let avatarPreview = $("#avatarPreview i");
         $("#edit").on("click", function () {
             $("#editForm").toggleClass("hidden");
@@ -203,23 +212,23 @@
 
         $(document).on("click", "input[name='image']", function (e) {
             const chosenImage = $(this).val();
-            if (blockedImage[chosenImage] > userLvl) {
+            if (blockedImage[chosenImage] > $("#userLvl").val()) {
                 e.preventDefault();
                 $(this).prop('checked', false);
             }
             else {
-                avatarPreview.removeClass().addClass(`fas ${chosenImage} pfp-${$("input[name='color']:checked").val() || 'black'}`);
+                avatarPreview.removeClass().addClass(`fa-solid ${chosenImage} pfp-${$("input[name='color']:checked").val() || 'black'}`);
             }
         });
 
         $(document).on("click", "input[name='color']", function (e) {
             const chosenColor = $(this).val();
-            if (blockedColor[chosenColor] > userLvl) {
+            if (blockedColor[chosenColor] > $("#userLvl").val()) {
                 e.preventDefault();
                 $(this).prop('checked', false);
             }
             else {
-                avatarPreview.removeClass().addClass(`fas ${$("input[name='image']:checked").val() || 'fa-user'} pfp-${chosenColor}`);
+                avatarPreview.removeClass().addClass(`fa-solid ${$("input[name='image']:checked").val() || 'fa-user'} pfp-${chosenColor}`);
             }
         });
     </script>

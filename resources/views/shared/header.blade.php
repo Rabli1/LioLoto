@@ -18,4 +18,4 @@
     .carousel-inner img { object-fit: cover; height: 400px; }
   </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
