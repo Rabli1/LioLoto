@@ -19,10 +19,6 @@
 
     function el(id) { return document.getElementById(id); }
 
-    function format(n) {
-        return Math.floor(n).toLocaleString('fr-FR');
-    }
-
     function resetRoundState() {
         state.positions = new Set();
         state.revealed = new Set();
@@ -32,7 +28,7 @@
         state.cashable = false;
     }
 
-    function multiplierForPicks(picks, total, mines) {
+    function multiplicateur(picks, total, mines) {
         if (picks <= 0) return 1;
         let m = 1;
         for (let i = 0; i < picks; i += 1) {
@@ -68,7 +64,7 @@
         return total - mines;
     }
 
-    function buildGrid() {
+    function gridBuilder() {
         const grid = el('minesGrid');
         grid.innerHTML = '';
         grid.style.setProperty('--grid-size', GRID_SIZE);
@@ -78,12 +74,12 @@
             btn.className = 'mine-cell';
             btn.dataset.index = String(i);
             btn.textContent = '';
-            btn.addEventListener('click', onCellClick);
+            btn.addEventListener('click', onClickCellule);
             grid.appendChild(btn);
         }
     }
 
-    function randomMines(count) {
+    function minesPlacement(count) {
         const set = new Set();
         while (set.size < count) {
             set.add(Math.floor(Math.random() * TOTAL_CELLS));
@@ -97,12 +93,13 @@
             const cell = grid.querySelector(`.mine-cell[data-index="${idx}"]`);
             if (cell) {
                 cell.classList.add('is-mine');
-                cell.textContent = '💣';
+                cell.innerHTML = '<img src="/img/mines/mine.png" alt="Mine" class="mine-icon">';
+
             }
         });
     }
 
-    function endRound(win, payout) {
+    function finRound(win, payout) {
         state.roundActive = false;
         state.cashable = false;
         el('cashoutButton').disabled = true;
@@ -121,7 +118,7 @@
         }
     }
 
-    function onCellClick(e) {
+    function onClickCellule(e) {
         if (!state.roundActive) return;
         const cell = e.currentTarget;
         const idx = Number(cell.dataset.index);
@@ -131,22 +128,22 @@
 
         if (state.positions.has(idx)) {
             cell.classList.add('is-mine');
-            cell.textContent = '💣';
+            cell.innerHTML = '<img src="/img/mines/mine.png" alt="Mine" class="mine-icon">';
             revealAllMines();
-            endRound(false, 0);
+            finRound(false, 0);
             return;
         }
 
         cell.classList.add('is-safe');
-        cell.textContent = '💎';
+        cell.innerHTML = '<img src="/img/mines/gem.png" alt="Safe" class="mine-icon">';
         state.picks += 1;
-        state.currentMultiplier = multiplierForPicks(state.picks, TOTAL_CELLS, state.mines);
+        state.currentMultiplier = multiplicateur(state.picks, TOTAL_CELLS, state.mines);
         state.cashable = true;
         updateHud();
 
         if (state.picks >= allSafePicks(TOTAL_CELLS, state.mines)) {
             const payout = Math.floor(state.bet * state.currentMultiplier);
-            endRound(true, payout);
+            finRound(true, payout);
         }
     }
 
@@ -155,11 +152,11 @@
         state.mines = Math.max(1, Math.min(24, Number(minesSel?.value || 3)));
         resetRoundState();
         state.roundActive = true;
-        state.positions = randomMines(state.mines);
+        state.positions = minesPlacement(state.mines);
         state.currentMultiplier = 1;
         state.cashable = false;
 
-        buildGrid();
+        gridBuilder();
         updateHud();
 
         el('betContainer').style.display = 'none';
@@ -168,10 +165,10 @@
         el('resultMessage').textContent = '';
     }
 
-    function cashout() {
+    function paiement() {
         if (!state.roundActive || !state.cashable) return;
         const payout = Math.floor(state.bet * state.currentMultiplier);
-        endRound(true, payout);
+        finRound(true, payout);
     }
 
     function restart() {
@@ -202,7 +199,7 @@
                 }
             });
         });
-
+        
         clearBetButton.addEventListener('click', function () {
             pendingBet = 0;
             selectedBetLabel.textContent = 'Aucune mise sélectionnée';
@@ -225,7 +222,7 @@
             startRound();
         });
 
-        cashoutButton.addEventListener('click', cashout);
+        cashoutButton.addEventListener('click', paiement);
         newRoundButton.addEventListener('click', restart);
     }
 
