@@ -6,9 +6,7 @@
 
         let payout = 0;
         let images = document.getElementsByClassName("playerCard");
-        let resultMessage = document.getElementById("playerSum");
-        let sumContainer = document.getElementById("sumContainer");
-
+        let resultMessage = document.getElementById("sumContainer");
 
         switch (outcome) {
             case 'blackjack':
@@ -16,15 +14,15 @@
                 for (let card of images) {
                     card.classList.add("blackjack");
                 }
-                sumContainer.classList.add("blackjack");
-                resultMessage.textContent +=`Blackjack ! Mise ${stake}, gain ${payout - stake}.`;
+                resultMessage.classList.add("blackjack");
+                resultMessage.textContent +=` - Blackjack ! Mise ${stake}, gain ${payout - stake}.`;
                 break;
             case 'win':
                 payout = stake * 2;
                 for (let card of images) {
                     card.classList.add("win");
                 }
-                sumContainer.classList.add("win");
+                resultMessage.classList.add("win");
                 resultMessage.textContent +=` - Vous gagner. Mise ${stake} gagné.`;
                 break;
             case 'push':
@@ -32,22 +30,22 @@
                 for (let card of images) {
                     card.classList.add("draw");
                 }
-                sumContainer.classList.add("draw");
-                resultMessage.textContent += `- Égalité. Mise ${stake} rendue.`;
+                resultMessage.classList.add("draw");
+                resultMessage.textContent += ` - Égalité. Mise ${stake} rendue.`;
                 break;
             case 'dealer-blackjack':
                 payout = 0;
                 for (let card of images) {
                     card.classList.add("lose");
                 }
-                sumContainer.classList.add("lose");
+                resultMessage.classList.add("lose");
                 resultMessage.textContent +=` - Le croupier a un blackjack ! Mise ${stake} perdue.`;
                 break;
             default:
                 for (let card of images) {
                     card.classList.add("lose");
                 }
-                sumContainer.classList.add("lose");
+                resultMessage.classList.add("lose");
                 resultMessage.textContent +=` - Vous perdez. Mise ${stake} perdue.`;
         }
 

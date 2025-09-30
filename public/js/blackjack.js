@@ -125,6 +125,7 @@
         playerHand = [];
         dealerHand = [];
         canHit = true;
+        document.getElementById('double').disabled = false;
 
         playerHand.push(deck.pop());
         dealerHand.push(deck.pop());
@@ -147,13 +148,13 @@
             revealDealerHand();
             setTimeout(() => {
                 if (dealerSum === 21 && playerSum === 21) {
-                    dispatchGameEvent('blackjack:result', { outcome: 'push' });
+                    settleAndRestart('push');
                 } else if (dealerSum === 21) {
-                    dispatchGameEvent('blackjack:result', { outcome: 'dealer-blackjack' });
+                    settleAndRestart('dealer-blackjack');
                 } else {
-                    dispatchGameEvent('blackjack:result', { outcome: 'blackjack' });
+                    settleAndRestart('blackjack');
                 }
-                restartGame();
+                
             }, 500);
         }
     }
@@ -185,7 +186,7 @@
         const playerSumLabel = document.getElementById('playerSum');
         const sumContainer = document.getElementById("sumContainer");
 
-        if (sumContainer) sumContainer.className = 'mt-3';
+        if (sumContainer) {sumContainer.className = 'mt-3'; sumContainer.innerHTML = `Total : <span id="playerSum">${playerSum}</span>`;}
         if (betContainer) betContainer.style.display = 'block';
         if (gameMat) gameMat.style.display = 'none';
         if (selectedBetLabel) selectedBetLabel.textContent = '';
@@ -244,6 +245,7 @@
 
         playerHand.push(deck.pop());
         playerSum = SommeMain(playerHand);
+        document.getElementById('double').disabled = true;
 
         afficheMains();
         updateScore();

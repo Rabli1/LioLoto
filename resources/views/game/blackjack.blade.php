@@ -55,8 +55,6 @@
                     <button id="hitButton" class="btn btn-danger mt-2 me-3" type="button">Tirer</button>
                     <button id="double" class="btn btn-secondary mt-2">Doubler</button>
                 </div>
-
-                <div id="resultMessage" class="mt-4 fw-semibold text-uppercase"></div>
             </section>
         </section>
     </div>
