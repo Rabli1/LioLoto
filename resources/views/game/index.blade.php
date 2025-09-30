@@ -16,13 +16,11 @@
 
 <body>
 
-    <!-- Navbar -->
     @include('shared.header')
     @include('shared.navbar')
 
     <div class="container mt-5" style="padding-bottom: 300px;">
         <div class="row">
-            <!-- Game -->
             <div class="d-flex flex-row col-lg-6 mb-4">
                 <div class="leaderboard-card text-center d-flex flex-column">
                     <div class="row"><img src='{{ asset("img/blackjack.jpg") }}' alt="BlackJack"></div>

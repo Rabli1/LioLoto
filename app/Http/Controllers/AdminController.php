@@ -17,8 +17,14 @@ class AdminController extends Controller
     {
         $this->userService = $userService;
     }
-    public function dashboard(): View
+    public function dashboard(): View | RedirectResponse
     {
+        if(!session()->has("user")){
+            return redirect('/user/connection');
+        }
+        if(!session("user")->admin){
+            return redirect('/user/connection');
+        }
         $users = $this->userService->all();
         return view('admin.dashboard', [
             'users' => $users,
@@ -27,7 +33,7 @@ class AdminController extends Controller
     public function fixPoints(Request $request):RedirectResponse
     {
         $userId = (int) $request->input('userId');
-        $newPoints = (int) $request->input('newPoints');
+        $newPoints = (int) $request->input('points');
         $path = base_path(self::USERS_PATH);
         $users = json_decode(@file_get_contents($path), true);
         foreach ($users as &$user) {
