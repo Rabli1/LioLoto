@@ -79,9 +79,13 @@
                 if (!showHidden && index === 1) {
                     img.src = `${CARD_PATH}BACK.png`;
                     img.alt = 'Carte cachée';
+                    img.classList.add('dealerCard');
+                    img.style.animationDelay = `${index * 0.5}s`;
                 } else {
                     img.src = `${CARD_PATH}${card}.png`;
                     img.alt = card;
+                    img.classList.add('dealerCard');
+                    img.style.animationDelay = `${index * 0.5}s`;
                 }
                 dealerContainer.appendChild(img);
             });
@@ -89,11 +93,13 @@
 
         if (playerContainer) {
             playerContainer.innerHTML = '';
-            playerHand.forEach((card) => {
+            playerHand.forEach((card,index) => {
                 const img = document.createElement('img');
                 img.src = `${CARD_PATH}${card}.png`;
                 img.alt = card;
+                img.classList.add('playerCard');
                 playerContainer.appendChild(img);
+                img.style.animationDelay = `${index * 0.5}s`;
             });
         }
     }
@@ -238,6 +244,12 @@
         dealerDraw();
     }
 
+    function split() {
+    }
+
+    function double() {
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         buildDeck();
         shuffleDeck();
@@ -250,18 +262,23 @@
     function initBlackjack() {
         const hitButton = document.getElementById('hitButton');
         const stayButton = document.getElementById('stayButton');
+        const splitButton = document.getElementById('split');
+        const doubleButton = document.getElementById('double');
+        const clearBet = document.getElementById('clearBet');
         const gameMat = document.getElementById('gameMat');
         const betContainer = document.getElementById('betContainer');
         const selectedBetLabel = document.getElementById('selectedBet');
         const placeBetButton = document.getElementById('placeBet');
 
-        if (!hitButton || !stayButton || !gameMat || !betContainer || !selectedBetLabel || !placeBetButton) {
+        if (!hitButton || !stayButton || !gameMat || !betContainer || !selectedBetLabel || !placeBetButton || !splitButton || !doubleButton) {
             console.warn('Blackjack UI is incomplete.');
             return;
         }
 
         hitButton.addEventListener('click', hit);
         stayButton.addEventListener('click', stay);
+        splitButton.addEventListener('click', split);
+        doubleButton.addEventListener('click', double);
         gameMat.style.display = 'none';
 
         document.querySelectorAll('.betToken').forEach((btn) => {

@@ -77,3 +77,41 @@
     min-height: 1.5rem;
     letter-spacing: 0.06em;
 }
+
+.playerCard {
+    animation-duration: 1s;
+    animation-name: dealtPlayerCard;
+    animation-timing-function: ease-out;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+.dealerCard {
+    animation-duration: 1s;
+    animation-name: dealtDealerCard;
+    animation-timing-function: ease-out;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+@keyframes dealtPlayerCard {
+    0% {
+        transform: translateY(50px) rotate(-20deg);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes dealtDealerCard {
+    0% {
+        transform: translateY(-50px) rotate(20deg);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+}

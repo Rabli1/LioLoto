@@ -51,8 +51,10 @@
                 </div>
 
                 <div class="action-buttons d-flex flex-wrap justify-content-center">
+                    <button id="split" class="btn btn-secondary mt-2 me-3" type="button">Séparer</button>
                     <button id="stayButton" class="btn btn-light mt-2 me-3" type="button">Rester</button>
-                    <button id="hitButton" class="btn btn-danger mt-2" type="button">Tirer</button>
+                    <button id="hitButton" class="btn btn-danger mt-2 me-3" type="button">Tirer</button>
+                    <button id="double" class="btn btn-secondary mt-2">Doubler</button>
                 </div>
 
                 <div id="resultMessage" class="mt-4 fw-semibold text-uppercase"></div>
