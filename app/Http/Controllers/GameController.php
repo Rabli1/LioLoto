@@ -69,6 +69,16 @@ class GameController extends Controller
         ]);
     }
 
+    public function mines(): View
+    {
+        $player = $this->resolvePlayer();
+        $balance = $player?->points ?? 0;
+
+        return view('game.mines', [
+            'playerBalance' => $balance,
+        ]);
+    }
+
     public function saveBalance(Request $request): JsonResponse
     {
 
