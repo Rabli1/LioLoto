@@ -24,9 +24,9 @@ Route::get('/game', function () {
     return view('game.index');
 });
 Route::get('game/blackjack', [GameController::class, 'blackjack']);
-//Route::get('game/plinko', [GameController::class, 'plinko']);
-//Route::post('game/balance', [GameController::class, 'saveBalance']);
-//Route::get('game/mines', [GameController::class, 'mines']);
+Route::get('game/plinko', [GameController::class, 'plinko']);
+Route::post('game/balance', [GameController::class, 'saveBalance']);
+Route::get('game/mines', [GameController::class, 'mines']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
