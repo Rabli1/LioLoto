@@ -19,6 +19,10 @@
 
     function el(id) { return document.getElementById(id); }
 
+    function format(n) {
+        return Math.floor(n).toLocaleString('fr-FR');
+    }
+
     function resetRoundState() {
         state.positions = new Set();
         state.revealed = new Set();
@@ -199,7 +203,7 @@
                 }
             });
         });
-        
+
         clearBetButton.addEventListener('click', function () {
             pendingBet = 0;
             selectedBetLabel.textContent = 'Aucune mise sélectionnée';
