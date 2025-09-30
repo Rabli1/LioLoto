@@ -73,33 +73,38 @@
         const playerContainer = document.getElementById('playerContainer');
 
         if (dealerContainer) {
-            dealerContainer.innerHTML = '';
             dealerHand.forEach((card, index) => {
-                const img = document.createElement('img');
+                let img;
+                if (dealerContainer.children[index]) {
+                    img = dealerContainer.children[index];
+                } else {
+                    img = document.createElement('img');
+                    img.classList.add('dealerCard');
+                    img.style.animationDelay = `${0.25}s`;
+                    dealerContainer.appendChild(img);
+                }
                 if (!showHidden && index === 1) {
                     img.src = `${CARD_PATH}BACK.png`;
                     img.alt = 'Carte cachée';
-                    img.classList.add('dealerCard');
-                    img.style.animationDelay = `${index * 0.5}s`;
                 } else {
+                    img.classList.add('dealerCard');
+                    img.style.animationDelay = `${0.25}s`;
                     img.src = `${CARD_PATH}${card}.png`;
                     img.alt = card;
-                    img.classList.add('dealerCard');
-                    img.style.animationDelay = `${index * 0.5}s`;
                 }
-                dealerContainer.appendChild(img);
             });
         }
 
         if (playerContainer) {
-            playerContainer.innerHTML = '';
-            playerHand.forEach((card,index) => {
-                const img = document.createElement('img');
-                img.src = `${CARD_PATH}${card}.png`;
-                img.alt = card;
-                img.classList.add('playerCard');
-                playerContainer.appendChild(img);
-                img.style.animationDelay = `${index * 0.5}s`;
+            playerHand.forEach((card, index) => {
+                if (!playerContainer.children[index]) {
+                    const img = document.createElement('img');
+                    img.src = `${CARD_PATH}${card}.png`;
+                    img.alt = card;
+                    img.classList.add('playerCard');
+                    img.style.animationDelay = `${0.25}s`;
+                    playerContainer.appendChild(img);
+                }
             });
         }
     }
@@ -117,21 +122,21 @@
     }
 
     function startGame() {
-    playerHand = [];
-    dealerHand = [];
-    canHit = true;
+        playerHand = [];
+        dealerHand = [];
+        canHit = true;
 
-    playerHand.push(deck.pop());
-    dealerHand.push(deck.pop());
-    playerHand.push(deck.pop());
-    hiddenCard = deck.pop();
-    dealerHand.push(hiddenCard);
+        playerHand.push(deck.pop());
+        dealerHand.push(deck.pop());
+        playerHand.push(deck.pop());
+        hiddenCard = deck.pop();
+        dealerHand.push(hiddenCard);
 
-    playerSum = SommeMain(playerHand);
-    dealerSum = SommeMain(dealerHand);
+        playerSum = SommeMain(playerHand);
+        dealerSum = SommeMain(dealerHand);
 
-    afficheMains();
-    updateScore();
+        afficheMains();
+        updateScore();
 
         const betAmountLabel = document.getElementById('betAmount');
         if (betAmountLabel) {
@@ -154,8 +159,12 @@
     }
 
     function revealDealerHand() {
-        afficheMains(true);
-        updateScore(true);
+        setTimeout(() => {
+            afficheMains(true);
+        }, 250);
+        setTimeout(() => {
+            updateScore(true);
+        }, 500);
     }
 
     function restartGame() {
@@ -174,7 +183,9 @@
         const selectedBetLabel = document.getElementById('selectedBet');
         const betAmountLabel = document.getElementById('betAmount');
         const playerSumLabel = document.getElementById('playerSum');
+        const sumContainer = document.getElementById("sumContainer");
 
+        if (sumContainer) sumContainer.className = 'mt-3';
         if (betContainer) betContainer.style.display = 'block';
         if (gameMat) gameMat.style.display = 'none';
         if (selectedBetLabel) selectedBetLabel.textContent = '';
@@ -194,60 +205,87 @@
 
     function settleAndRestart(outcome) {
         dispatchGameEvent('blackjack:result', { outcome });
-        restartGame();
+        setTimeout(() => {
+            restartGame();
+        }, 4000);
+    }
+
+    function dealerDraw() {
+        if (dealerSum < 17) {
+            const card = deck.pop();
+            dealerHand.push(card);
+            dealerSum = SommeMain(dealerHand);
+            setTimeout(() => {
+                afficheMains(true);
+                updateScore(true);
+            }, 500);
+            setTimeout(dealerDraw, 700);
+        } else {
+            setTimeout(() => {
+                if (dealerSum > 21) {
+                    revealDealerHand();
+                    settleAndRestart(`win`);
+                } else if (dealerSum > playerSum) {
+                    revealDealerHand();
+                    settleAndRestart('lose');
+                } else if (dealerSum < playerSum) {
+                    revealDealerHand();
+                    settleAndRestart('win');
+                } else {
+                    revealDealerHand();
+                    settleAndRestart('push');
+                }
+            }, 700);
+        }
     }
 
     function hit() {
-    if (!canHit) return;
+        if (!canHit) return;
 
-    playerHand.push(deck.pop());
-    playerSum = SommeMain(playerHand);
+        playerHand.push(deck.pop());
+        playerSum = SommeMain(playerHand);
 
-    afficheMains();
-    updateScore();
+        afficheMains();
+        updateScore();
 
-    if (playerSum > 21) {
-        canHit = false;
-        setTimeout(() => {
-            settleAndRestart('lose');
-        }, 500);
+        if (playerSum > 21) {
+            canHit = false;
+            revealDealerHand();
+            setTimeout(() => {
+                settleAndRestart('lose');
+            }, 500);
+        }
     }
-}
 
     function stay() {
         canHit = false;
         revealDealerHand();
 
-        function dealerDraw() {
-            if (dealerSum < 17) {
-                const card = deck.pop();
-                dealerHand.push(card);
-                dealerSum = SommeMain(dealerHand);
-                afficheMains(true);
-                updateScore(true);
-                setTimeout(dealerDraw, 700);
-            } else {
-                setTimeout(() => {
-                    if (dealerSum > 21) {
-                        settleAndRestart(`win`);
-                    } else if (dealerSum > playerSum) {
-                        settleAndRestart('lose');
-                    } else if (dealerSum < playerSum) {
-                        settleAndRestart('win');
-                    } else {
-                        settleAndRestart('push');
-                    }
-                }, 700);
-            }
-        }
-
         dealerDraw();
     }
 
     function split() {
+
     }
 
     function double() {
+        if (!canHit) return;
+
+        playerHand.push(deck.pop());
+        playerSum = SommeMain(playerHand);
+
+        afficheMains();
+        updateScore();
+        canHit = false;
+        revealDealerHand();
+
+        if (playerSum > 21) {
+            setTimeout(() => {
+                settleAndRestart('lose');
+            }, 500);
+        } else {
+            dealerDraw();
+        }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -285,10 +323,10 @@
             btn.addEventListener('click', function onBetTokenClick() {
                 betAmount += parseInt(this.getAttribute('data-value'), 10);
                 window.pendingBlackjackBet = betAmount;
-                if (betAmount > 0){
-                selectedBetLabel.textContent = `Mise sélectionnée : ${betAmount}`;
+                if (betAmount > 0) {
+                    selectedBetLabel.textContent = `Mise sélectionnée : ${betAmount}`;
                 } else {
-                selectedBetLabel.textContent = 'Aucune mise sélectionnée';
+                    selectedBetLabel.textContent = 'Aucune mise sélectionnée';
                 }
             });
         });

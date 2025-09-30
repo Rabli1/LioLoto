@@ -115,3 +115,32 @@
         opacity: 1;
     }
 }
+
+.win{
+    border: 3px solid #00E600 !important;
+    font-weight: bold;
+    display: inline-block;
+    background-color: #00E6005E;
+}
+
+
+.lose{
+    border: 3px solid #ff0000 !important;
+    font-weight: bold;
+    display: inline-block;
+    background-color: #ff00005E;
+}
+
+.draw{
+    border: 3px solid #555554 !important;
+    font-weight: bold;
+    display: inline-block;
+    background-color: #5555545E;
+}
+
+.blackjack{
+    border: 3px solid #FFD700 !important;
+    font-weight: bold;
+    display: inline-block;
+    background-color: #FFD7005E;
+}

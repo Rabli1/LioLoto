@@ -46,7 +46,7 @@
                 <div class="mb-4">
                     <h3 class="h6 text-uppercase mb-3">Joueur</h3>
                     <div id="playerContainer"></div>
-                    <p class="mt-3">Total : <span id="playerSum">0</span></p>
+                    <p id="sumContainer" class="mt-3">Total : <span id="playerSum">0</span></p>
                 </div>
 
                 <div class="action-buttons d-flex flex-wrap justify-content-center">
