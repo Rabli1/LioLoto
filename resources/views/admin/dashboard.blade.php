@@ -16,6 +16,7 @@
             <th scope="col">Nom d'utilisateur</th>
             <th scope="col">Points</th>
             <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -31,6 +32,17 @@
                         <input type="number" name="points" value="{{ $user['points'] }}" 
                                class="form-control d-inline-block w-auto" style="width: 80px;">
                         <button type="submit" class="btn btn-danger btn-sm">mettre à jour</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/admin/toggleAdmin" method="post">
+                        @csrf
+                        <input type="hidden" name="userId" value="{{ $user['id'] }}">
+                        @if(!$user['admin'])
+                            <button type="submit" class="btn btn-success" name="action" value="admin">Ajouter droit admin</button>
+                        @else
+                            <button type="submit" class="btn btn-danger" name="action" value="user">Retirer droit admin</button>
+                        @endif
                     </form>
                 </td>
                 <td>

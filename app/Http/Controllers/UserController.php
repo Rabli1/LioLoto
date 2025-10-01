@@ -23,6 +23,7 @@ class UserController extends Controller
 
     public function signIn()
     {
+        $this->userService->redirectIfConnected();
         return view('user.signIn');
     }
     public function addUser(Request $request)
@@ -59,6 +60,7 @@ class UserController extends Controller
 
     public function connection(Request $request)
     {
+        $this->userService->redirectIfConnected();
         return view('user.connection', ['message' => $request->input('message')]);
     }
 

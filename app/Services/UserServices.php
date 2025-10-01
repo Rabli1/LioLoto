@@ -71,4 +71,19 @@ class UserServices
         }
         return null;
     }
+    public function redirectIfNotConnected(){
+        if(!session()->has("user")){
+            abort(redirect('/user/connection'));
+        }
+    }
+    public function redirectIfConnected(){
+        if(session()->has("user")){
+            abort(redirect('/'));
+        }
+    }
+    public function redirectIfNotAdmin(){
+        if(!session("user")->admin){
+            abort(redirect('/'));
+        }
+    } 
 }
