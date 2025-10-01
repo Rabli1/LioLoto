@@ -106,11 +106,12 @@ class GameController extends Controller
         foreach ($users as &$entry) {
             if (($entry['id'] ?? null) === $user->id) {
                 $difference = ($validated['balance'] - $entry['points']) / 2; // divisé par deux pcq il redonne la mise
+                $mise = $validated['balance'] - $entry['points'];
                 if($difference > 0){
                     $this->gameServices->addExp($difference, $entry);
                 }
                 if($difference < 0){
-                    $this->gameServices->addPointLost($difference*2, $entry);
+                    $this->gameServices->addPointLost($mise, $entry);
                     $user->pointsLost = $entry['pointsLost'];
                 }
                 $entry['points'] = $validated['balance'];
