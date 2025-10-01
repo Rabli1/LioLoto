@@ -19,6 +19,6 @@ class GameServices
         }
     }
     public function addPointLost($pointLost, &$user){
-        $user['pointLost'] += $pointLost;
+        $user['pointsLost'] += $pointLost;
     }
 }
