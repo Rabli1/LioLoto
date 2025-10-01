@@ -32,7 +32,7 @@
 }
 
 #dealerContainer,
-#playerContainer {
+#playerContainer, #playerContainerSplit {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -41,7 +41,8 @@
 }
 
 #dealerContainer img,
-#playerContainer img {
+#playerContainer img,
+#playerContainerSplit img {
     width: 90px;
     height: auto;
     border-radius: 12px;
@@ -220,4 +221,13 @@
     font-weight: bold;
     display: inline-block;
     background-color: #FFD7005E;
+}
+
+#playerHand1{
+    display: inline-block;
+}
+
+#playerHand2{
+    display: inline-block;
+    margin-left: 2rem;
 }

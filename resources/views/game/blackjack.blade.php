@@ -43,10 +43,16 @@
                     <p class="mt-3">Total : <span id="dealerSum">0</span></p>
                 </div>
 
-                <div class="mb-4">
-                    <h3 class="h6 text-uppercase mb-3">Joueur</h3>
+                <div id="playerHand1" class="mb-4">
+                    <h3 id='labelMain' class="h6 text-uppercase mb-3">Joueur</h3>
                     <div id="playerContainer"></div>
                     <p id="sumContainer" class="mt-3">Total : <span id="playerSum">0</span></p>
+                </div>
+
+                <div id="playerHand2" class="mb-4">
+                    <h3 class="h6 text-uppercase mb-3">Main 2</h3>
+                    <div id="playerContainerSplit"></div>
+                    <p id="sumContainerSplit" class="mt-3">Total : <span id="playerSumSplit">0</span></p>
                 </div>
 
                 <div class="action-buttons d-flex flex-wrap justify-content-center">
