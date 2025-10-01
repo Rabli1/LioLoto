@@ -6,6 +6,8 @@ if ($userConnected = session()->has("user")) {
     $connectedUser = session('user');
     $connectedUserId = $connectedUser->id;
 }
+$lastPoints = null;
+$lastRank = 0;
 ?>
 <h1 class="mt-5 text-center">Classement Général</h1>
 
@@ -20,10 +22,6 @@ if ($userConnected = session()->has("user")) {
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $lastPoints = null;
-                    $lastRank = 0;
-                @endphp
 
                 @foreach ($top10 as $index => $user)
                     @php
