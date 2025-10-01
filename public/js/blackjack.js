@@ -8,6 +8,7 @@
     let canHit = true;
     document.getElementById('split').disabled = true;
     let hasSplit = false;
+    let hasDoubled = false;
     let betAmount = 0;
 
     let playerHand = [];
@@ -127,7 +128,10 @@
         playerHand = [];
         dealerHand = [];
         canHit = true;
-        document.getElementById('double').disabled = false;
+        if (window.Balance < betAmount*2)
+            document.getElementById('double').disabled = true;
+        else
+            document.getElementById('double').disabled = false;
 
         playerHand.push(deck.pop());
         dealerHand.push(deck.pop());
@@ -141,7 +145,7 @@
         afficheMains();
         updateScore();
 
-        if(getCardValue(playerHand[0]) === getCardValue(playerHand[1])) {
+        if (getCardValue(playerHand[0]) === getCardValue(playerHand[1])) {
             document.getElementById('split').disabled = false;
         }
 
@@ -160,7 +164,7 @@
                 } else {
                     settleAndRestart('blackjack');
                 }
-                
+
             }, 500);
         }
     }
@@ -192,7 +196,7 @@
         const playerSumLabel = document.getElementById('playerSum');
         const sumContainer = document.getElementById("sumContainer");
 
-        if (sumContainer) {sumContainer.className = 'mt-3'; sumContainer.innerHTML = `Total : <span id="playerSum">${playerSum}</span>`;}
+        if (sumContainer) { sumContainer.className = 'mt-3'; sumContainer.innerHTML = `Total : <span id="playerSum">${playerSum}</span>`; }
         if (betContainer) betContainer.style.display = 'block';
         if (gameMat) gameMat.style.display = 'none';
         if (selectedBetLabel) selectedBetLabel.textContent = '';
@@ -273,7 +277,7 @@
     }
 
     function split() {
-        
+
     }
 
     function double() {
@@ -281,6 +285,10 @@
 
         playerHand.push(deck.pop());
         playerSum = SommeMain(playerHand);
+        hasDoubled = true;
+        window.currentBlackjackBet *= 2;
+        window.Balance.miser(betAmount)
+        document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${window.currentBlackjackBet}</h2>`;
 
         afficheMains();
         updateScore();
@@ -303,6 +311,9 @@
         window.blackjackHit = hit;
         window.blackjackStay = stay;
         window.restartGame = restartGame;
+        window.blackjackDouble = double;
+        window.blackjackSplit = split;
+        window.hasDoubled = hasDoubled;
     });
 
     function initBlackjack() {
