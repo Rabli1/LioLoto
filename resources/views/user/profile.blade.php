@@ -64,7 +64,7 @@
                         <strong>Bronze :</strong> {{ $user['bronze'] }}
                     </li>
                     <li class="list-group-item bg-transparent {{ $textColor }}">
-                        <strong>Points perdus :</strong> {{ $user['pointsLost'] }}
+                        <strong>Points misés :</strong> {{ $user['pointsLost'] }}
                     </li>
                 </ul>
             </div>
