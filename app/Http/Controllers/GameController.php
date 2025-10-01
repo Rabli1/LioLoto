@@ -110,8 +110,8 @@ class GameController extends Controller
                     $this->gameServices->addExp($difference, $entry);
                 }
                 if($difference < 0){
-                    $this->gameServices->addPointLost($difference, $user);
-
+                    $this->gameServices->addPointLost($difference, $entry);
+                    $user->pointsLost = $entry['pointsLost'];
                 }
                 $entry['points'] = $validated['balance'];
                 $user->points = $entry['points'];
