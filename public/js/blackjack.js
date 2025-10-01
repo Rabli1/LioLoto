@@ -240,6 +240,11 @@
         window.pendingBlackjackBet = 0;
         window.currentBlackjackBet = 0;
 
+        document.getElementById('stayButton').disabled = false;
+        document.getElementById('hitButton').disabled = false;
+        document.getElementById('double').disabled = false;
+        document.getElementById('split').disabled = false;
+
         const betContainer = document.getElementById('betContainer');
         const gameMat = document.getElementById('gameMat');
         const selectedBetLabel = document.getElementById('selectedBet');
@@ -433,6 +438,10 @@
     function stay() {
         if (!hisSplit) {
             canHit = false;
+            document.getElementById('stayButton').disabled = true;
+            document.getElementById('hitButton').disabled = true;
+            document.getElementById('double').disabled = true;
+            document.getElementById('split').disabled = true;
             revealDealerHand();
             dealerDraw();
         }
@@ -444,6 +453,10 @@
             }
             else {
                 canHit = false;
+                document.getElementById('stayButton').disabled = true;
+                document.getElementById('hitButton').disabled = true;
+                document.getElementById('double').disabled = true;
+                document.getElementById('split').disabled = true;
                 revealDealerHand();
                 dealerDraw();
             }
@@ -460,7 +473,7 @@
         document.getElementById('playerHand2').style.opacity = '0.5';
         window.Balance.miser(betAmount)
         window.currentBlackjackBet = betAmount * 2;
-        document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${betAmount*2}</h2>`;
+        document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${betAmount * 2}</h2>`;
 
         if (window.Balance.get() < betAmount * 2)
             document.getElementById('double').disabled = true;
