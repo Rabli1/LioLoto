@@ -5,26 +5,48 @@
         if (!stake) return;
 
         let payout = 0;
+        let images = document.getElementsByClassName("playerCard");
+        let resultMessage = document.getElementById("sumContainer");
 
         switch (outcome) {
             case 'blackjack':
                 payout = Math.floor(stake * 5 / 2);
-                alert(`Blackjack ! Mise ${stake}, gain ${payout - stake}.`);
+                for (let card of images) {
+                    card.classList.add("blackjack");
+                }
+                resultMessage.classList.add("blackjack");
+                resultMessage.textContent +=` - Blackjack ! Mise ${stake}, gain ${payout - stake}.`;
                 break;
             case 'win':
                 payout = stake * 2;
-                alert(`Vous gagnez ! Mise ${stake}, gain ${payout - stake}.`);
+                for (let card of images) {
+                    card.classList.add("win");
+                }
+                resultMessage.classList.add("win");
+                resultMessage.textContent +=` - Vous gagner. Mise ${stake} gagné.`;
                 break;
             case 'push':
                 payout = stake;
-                alert(`Égalité. Mise ${stake} rendue.`);
+                for (let card of images) {
+                    card.classList.add("draw");
+                }
+                resultMessage.classList.add("draw");
+                resultMessage.textContent += ` - Égalité. Mise ${stake} rendue.`;
                 break;
             case 'dealer-blackjack':
                 payout = 0;
-                alert(`Le croupier a un blackjack ! Mise ${stake} perdue.`);
+                for (let card of images) {
+                    card.classList.add("lose");
+                }
+                resultMessage.classList.add("lose");
+                resultMessage.textContent +=` - Le croupier a un blackjack ! Mise ${stake} perdue.`;
                 break;
             default:
-                alert(`Vous perdez. Mise ${stake} perdue.`);
+                for (let card of images) {
+                    card.classList.add("lose");
+                }
+                resultMessage.classList.add("lose");
+                resultMessage.textContent +=` - Vous perdez. Mise ${stake} perdue.`;
         }
 
         if (payout > 0) {
