@@ -68,12 +68,12 @@ $lastRank = 0;
                         </td>
                     </tr>
                 @endforeach
-                @php
-                    if($top10[9]['points'] == $apartUser['points']){
-                        $position = $lastRank;
-                    }
-                @endphp
                 @if($apartUser != null)
+                    @php
+                        if($top10[9]['points'] == $apartUser->points){
+                            $position = $lastRank;
+                        }
+                    @endphp
                     <tr>
                         <td colspan="3" class="text-center">...</td>
                     </tr>
