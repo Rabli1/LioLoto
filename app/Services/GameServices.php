@@ -18,4 +18,8 @@ class GameServices
             $user['lvl'] += 1;
         }
     }
+    public function addPointLost($pointsLost, &$user){
+
+        $user['pointsLost'] += abs($pointsLost);
+    }
 }

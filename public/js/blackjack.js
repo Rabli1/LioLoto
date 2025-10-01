@@ -3,12 +3,21 @@
 
     let dealerSum = 0;
     let playerSum = 0;
+    let playerSumSplit = 0;
     let hiddenCard;
     let deck = [];
     let canHit = true;
+    let canHitSplit = true;
+    let hisSplit = false;
+    let firstSplit = true;
+    let result1 = '';
+    let result2 = '';
+    document.getElementById('split').disabled = true;
+    document.getElementById('playerHand2').style.display = 'none';
     let betAmount = 0;
 
     let playerHand = [];
+    let playerHandSplit = [];
     let dealerHand = [];
 
     function dispatchGameEvent(name, detail = {}) {
@@ -71,6 +80,7 @@
     function afficheMains(showHidden = false) {
         const dealerContainer = document.getElementById('dealerContainer');
         const playerContainer = document.getElementById('playerContainer');
+        const playerContainerSplit = document.getElementById('playerContainerSplit');
 
         if (dealerContainer) {
             dealerHand.forEach((card, index) => {
@@ -95,23 +105,59 @@
             });
         }
 
-        if (playerContainer) {
-            playerHand.forEach((card, index) => {
-                if (!playerContainer.children[index]) {
-                    const img = document.createElement('img');
-                    img.src = `${CARD_PATH}${card}.png`;
-                    img.alt = card;
-                    img.classList.add('playerCard');
-                    img.style.animationDelay = `${0.25}s`;
-                    playerContainer.appendChild(img);
-                }
-            });
+        if (!hisSplit) {
+            if (playerContainer) {
+                playerHand.forEach((card, index) => {
+                    if (!playerContainer.children[index]) {
+                        const img = document.createElement('img');
+                        img.src = `${CARD_PATH}${card}.png`;
+                        img.alt = card;
+                        img.classList.add('playerCard');
+                        img.style.animationDelay = `${0.25}s`;
+                        playerContainer.appendChild(img);
+                    }
+                });
+            }
+        }
+        else {
+            if (firstSplit) {
+                playerContainer.innerHTML = '';
+                playerContainerSplit.innerHTML = '';
+                firstSplit = false;
+            }
+            if (playerContainer) {
+                playerHand.forEach((card, index) => {
+                    if (!playerContainer.children[index]) {
+                        const img = document.createElement('img');
+                        img.src = `${CARD_PATH}${card}.png`;
+                        img.alt = card;
+                        img.classList.add('playerCard');
+                        img.style.animationDelay = `${0.25}s`;
+                        playerContainer.appendChild(img);
+                    }
+                });
+            }
+
+            if (playerContainerSplit) {
+                playerHandSplit.forEach((card, index) => {
+                    if (!playerContainerSplit.children[index]) {
+                        const img = document.createElement('img');
+                        img.src = `${CARD_PATH}${card}.png`;
+                        img.alt = card;
+                        img.classList.add('playerCard');
+                        img.style.animationDelay = `${0.25}s`;
+                        playerContainerSplit.appendChild(img);
+                    }
+                });
+            }
+
         }
     }
 
     function updateScore(showDealerTotal = false) {
         const dealerSumLabel = document.getElementById('dealerSum');
         const playerSumLabel = document.getElementById('playerSum');
+        const playerSumSplitLabel = document.getElementById('playerSumSplit');
 
         if (dealerSumLabel) {
             dealerSumLabel.textContent = showDealerTotal ? dealerSum : getCardValue(dealerHand[0]);
@@ -119,13 +165,19 @@
         if (playerSumLabel) {
             playerSumLabel.textContent = playerSum;
         }
+        if (playerSumSplitLabel) {
+            playerSumSplitLabel.textContent = playerSumSplit;
+        }
     }
 
     function startGame() {
         playerHand = [];
         dealerHand = [];
         canHit = true;
-        document.getElementById('double').disabled = false;
+        if (window.Balance.get() < betAmount * 2)
+            document.getElementById('double').disabled = true;
+        else
+            document.getElementById('double').disabled = false;
 
         playerHand.push(deck.pop());
         dealerHand.push(deck.pop());
@@ -138,6 +190,9 @@
 
         afficheMains();
         updateScore();
+        if ((getCardValue(playerHand[0]) === getCardValue(playerHand[1])) && window.Balance.get() >= betAmount * 2) {
+            document.getElementById('split').disabled = false;
+        }
 
         const betAmountLabel = document.getElementById('betAmount');
         if (betAmountLabel) {
@@ -154,7 +209,7 @@
                 } else {
                     settleAndRestart('blackjack');
                 }
-                
+
             }, 500);
         }
     }
@@ -171,13 +226,24 @@
     function restartGame() {
         dealerSum = 0;
         playerSum = 0;
+        playerSumSplit = 0;
         playerHand = [];
         dealerHand = [];
+        playerHandSplit = [];
+        hisSplit = false;
+        canHitSplit = true;
+        firstSplit = true;
+
         hiddenCard = null;
         canHit = true;
         betAmount = null;
         window.pendingBlackjackBet = 0;
         window.currentBlackjackBet = 0;
+
+        document.getElementById('stayButton').disabled = false;
+        document.getElementById('hitButton').disabled = false;
+        document.getElementById('double').disabled = false;
+        document.getElementById('split').disabled = false;
 
         const betContainer = document.getElementById('betContainer');
         const gameMat = document.getElementById('gameMat');
@@ -185,18 +251,25 @@
         const betAmountLabel = document.getElementById('betAmount');
         const playerSumLabel = document.getElementById('playerSum');
         const sumContainer = document.getElementById("sumContainer");
+        const sumContainerSplit = document.getElementById("sumContainerSplit");
+        const plaerHand2 = document.getElementById("playerHand2");
 
-        if (sumContainer) {sumContainer.className = 'mt-3'; sumContainer.innerHTML = `Total : <span id="playerSum">${playerSum}</span>`;}
+
+        if (sumContainer) { sumContainer.className = 'mt-3'; sumContainer.innerHTML = `Total : <span id="playerSum">${playerSum}</span>`; }
+        if (sumContainerSplit) { sumContainerSplit.className = 'mt-3'; sumContainerSplit.innerHTML = `Total : <span id="playerSum">${playerSumSplit}</span>`; }
         if (betContainer) betContainer.style.display = 'block';
         if (gameMat) gameMat.style.display = 'none';
         if (selectedBetLabel) selectedBetLabel.textContent = '';
         if (betAmountLabel) betAmountLabel.innerHTML = '';
         if (playerSumLabel) playerSumLabel.textContent = '';
+        if (plaerHand2) plaerHand2.style.display = 'none';
 
         const dealerContainer = document.getElementById('dealerContainer');
         const playerContainer = document.getElementById('playerContainer');
+        const playerContainerSplit = document.getElementById('playerContainerSplit');
         if (dealerContainer) dealerContainer.innerHTML = '';
         if (playerContainer) playerContainer.innerHTML = '';
+        if (playerContainerSplit) playerContainerSplit.innerHTML = '';
 
         dispatchGameEvent('blackjack:bet-reset');
 
@@ -211,7 +284,16 @@
         }, 4000);
     }
 
+    function settleAndRestartSplit(outcome1, outcome2) {
+        dispatchGameEvent('blackjack:resultSplit', { outcome1, outcome2 });
+        setTimeout(() => {
+            restartGame();
+        }, 4000);
+    }
+
     function dealerDraw() {
+        document.getElementById('playerHand1').style.opacity = '1';
+        document.getElementById('playerHand2').style.opacity = '1';
         if (dealerSum < 17) {
             const card = deck.pop();
             dealerHand.push(card);
@@ -222,71 +304,254 @@
             }, 500);
             setTimeout(dealerDraw, 700);
         } else {
-            setTimeout(() => {
-                if (dealerSum > 21) {
-                    revealDealerHand();
-                    settleAndRestart(`win`);
-                } else if (dealerSum > playerSum) {
-                    revealDealerHand();
-                    settleAndRestart('lose');
-                } else if (dealerSum < playerSum) {
-                    revealDealerHand();
-                    settleAndRestart('win');
-                } else {
-                    revealDealerHand();
-                    settleAndRestart('push');
-                }
-            }, 700);
+            if (!hisSplit) {
+                setTimeout(() => {
+                    if (dealerSum > 21) {
+                        revealDealerHand();
+                        settleAndRestart(`win`);
+                    } else if (dealerSum > playerSum) {
+                        revealDealerHand();
+                        settleAndRestart('lose');
+                    } else if (dealerSum < playerSum) {
+                        revealDealerHand();
+                        settleAndRestart('win');
+                    } else {
+                        revealDealerHand();
+                        settleAndRestart('push');
+                    }
+                }, 700);
+            }
+            else {
+                setTimeout(() => {
+                    if ((dealerSum > 21) && (result1 !== 'lose' && result2 !== 'lose')) {
+                        revealDealerHand();
+                        settleAndRestartSplit('win', 'win');
+                    } else if ((dealerSum > 21) && (result1 !== 'lose' && result2 === 'lose')) {
+                        revealDealerHand();
+                        settleAndRestartSplit('win', 'lose');
+                    } else if ((dealerSum > 21) && (result1 === 'lose' && result2 !== 'lose')) {
+                        revealDealerHand();
+                        settleAndRestartSplit('lose', 'win');
+                    } else if ((dealerSum > 21) && (result1 === 'lose' && result2 === 'lose')) {
+                        revealDealerHand();
+                        settleAndRestartSplit('lose', 'lose');
+                    } else if (playerSum > 21 && playerSumSplit > 21) {
+                        revealDealerHand();
+                        settleAndRestartSplit('lose', 'lose');
+                    } else if (playerSum > 21 && playerSumSplit <= 21) {
+                        if (dealerSum < playerSumSplit) {
+                            revealDealerHand();
+                            settleAndRestartSplit('lose', 'win');
+                        } else if (dealerSum > playerSumSplit) {
+                            revealDealerHand();
+                            settleAndRestartSplit('lose', 'lose');
+                        } else {
+                            revealDealerHand();
+                            settleAndRestartSplit('lose', 'push');
+                        }
+                    } else if (playerSumSplit > 21 && playerSum <= 21) {
+                        if (dealerSum < playerSum) {
+                            revealDealerHand();
+                            settleAndRestartSplit('win', 'lose');
+                        } else if (dealerSum > playerSum) {
+                            revealDealerHand();
+                            settleAndRestartSplit('lose', 'lose');
+                        } else {
+                            revealDealerHand();
+                            settleAndRestartSplit('push', 'lose');
+                        }
+                    } else if (dealerSum > playerSum && dealerSum > playerSumSplit) {
+                        revealDealerHand();
+                        settleAndRestartSplit('lose', 'lose');
+                    } else if (dealerSum < playerSum && dealerSum < playerSumSplit) {
+                        revealDealerHand();
+                        settleAndRestartSplit('win', 'win');
+                    } else {
+                        if (playerSum > dealerSum) result1 = 'win';
+                        else if (playerSum < dealerSum) result1 = 'lose';
+                        else result1 = 'push';
+
+                        if (playerSumSplit > dealerSum) result2 = 'win';
+                        else if (playerSumSplit < dealerSum) result2 = 'lose';
+                        else result2 = 'push';
+
+                        revealDealerHand();
+                        settleAndRestartSplit(result1, result2);
+                    }
+                }, 700);
+            }
         }
     }
 
     function hit() {
         if (!canHit) return;
 
-        playerHand.push(deck.pop());
-        playerSum = SommeMain(playerHand);
-        document.getElementById('double').disabled = true;
+        if (!hisSplit) {
+            playerHand.push(deck.pop());
+            playerSum = SommeMain(playerHand);
+            document.getElementById('double').disabled = true;
 
-        afficheMains();
-        updateScore();
+            afficheMains();
+            updateScore();
 
-        if (playerSum > 21) {
-            canHit = false;
-            revealDealerHand();
-            setTimeout(() => {
-                settleAndRestart('lose');
-            }, 500);
+            if (playerSum > 21) {
+                canHit = false;
+                revealDealerHand();
+                setTimeout(() => {
+                    settleAndRestart('lose');
+                }, 500);
+            }
+        }
+        else {
+            if (canHitSplit) {
+                playerHand.push(deck.pop());
+                playerSum = SommeMain(playerHand);
+                document.getElementById('double').disabled = true;
+
+                afficheMains();
+                updateScore();
+
+                if (playerSum > 21) {
+                    canHitSplit = false;
+                    document.getElementById('playerHand1').style.opacity = '0.5';
+                    document.getElementById('playerHand2').style.opacity = '1';
+                    result1 = 'lose';
+                }
+            }
+            else {
+                playerHandSplit.push(deck.pop());
+                playerSumSplit = SommeMain(playerHandSplit);
+
+                afficheMains();
+                updateScore();
+
+                if (playerSumSplit > 21) {
+                    canHit = false;
+                    result2 = 'lose';
+                    revealDealerHand();
+                    dealerDraw();
+                }
+            }
         }
     }
 
     function stay() {
-        canHit = false;
-        revealDealerHand();
-
-        dealerDraw();
+        if (!hisSplit) {
+            canHit = false;
+            document.getElementById('stayButton').disabled = true;
+            document.getElementById('hitButton').disabled = true;
+            document.getElementById('double').disabled = true;
+            document.getElementById('split').disabled = true;
+            revealDealerHand();
+            dealerDraw();
+        }
+        else {
+            if (canHitSplit) {
+                canHitSplit = false;
+                document.getElementById('playerHand1').style.opacity = '0.5';
+                document.getElementById('playerHand2').style.opacity = '1';
+            }
+            else {
+                canHit = false;
+                document.getElementById('stayButton').disabled = true;
+                document.getElementById('hitButton').disabled = true;
+                document.getElementById('double').disabled = true;
+                document.getElementById('split').disabled = true;
+                revealDealerHand();
+                dealerDraw();
+            }
+        }
     }
 
     function split() {
+        hisSplit = true;
+        canHitSplit = true;
+        document.getElementById('split').disabled = true;
+        document.getElementById('playerHand2').style.display = 'inline-block';
+        document.getElementById('labelMain').textContent = 'Main 1';
+        document.getElementById('playerHand1').style.opacity = '1';
+        document.getElementById('playerHand2').style.opacity = '0.5';
+        window.Balance.miser(betAmount)
+        window.currentBlackjackBet = betAmount * 2;
+        document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${betAmount * 2}</h2>`;
 
+        if (window.Balance.get() < betAmount * 2)
+            document.getElementById('double').disabled = true;
+        else
+            document.getElementById('double').disabled = false;
+        splitHand();
+    }
+
+    function splitHand() {
+        playerHandSplit.push(playerHand.pop());
+        playerHand.push(deck.pop());
+        playerHandSplit.push(deck.pop());
+        playerSum = SommeMain(playerHand);
+        playerSumSplit = SommeMain(playerHandSplit);
+        afficheMains();
+        updateScore();
     }
 
     function double() {
         if (!canHit) return;
 
-        playerHand.push(deck.pop());
-        playerSum = SommeMain(playerHand);
+        if (!hisSplit) {
+            playerHand.push(deck.pop());
+            playerSum = SommeMain(playerHand);
+            window.currentBlackjackBet *= 2;
+            window.Balance.miser(betAmount)
+            document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${window.currentBlackjackBet}</h2>`;
 
-        afficheMains();
-        updateScore();
-        canHit = false;
-        revealDealerHand();
+            afficheMains();
+            updateScore();
+            canHit = false;
+            revealDealerHand();
 
-        if (playerSum > 21) {
-            setTimeout(() => {
-                settleAndRestart('lose');
-            }, 500);
-        } else {
-            dealerDraw();
+            if (playerSum > 21) {
+                setTimeout(() => {
+                    settleAndRestart('lose');
+                }, 500);
+            } else {
+                dealerDraw();
+            }
+        }
+        else {
+            if (canHitSplit) {
+                playerHand.push(deck.pop());
+                playerSum = SommeMain(playerHand);
+                window.currentBlackjackBet *= 2;
+                window.Balance.miser(betAmount)
+                document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${window.currentBlackjackBet}</h2>`;
+
+                afficheMains();
+                updateScore();
+                canHitSplit = false;
+                document.getElementById('playerHand1').style.opacity = '0.5';
+                document.getElementById('playerHand2').style.opacity = '1';
+                if (playerSum > 21) {
+                    result1 = 'lose';
+                }
+            }
+            else {
+                playerHandSplit.push(deck.pop());
+                playerSumSplit = SommeMain(playerHandSplit);
+                window.currentBlackjackBet *= 2;
+                window.Balance.miser(betAmount)
+                document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${window.currentBlackjackBet}</h2>`;
+                afficheMains();
+                updateScore();
+                canHit = false;
+                revealDealerHand();
+                if (playerSumSplit > 21) {
+                    result2 = 'lose';
+                }
+                if (playerSum > 21 && playerSumSplit > 21) {
+                    settleAndRestartSplit('lose', 'lose');
+                } else {
+                    dealerDraw();
+                }
+            }
+
         }
     }
 
@@ -297,6 +562,8 @@
         window.blackjackHit = hit;
         window.blackjackStay = stay;
         window.restartGame = restartGame;
+        window.blackjackDouble = double;
+        window.blackjackSplit = split;
     });
 
     function initBlackjack() {
