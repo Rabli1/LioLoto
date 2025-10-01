@@ -70,6 +70,11 @@ if ($userConnected = session()->has("user")) {
                         </td>
                     </tr>
                 @endforeach
+                @php
+                    if($top10[9]['points'] == $apartUser['points']){
+                        $position = $lastRank;
+                    }
+                @endphp
                 @if($apartUser != null)
                     <tr>
                         <td colspan="3" class="text-center">...</td>
