@@ -6,6 +6,8 @@
     let hiddenCard;
     let deck = [];
     let canHit = true;
+    document.getElementById('split').disabled = true;
+    let hasSplit = false;
     let betAmount = 0;
 
     let playerHand = [];
@@ -139,6 +141,10 @@
         afficheMains();
         updateScore();
 
+        if(getCardValue(playerHand[0]) === getCardValue(playerHand[1])) {
+            document.getElementById('split').disabled = false;
+        }
+
         const betAmountLabel = document.getElementById('betAmount');
         if (betAmountLabel) {
             betAmountLabel.innerHTML = `<h2>Votre mise : ${betAmount}</h2>`;
@@ -267,7 +273,7 @@
     }
 
     function split() {
-
+        
     }
 
     function double() {
