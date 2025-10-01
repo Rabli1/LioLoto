@@ -19,12 +19,8 @@ class AdminController extends Controller
     }
     public function dashboard(): View | RedirectResponse
     {
-        if(!session()->has("user")){
-            return redirect('/user/connection');
-        }
-        if(!session("user")->admin){
-            return redirect('/user/connection');
-        }
+        $this->userService->redirectIfNotConnected();
+        $this->userService->redirectIfNotAdmin();
         $users = $this->userService->all();
         return view('admin.dashboard', [
             'users' => $users,
@@ -56,6 +52,25 @@ class AdminController extends Controller
                     $user['banned'] = true;
                 } elseif ($action === 'unban') {
                     $user['banned'] = false;
+                }
+                file_put_contents($path, json_encode($users));
+                break;
+            }
+        }
+        return redirect('/admin/dashboard');
+    }
+    public function toggleAdmin(Request $request): RedirectResponse
+    {
+        $userId = (int) $request->input('userId');
+        $action = $request->input('action');
+        $path = base_path(self::USERS_PATH);
+        $users = json_decode(@file_get_contents($path), true);
+        foreach ($users as &$user) {
+            if ($user['id'] === $userId) {
+                if ($action === 'admin') {
+                    $user['admin'] = true;
+                } elseif ($action === 'user') {
+                    $user['admin'] = false;
                 }
                 file_put_contents($path, json_encode($users));
                 break;
