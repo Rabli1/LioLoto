@@ -107,7 +107,6 @@ class GameController extends Controller
             if (($entry['id'] ?? null) === $user->id) {
                 $difference = ($validated['balance'] - $entry['points']) / 2; // divisé par deux pcq il redonne la mise
                 $mise = $validated['balance'] - $entry['points'];
-                var_dump($difference);
                 if($difference > 0){
                     $this->gameServices->addExp($difference, $entry);
                 }
