@@ -152,8 +152,8 @@
     }
 
     function startRound() {
-        const minesSel = el('minesCount');
-        state.mines = Math.max(1, Math.min(24, Number(minesSel?.value || 3)));
+        const minesCell = el('minesCount');
+        state.mines = Math.max(1, Math.min(24, Number(minesCell.value)));
         resetRoundState();
         state.roundActive = true;
         state.positions = minesPlacement(state.mines);
