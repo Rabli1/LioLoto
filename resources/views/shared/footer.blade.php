@@ -7,7 +7,7 @@
           <li><a href="https://github.com/Just10Lessard" target="_blank" class="text-decoration-none text-light">
             <i class="fab fa-github"></i> GitHub</a></li>
           <li><a href="mailto:justin.lessard2025@gmail.com" class="text-decoration-none text-light">
-            <i class="fas fa-envelope"></i>Email</a></li>
+            <i class="fas fa-envelope"></i> Email</a></li>
           <li><a href="https://www.linkedin.com/in/justin-lessard-a4374b385/" target="_blank" class="text-decoration-none text-light">
             <i class="fab fa-linkedin"></i> LinkedIn</a></li>
         </ul>

@@ -1,6 +1,9 @@
 @include('shared.header')
 @include('shared.navbar')
 
+@php
+    $connectedUserId = session('user')->id;
+@endphp
 <h1 class="mt-5 text-center">Tableau de bord</h1>
 
 <div class="d-flex justify-content-center mt-3 mb-4">
@@ -39,9 +42,9 @@
                         @csrf
                         <input type="hidden" name="userId" value="{{ $user['id'] }}">
                         @if(!$user['admin'])
-                            <button type="submit" class="btn btn-success" name="action" value="admin">Ajouter droit admin</button>
+                                <button type="submit" class="btn btn-success" name="action" value="admin" {{ $user['id'] == $connectedUserId ? "disabled" : "" }}>Ajouter droit admin</button>
                         @else
-                            <button type="submit" class="btn btn-danger" name="action" value="user">Retirer droit admin</button>
+                            <button type="submit" class="btn btn-danger" name="action" value="user" {{ $user['id'] == $connectedUserId ? "disabled" : "" }}>Retirer droit admin</button>
                         @endif
                     </form>
                 </td>
@@ -50,9 +53,9 @@
                         @csrf
                         <input type="hidden" name="userId" value="{{ $user['id'] }}">
                         @if($user['banned'])
-                            <button type="submit" class="btn btn-success" name="action" value="unban">Débannir</button>
+                            <button type="submit" class="btn btn-success" name="action" value="unban" {{ $user['id'] == $connectedUserId ? "disabled" : "" }}>Débannir</button>
                         @else
-                            <button type="submit" class="btn btn-danger" name="action" value="ban">Bannir</button>
+                            <button type="submit" class="btn btn-danger" name="action" value="ban" {{ $user['id'] == $connectedUserId ? "disabled" : "" }}>Bannir</button>
                         @endif
                     </form>
                 </td>
