@@ -7,8 +7,8 @@ var world;
 var particles = [];
 var plinkos = [];
 var bounds = [];
-var cols = 11;
-var rows = 10;
+var cols = 19;
+var rows = 19;
 
 function setup() {
     let canvas = createCanvas(600, 800); //grace a p5 width = 600 et height = 800. Pas besoin de les calls
@@ -17,14 +17,14 @@ function setup() {
     world = engine.world;
     world.gravity.y = 2;
     newParticle();
-    var spacing = width/cols /1.5;
-    for (var j = 0; j < rows * 1.5; j++) {
-        for (var i = 0; i < cols * 1.5 + 1; i++) {
+    var spacing = width/cols;
+    for (var j = 0; j < rows; j++) {
+        for (var i = 0; i < cols + 1; i++) {
             var x = i * spacing;
             if ( j % 2 == 0) {
                 x += spacing/2;
             }
-            var y = spacing + j * spacing + 30;
+            var y = spacing + j * spacing + 50;
             var p = new Plinko(x, y, 6);
             plinkos.push(p);
         }

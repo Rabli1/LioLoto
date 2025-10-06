@@ -4,7 +4,7 @@ function Particle(x,y,r) {
         friction: 0, //friction
     }
 
-    x += random(-1, 1);
+    x += random(-10, 10);
     this.body = Bodies.circle(x, y, r, options);
     this.body.label = "particle";
     this.r = r;
