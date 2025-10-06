@@ -5,7 +5,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Loto Lio - Blackjack</title>
-        <link rel="stylesheet" href="{{ asset('css/game.css') }}">
     </head>
 <main class="blackjack-page py-4">
     <div class="container">
