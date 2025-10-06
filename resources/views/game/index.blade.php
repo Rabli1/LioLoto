@@ -57,10 +57,14 @@
                     </div>
                     <div class="row"><a href="/game/roulette" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
-                <div class="leaderboard-card text-center d-flex flex-column ms-5 mw-100">
-                    <div class="row"><img src='{{ asset("img/Mines.webp") }}' alt="Plinko"></div>
-                    <div class="row"><h3>Crash</h3></div>
-                    <div class="row mt-auto"><a href="/game/crash" class="btn btn-danger btn-md">Jouer</a></div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
+                    <div class="row"><img src='{{ asset("img/mines.webp") }}' alt="Crash"></div>
+                    <div class="row">
+                        <h3>Crash</h3>
+                    </div>
+                    <div class="row"><a href="/game/crash" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
             </div>
         </div>
