@@ -190,7 +190,7 @@
 
         afficheMains();
         updateScore();
-        if ((getCardValue(playerHand[0]) === getCardValue(playerHand[1])) && window.Balance.get() >= betAmount * 2) {
+        if ((getCardValue(playerHand[0]) === getCardValue(playerHand[1])) && (window.Balance.get() >= betAmount * 2)) {
             document.getElementById('split').disabled = false;
         }
 
@@ -243,7 +243,7 @@
         document.getElementById('stayButton').disabled = false;
         document.getElementById('hitButton').disabled = false;
         document.getElementById('double').disabled = false;
-        document.getElementById('split').disabled = false;
+        document.getElementById('split').disabled = true;
 
         const betContainer = document.getElementById('betContainer');
         const gameMat = document.getElementById('gameMat');
@@ -256,7 +256,7 @@
 
 
         if (sumContainer) { sumContainer.className = 'mt-3'; sumContainer.innerHTML = `Total : <span id="playerSum">${playerSum}</span>`; }
-        if (sumContainerSplit) { sumContainerSplit.className = 'mt-3'; sumContainerSplit.innerHTML = `Total : <span id="playerSum">${playerSumSplit}</span>`; }
+        if (sumContainerSplit) { sumContainerSplit.className = 'mt-3'; sumContainerSplit.innerHTML = `Total : <span id="playerSumSplit">${playerSumSplit}</span>`; }
         if (betContainer) betContainer.style.display = 'block';
         if (gameMat) gameMat.style.display = 'none';
         if (selectedBetLabel) selectedBetLabel.textContent = '';
@@ -519,7 +519,7 @@
             if (canHitSplit) {
                 playerHand.push(deck.pop());
                 playerSum = SommeMain(playerHand);
-                window.currentBlackjackBet *= 2;
+                window.currentBlackjackBet += betAmount;
                 window.Balance.miser(betAmount)
                 document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${window.currentBlackjackBet}</h2>`;
 
@@ -535,7 +535,7 @@
             else {
                 playerHandSplit.push(deck.pop());
                 playerSumSplit = SommeMain(playerHandSplit);
-                window.currentBlackjackBet *= 2;
+                window.currentBlackjackBet += betAmount;
                 window.Balance.miser(betAmount)
                 document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${window.currentBlackjackBet}</h2>`;
                 afficheMains();

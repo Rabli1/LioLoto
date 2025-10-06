@@ -9,7 +9,7 @@ if($userConnected){
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/">Lio Loto</a>
+    <a class="navbar-brand fw-bold" href="/">Lotoli</a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
       aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">

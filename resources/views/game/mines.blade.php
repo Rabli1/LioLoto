@@ -38,7 +38,7 @@
                 <p id="selectedBet" class="fw-semibold mt-3">Aucune mise sélectionnée</p>
                 <div class="d-flex flex-row justify-content-center">
                     <button id="clearBet" class="btn btn-light mt-2 me-3" type="button">Effacer la mise</button>
-                    <button id="placeBet" class="btn btn-danger mt-2" type="button">Placer la mise</button>
+                    <button id="placeBet" class="btn btn-danger mt-2" type="button" @if(!session()->has('user')) disabled @endif>Placer la mise</button>
                 </div>
             </section>
 

@@ -19,23 +19,43 @@
     @include('shared.header')
     @include('shared.navbar')
 
-    <div class="container mt-5" style="padding-bottom: 300px;">
+    <div class="container mt-5">
+        <h1 style="text-align: center; margin-top: 20px;">Jeux</h1>
         <div class="row">
-            <div class="d-flex flex-row col-lg-6 mb-4">
-                <div class="leaderboard-card text-center d-flex flex-column">
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
                     <div class="row"><img src='{{ asset("img/blackjack.jpg") }}' alt="BlackJack"></div>
-                    <div class="row"><h3>BlackJack</h3></div>
-                    <div class="row mt-auto"><a href="/game/blackjack" class="btn btn-danger btn-md">Jouer</a></div>
+                    <div class="row">
+                        <h3>BlackJack</h3>
+                    </div>
+                    <div class="row"><a href="/game/blackjack" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
-                <div class="leaderboard-card text-center ms-5">
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
                     <div class="row"><img src='{{ asset("img/plinko.webp") }}' alt="Plinko"></div>
-                    <div class="row"><h3>Plinko</h3></div>
-                    <div class="row mt-auto"><a href="/game/plinko" class="btn btn-danger btn-md">Jouer</a></div>
+                    <div class="row">
+                        <h3>Plinko</h3>
+                    </div>
+                    <div class="row"><a href="/game/plinko" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
-                <div class="leaderboard-card text-center d-flex flex-column ms-5 mw-100">
-                    <div class="row"><img src='{{ asset("img/Mines.webp") }}' alt="Plinko"></div>
-                    <div class="row"><h3>Mines</h3></div>
-                    <div class="row mt-auto"><a href="/game/mines" class="btn btn-danger btn-md">Jouer</a></div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
+                    <div class="row"><img src='{{ asset("img/mines.webp") }}' alt="Mines"></div>
+                    <div class="row">
+                        <h3>Mines</h3>
+                    </div>
+                    <div class="row"><a href="/game/mines" class="btn btn-danger btn-md">Jouer</a></div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
+                    <div class="row"><img style="heigh:" src='{{ asset("img/roulette.png") }}' alt="Roulette"></div>
+                    <div class="row">
+                        <h3>Roulette</h3>
+                    </div>
+                    <div class="row"><a href="/game/roulette" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
                 <div class="leaderboard-card text-center d-flex flex-column ms-5 mw-100">
                     <div class="row"><img src='{{ asset("img/Mines.webp") }}' alt="Plinko"></div>
@@ -45,6 +65,9 @@
             </div>
         </div>
     </div>
+
+    </div>
 </body>
 @include('shared.footer')
+
 </html>
