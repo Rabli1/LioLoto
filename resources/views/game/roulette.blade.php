@@ -18,7 +18,12 @@
                 </p>
                 <span class="balance">Solde : $<span id="mines-balance" data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
             </header>
-            
+
+            <section id="betMat">
+                <div id="bettingMat">
+
+                </div>
+            </section>
         </section>
     </div>
 </main>
