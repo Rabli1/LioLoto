@@ -8,11 +8,13 @@
     <title>Lotoli - Plinko</title>
     <link rel="stylesheet" href="{{ asset('css/game.css') }}">
     
-    <!-- Charger les bibliothèques JavaScript avec <script>, pas <link> -->
     <script src="{{ asset('js/plinko/libraries/matter.js') }}"></script>
     <script src="{{ asset('js/plinko/libraries/p5.js') }}"></script>
     <script src="{{ asset('js/plinko/particle.js') }}"></script>
     <script src="{{ asset('js/plinko/sketch.js') }}"></script>
+    <script src="{{ asset('js/plinko/plinko.js') }}"></script>
+    <script src="{{ asset('js/plinko/boundaries.js') }}"></script>
+
 </head>
 
 <body>
@@ -22,7 +24,7 @@
                 <header class="mb-4">
                     <h1 class="mb-2">Plinko</h1>
                     <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
-                        Thomas a fait un pet puant!
+                        Laissez tomber la balle et voyez où elle atterrit !
                     </p>
                 </header>
                 
