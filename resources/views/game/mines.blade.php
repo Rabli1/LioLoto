@@ -6,7 +6,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Loto Lio - Mines</title>
-        <link rel="stylesheet" href="{{ asset('css/game.css') }}">
     </head>
 <main class="py-4">
     <div class="container">
@@ -39,7 +38,7 @@
                 <p id="selectedBet" class="fw-semibold mt-3">Aucune mise sélectionnée</p>
                 <div class="d-flex flex-row justify-content-center">
                     <button id="clearBet" class="btn btn-light mt-2 me-3" type="button">Effacer la mise</button>
-                    <button id="placeBet" class="btn btn-danger mt-2" type="button">Placer la mise</button>
+                    <button id="placeBet" class="btn btn-danger mt-2" type="button" @if(!session()->has('user')) disabled @endif>Placer la mise</button>
                 </div>
             </section>
 

@@ -94,6 +94,15 @@ class GameController extends Controller
             'playerBalance' => $balance,
         ]);
     }
+    public function crash(): View{
+        $balance = 0;
+        if(session()->has('user')){
+            $balance = session('user')->points;
+        }
+        return view('game.crash', [
+            'playerBalance' => $balance
+        ]);
+    }
 
     public function saveBalance(Request $request): JsonResponse
     {

@@ -28,6 +28,7 @@ Route::get('game/plinko', [GameController::class, 'plinko']);
 Route::post('game/balance', [GameController::class, 'saveBalance']);
 Route::get('game/mines', [GameController::class, 'mines']);
 Route::get('game/roulette', [GameController::class, 'roulette']);
+Route::get('game/crash', [GameController::class, 'crash']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
