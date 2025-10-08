@@ -3,6 +3,7 @@
       <div class="carousel-item active">
         <a href="/game/blackjack">
             <img src="{{ asset('img/blackjack.jpg') }}" class="d-block w-100" alt="Blackjack">
+        </a>
       </div>
       <div class="carousel-item">
         <a href="/game/plinko">
