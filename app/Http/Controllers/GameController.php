@@ -106,7 +106,6 @@ class GameController extends Controller
 
     public function saveBalance(Request $request): JsonResponse
     {
-
         $user = $this->resolvePlayer();
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);

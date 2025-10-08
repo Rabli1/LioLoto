@@ -10,8 +10,8 @@
         <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
           Quittez le train avant que tout s'écroule!
         </p>
-        <span class="balance">
-          Solde : $<span data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span>
+        <span class="balance" id="balanceUI">
+          Solde : <span data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span>
         </span>
       </header>
 
