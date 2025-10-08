@@ -60,7 +60,7 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src='{{ asset("img/mines.webp") }}' alt="Crash"></div>
+                    <div class="row"><img src='{{ asset("img/crash.png") }}' alt="Crash"></div>
                     <div class="row">
                         <h3>Crash</h3>
                     </div>
