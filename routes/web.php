@@ -19,6 +19,7 @@ Route::post('user/updateAvatar', [UserController::class, 'updateAvatar'])->name(
 Route::post('user/updateBio', [UserController::class, 'updateBio']);
 Route::get('/user/changePassword', [UserController::class, 'changePassword'])->name('user.changePassword');
 Route::post('/user/changePassword', [UserController::class, 'updatePassword'])->name('user.updatePassword');
+Route::get('user/support', [UserController::class, 'support']);
 Route::get('/leaderboard', [UserController::class, 'leaderboard']);
 Route::get('/game', function () {
     return view('game.index');

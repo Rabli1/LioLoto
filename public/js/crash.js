@@ -8,6 +8,7 @@ const winMessage = $("#win-message");
 const auto = $("#auto");
 const autoWithdrawal = $("#autoWithdrawal");
 const balanceUI = $("#balanceUI");
+const balanceError = $("#balance-error");
 const csrfToken = $('meta[name="csrf-token"]').attr('content');
 let betAmount = 0;
 let value = 1;
@@ -70,10 +71,10 @@ async function animateGame() {
   $.ajax({
     url: '/game/balance',
     method: 'POST',
-    data: { balance: window.gameSession.balance },
+    data: { balance: parseInt(window.gameSession.balance) },
     headers: { 'X-CSRF-TOKEN': csrfToken },
     success: function (response) {
-      balanceUI.text(`Solde : ${response.balance}`);
+      balanceUI.text(`Solde : ${response.balance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
     },
     error: function (xhr, status, error) {
       console.error('Error saving balance:', error);
@@ -93,10 +94,10 @@ async function animateGame() {
         $.ajax({
           url: '/game/balance',
           method: 'POST',
-          data: { balance: window.gameSession.balance },
+          data: { balance: parseInt(window.gameSession.balance) },
           headers: { 'X-CSRF-TOKEN': csrfToken },
           success: function (response) {
-            balanceUI.text(`Solde : ${response.balance}`);
+            balanceUI.text(`Solde : ${response.balance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
           },
           error: function (xhr, status, error) {
             console.error('Error saving balance:', error);
@@ -126,11 +127,20 @@ async function animateGame() {
     await sleep(sleepTime);
   }
   multiplier.addClass("text-danger");
+  let list = lastCrash.find('div');
+  if(list.length > 10){
+    list.eq(0).remove();
+  }
   lastCrash.append(`<div class="bg-secondary rounded p-1">${value.toFixed(2) + "x"}</div>`);
-
 }
 
 playBtn.on("click", async function () {
+  window.gameSession.balance = Number(window.gameSession.balance)
+  balanceError.text("");
+  if(window.gameSession.balance < bet.val()){
+    balanceError.text("Vous n'avez pas assez de points");
+    return;
+  }
   playBtn.prop('disabled', true);
   await animateGame();
   cachOutBtn.prop('disabled', true)
@@ -138,6 +148,7 @@ playBtn.on("click", async function () {
 });
 
 cachOutBtn.on("click", function () {
+  window.gameSession.balance = Number(window.gameSession.balance)
   cachOutBtn.prop('disabled', true)
   const balance = parseInt(value * betAmount);
   winMessage.text(`${value.toFixed(2)}x -> ${(balance)} gagné`)
@@ -146,10 +157,10 @@ cachOutBtn.on("click", function () {
   $.ajax({
     url: '/game/balance',
     method: 'POST',
-    data: { balance: window.gameSession.balance },
+    data: { balance: parseInt(window.gameSession.balance) },
     headers: { 'X-CSRF-TOKEN': csrfToken },
     success: function (response) {
-      balanceUI.text(`Solde : ${response.balance}`);
+      balanceUI.text(`Solde : ${response.balance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
     },
     error: function (xhr, status, error) {
       console.error('Error saving balance:', error);

@@ -132,7 +132,8 @@ class GameController extends Controller
                     $user->pointsLost = $entry['pointsLost'];
                 }
                 $entry['points'] = $validated['balance'];
-                $user->points = $entry['points'];
+                $entry['points'] = (int) $entry['points'];
+                $user->points = (int) $entry['points'];
                 $updated = true;
                 break;
             }

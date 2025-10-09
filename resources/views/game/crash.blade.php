@@ -23,6 +23,7 @@
               <div class="mb-4">
                 <label for="bet" class="form-label">Montant :</label>
                 <input type="number" class="form-control" min="1" max="{{ $playerBalance }}" value="1" name="bet" id="bet">
+                <span id="balance-error" class="text-danger"></span>
               </div>
 
               <div class="form-check form-switch mb-3">
