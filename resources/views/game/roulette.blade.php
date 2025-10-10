@@ -21,7 +21,6 @@
 
             <section id="betMat">
                 <div id="bettingMat">
-
                 </div>
             </section>
         </section>

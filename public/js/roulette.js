@@ -7,6 +7,9 @@ function initBettingMat() {
 
     let rowCnt = 4;
     let colCnt = 2;
+    let leftHorizontal = 400;
+    let leftVertical = 480;
+    let topVertical = 508;
 
     item0.textContent = 0;
     item0.id = 'item0';
@@ -70,25 +73,80 @@ function initBettingMat() {
         else if (i == 4) {
             bottomItem.textContent = 'Pair';
         }
-        else if (i == 6){
+        else if (i == 6) {
             bottomItem.textContent = 'Rouge';
             bottomItem.style.backgroundColor = 'rgba(211, 47, 47, 0.5)';
         }
-        else if(i == 8){
+        else if (i == 8) {
             bottomItem.textContent = 'Noir';
             bottomItem.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
         }
         else if (i == 10) {
             bottomItem.textContent = 'Impair';
         }
-        else{
+        else {
             bottomItem.textContent = '19 à 36';
         }
         bottomItem.classList.add('bottomItem');
         bottomItem.style.gridColumn = `${i}/${i + 2}`;
         bettingMat.appendChild(bottomItem);
     }
-    
+
+    for (let i = 1; i < 36; i += 3) {
+        const item = document.createElement('div');
+        item.classList.add('bottomHorizontalGap', 'horizontalGap', 'clickGap');
+        item.dataset.cases = `${i} et ${i + 1}`
+        item.style.left = `${leftHorizontal}px`;
+        leftHorizontal += 85;
+        if (leftHorizontal > 1335) {
+            leftHorizontal = 400;
+        }
+        bettingMat.appendChild(item);
+    }
+
+    for (let i = 2; i < 36; i += 3) {
+        const item = document.createElement('div');
+        item.classList.add('topHorizontalGap', 'horizontalGap', 'clickGap');
+        item.dataset.cases = `${i} et ${i + 1}`
+        item.style.left = `${leftHorizontal}px`;
+        leftHorizontal += 85;
+        if (leftHorizontal > 1335) {
+            leftHorizontal = 400;
+        }
+        bettingMat.appendChild(item);
+    }
+
+    for (let i = 2; i < 36; i += 3) {
+        const item = document.createElement('div');
+        item.classList.add('topHorizontalGap', 'horizontalGap', 'clickGap');
+        item.dataset.cases = `${i} et ${i + 1}`
+        item.style.left = `${leftHorizontal}px`;
+        leftHorizontal += 85;
+        if (leftHorizontal > 1335) {
+            leftHorizontal = 400;
+        }
+        bettingMat.appendChild(item);
+    }
+
+     for (let i = 1; i < 34; i ++) {
+        const item = document.createElement('div');
+        item.classList.add('verticalGap', 'clickGap');
+        item.dataset.cases = `${i} et ${i+3}`;
+        item.style.left = `${leftVertical}px`;
+        item.style.top = `${topVertical}px`;
+        topVertical -= 85;
+        if(topVertical < 338){
+            topVertical = 508;
+            leftVertical += 85;
+        }
+        bettingMat.appendChild(item);
+    }
+
 }
 
 initBettingMat();
+document.querySelectorAll('.clickGap').forEach(gapClick => {
+    gapClick.addEventListener('click', e => {
+        alert('Tu as cliqué entre les cases: ' + gapClick.dataset.cases);
+    });
+});
