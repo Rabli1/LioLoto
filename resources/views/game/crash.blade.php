@@ -10,8 +10,8 @@
         <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
           Quittez le train avant que tout s'écroule!
         </p>
-        <span class="balance">
-          Solde : $<span data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span>
+        <span class="balance" id="balanceUI">
+          Solde : <span data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span>
         </span>
       </header>
 
@@ -23,6 +23,7 @@
               <div class="mb-4">
                 <label for="bet" class="form-label">Montant :</label>
                 <input type="number" class="form-control" min="1" max="{{ $playerBalance }}" value="1" name="bet" id="bet">
+                <span id="balance-error" class="text-danger"></span>
               </div>
 
               <div class="form-check form-switch mb-3">

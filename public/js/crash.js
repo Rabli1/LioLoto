@@ -7,6 +7,9 @@ const bet = $("#bet");
 const winMessage = $("#win-message");
 const auto = $("#auto");
 const autoWithdrawal = $("#autoWithdrawal");
+const balanceUI = $("#balanceUI");
+const balanceError = $("#balance-error");
+const csrfToken = $('meta[name="csrf-token"]').attr('content');
 let betAmount = 0;
 let value = 1;
 let autoCashout = false;
@@ -63,22 +66,50 @@ async function animateGame() {
     cachOutBtn.prop('disabled', false);
   }
   winMessage.text("")
+
+  window.gameSession.balance -= betAmount;
+  $.ajax({
+    url: '/game/balance',
+    method: 'POST',
+    data: { balance: parseInt(window.gameSession.balance) },
+    headers: { 'X-CSRF-TOKEN': csrfToken },
+    success: function (response) {
+      balanceUI.text(`Solde : ${response.balance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
+    },
+    error: function (xhr, status, error) {
+      console.error('Error saving balance:', error);
+    }
+  });
+
   while (value < gameEnd) {
     value += increment;
     multiplier.text(value.toFixed(2) + "x");
 
-    if(autoCashout){
-      if(cashOut < value){
-        winMessage.text(`${value.toFixed(2)}x -> ${(value * betAmount).toFixed(2)} gagné`)
+    if (autoCashout) {
+      if (cashOut < value) {
+        const win = parseInt(value * betAmount);
+        winMessage.text(`${value.toFixed(2)}x -> ${win} gagné`)
         autoCashout = false;
-        //backend ici
+        window.gameSession.balance += win;
+        $.ajax({
+          url: '/game/balance',
+          method: 'POST',
+          data: { balance: parseInt(window.gameSession.balance) },
+          headers: { 'X-CSRF-TOKEN': csrfToken },
+          success: function (response) {
+            balanceUI.text(`Solde : ${response.balance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
+          },
+          error: function (xhr, status, error) {
+            console.error('Error saving balance:', error);
+          }
+        });
       }
     }
 
-    if(value < 25){
-        const a = Math.min(value / 2, 10) + 1;
-        chart.data.datasets[0].data = xValues.map(x => Math.pow(x, a));
-        chart.update();
+    if (value < 25) {
+      const a = Math.min(value / 2, 10) + 1;
+      chart.data.datasets[0].data = xValues.map(x => Math.pow(x, a));
+      chart.update();
     }
 
     if (value > 5) {
@@ -96,19 +127,45 @@ async function animateGame() {
     await sleep(sleepTime);
   }
   multiplier.addClass("text-danger");
+  let list = lastCrash.find('div');
+  if(list.length > 10){
+    list.eq(0).remove();
+  }
   lastCrash.append(`<div class="bg-secondary rounded p-1">${value.toFixed(2) + "x"}</div>`);
-
 }
 
-playBtn.on("click", async function(){
+playBtn.on("click", async function () {
+  window.gameSession.balance = Number(window.gameSession.balance)
+  balanceError.text("");
+  if(window.gameSession.balance < bet.val()){
+    balanceError.text("Vous n'avez pas assez de points");
+    return;
+  }
   playBtn.prop('disabled', true);
   await animateGame();
+  cachOutBtn.prop('disabled', true)
   playBtn.prop('disabled', false);
 });
 
-cachOutBtn.on("click", function(){
+cachOutBtn.on("click", function () {
+  window.gameSession.balance = Number(window.gameSession.balance)
   cachOutBtn.prop('disabled', true)
-  winMessage.text(`${value.toFixed(2)}x -> ${(value * betAmount).toFixed(2)} gagné`)
-  //backend ici
+  const balance = parseInt(value * betAmount);
+  winMessage.text(`${value.toFixed(2)}x -> ${(balance)} gagné`)
+
+  window.gameSession.balance += balance;
+  $.ajax({
+    url: '/game/balance',
+    method: 'POST',
+    data: { balance: parseInt(window.gameSession.balance) },
+    headers: { 'X-CSRF-TOKEN': csrfToken },
+    success: function (response) {
+      balanceUI.text(`Solde : ${response.balance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
+    },
+    error: function (xhr, status, error) {
+      console.error('Error saving balance:', error);
+    }
+  });
+
 });
 

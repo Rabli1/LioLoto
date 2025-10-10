@@ -279,4 +279,7 @@ class UserController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
     }
+    public function support(){
+        return view('user.support');
+    }
 }

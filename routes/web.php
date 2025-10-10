@@ -19,19 +19,20 @@ Route::post('user/updateAvatar', [UserController::class, 'updateAvatar'])->name(
 Route::post('user/updateBio', [UserController::class, 'updateBio']);
 Route::get('/user/changePassword', [UserController::class, 'changePassword'])->name('user.changePassword');
 Route::post('/user/changePassword', [UserController::class, 'updatePassword'])->name('user.updatePassword');
+Route::get('user/support', [UserController::class, 'support']);
 Route::get('/leaderboard', [UserController::class, 'leaderboard']);
 Route::get('/game', function () {
     return view('game.index');
 });
 Route::get('game/blackjack', [GameController::class, 'blackjack']);
 Route::get('game/plinko', [GameController::class, 'plinko']);
-Route::post('game/balance', [GameController::class, 'saveBalance']);
 Route::get('game/mines', [GameController::class, 'mines']);
 Route::get('game/roulette', [GameController::class, 'roulette']);
 Route::get('game/crash', [GameController::class, 'crash']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
+Route::post('/game/balance', [GameController::class, 'saveBalance']);
 
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 Route::post('admin/fixPoints', [AdminController::class, 'fixPoints']);

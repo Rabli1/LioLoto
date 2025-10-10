@@ -106,7 +106,6 @@ class GameController extends Controller
 
     public function saveBalance(Request $request): JsonResponse
     {
-
         $user = $this->resolvePlayer();
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
@@ -133,7 +132,8 @@ class GameController extends Controller
                     $user->pointsLost = $entry['pointsLost'];
                 }
                 $entry['points'] = $validated['balance'];
-                $user->points = $entry['points'];
+                $entry['points'] = (int) $entry['points'];
+                $user->points = (int) $entry['points'];
                 $updated = true;
                 break;
             }
