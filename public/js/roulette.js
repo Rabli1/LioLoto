@@ -128,14 +128,14 @@ function initBettingMat() {
         bettingMat.appendChild(item);
     }
 
-     for (let i = 1; i < 34; i ++) {
+    for (let i = 1; i < 34; i++) {
         const item = document.createElement('div');
         item.classList.add('verticalGap', 'clickGap');
-        item.dataset.cases = `${i} et ${i+3}`;
+        item.dataset.cases = `${i} et ${i + 3}`;
         item.style.left = `${leftVertical}px`;
         item.style.top = `${topVertical}px`;
         topVertical -= 85;
-        if(topVertical < 338){
+        if (topVertical < 338) {
             topVertical = 508;
             leftVertical += 85;
         }

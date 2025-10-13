@@ -306,7 +306,8 @@
 
 .clickGap {
     position: absolute;
-    opacity: 0;
+    /*opacity: 0;*/
+    border: 2px solid white;
     cursor: pointer;
 }
 
