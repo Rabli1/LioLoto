@@ -5,7 +5,7 @@ function initBettingMat() {
     const bettingMat = document.getElementById('bettingMat');
     const item0 = document.createElement('div');
 
-    let rowCnt = 4;
+    let rowCnt = 6;
     let colCnt = 2;
     let leftHorizontal = 400;
     let leftVertical = 480;
@@ -20,9 +20,10 @@ function initBettingMat() {
         const item = document.createElement('div');
         item.textContent = i;
         item.id = `item${i}`;
+        item.classList.add('clickRoulette');
 
         if (rowCnt < 2) {
-            rowCnt = 4;
+            rowCnt = 6;
         }
 
         if (redNumbers.includes(i)) {
@@ -35,118 +36,104 @@ function initBettingMat() {
         item.style.gridColumn = colCnt;
 
         if (i % 3 == 0) {
-            colCnt++;
+            colCnt += 2;
         }
-        rowCnt--;
+        rowCnt -= 2;
         bettingMat.appendChild(item);
     }
 
-    for (let i = 2; i < 5; i++) {
+    for (let i = 2; i < 7; i++) {
+        if (i == 2 || i == 4 || i == 6) {
+            for (let j = 3; j < 25; j += 2) {
+                const item = document.createElement('div');
+                item.style.gridRow = i;
+                item.style.gridColumn = j;
+                item.classList.add('gap', 'clickRoulette');
+                bettingMat.appendChild(item);
+            }
+        }
+        else {
+            for (let j = 2; j < 25; j += 2) {
+                const item = document.createElement('div');
+                item.style.gridRow = i;
+                item.style.gridColumn = j;
+                item.classList.add('gap', 'clickRoulette');
+                bettingMat.appendChild(item);
+            }
+        }
+    }
+
+    for (let i = 2; i < 7; i++) {
         const rightSideItem = document.createElement('div');
+        if (i == 3 || i == 5) {
+            i++;
+        }
         rightSideItem.textContent = '2:1';
-        rightSideItem.classList.add('rightSideItem');
+        rightSideItem.classList.add('rightSideItem', 'clickRoulette');
         rightSideItem.style.gridRow = i;
         bettingMat.appendChild(rightSideItem);
     }
 
-    for (let i = 2; i < 11; i = i + 4) {
+    for (let i = 2; i < 19; i = i + 8) {
         const topItem = document.createElement('div');
         if (i == 2) {
             topItem.textContent = '1 à 12';
         }
-        else if (i == 6) {
+        else if (i == 10) {
             topItem.textContent = '13 à 24';
         }
-        else {
+        else if (i == 18) {
             topItem.textContent = '25 à 36';
         }
-        topItem.classList.add('topItem');
-        topItem.style.gridColumn = `${i}/${i + 4}`;
+        topItem.classList.add('topItem', 'clickRoulette');
+        topItem.style.gridColumn = `${i}/${i + 7}`;
         bettingMat.appendChild(topItem);
     }
 
-    for (let i = 2; i < 13; i = i + 2) {
+    for (let i = 2; i < 23; i = i + 4) {
         const bottomItem = document.createElement('div');
         if (i == 2) {
             bottomItem.textContent = '1 à 18';
         }
-        else if (i == 4) {
+        else if (i == 6) {
             bottomItem.textContent = 'Pair';
         }
-        else if (i == 6) {
+        else if (i == 10) {
             bottomItem.textContent = 'Rouge';
             bottomItem.style.backgroundColor = 'rgba(211, 47, 47, 0.5)';
         }
-        else if (i == 8) {
+        else if (i == 14) {
             bottomItem.textContent = 'Noir';
             bottomItem.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
         }
-        else if (i == 10) {
+        else if (i == 18) {
             bottomItem.textContent = 'Impair';
         }
         else {
             bottomItem.textContent = '19 à 36';
         }
-        bottomItem.classList.add('bottomItem');
-        bottomItem.style.gridColumn = `${i}/${i + 2}`;
+        bottomItem.classList.add('bottomItem', 'clickRoulette');
+        bottomItem.style.gridColumn = `${i}/${i + 3}`;
         bettingMat.appendChild(bottomItem);
     }
-
-    for (let i = 1; i < 36; i += 3) {
-        const item = document.createElement('div');
-        item.classList.add('bottomHorizontalGap', 'horizontalGap', 'clickGap');
-        item.dataset.cases = `${i} et ${i + 1}`
-        item.style.left = `${leftHorizontal}px`;
-        leftHorizontal += 85;
-        if (leftHorizontal > 1335) {
-            leftHorizontal = 400;
-        }
-        bettingMat.appendChild(item);
-    }
-
-    for (let i = 2; i < 36; i += 3) {
-        const item = document.createElement('div');
-        item.classList.add('topHorizontalGap', 'horizontalGap', 'clickGap');
-        item.dataset.cases = `${i} et ${i + 1}`
-        item.style.left = `${leftHorizontal}px`;
-        leftHorizontal += 85;
-        if (leftHorizontal > 1335) {
-            leftHorizontal = 400;
-        }
-        bettingMat.appendChild(item);
-    }
-
-    for (let i = 2; i < 36; i += 3) {
-        const item = document.createElement('div');
-        item.classList.add('topHorizontalGap', 'horizontalGap', 'clickGap');
-        item.dataset.cases = `${i} et ${i + 1}`
-        item.style.left = `${leftHorizontal}px`;
-        leftHorizontal += 85;
-        if (leftHorizontal > 1335) {
-            leftHorizontal = 400;
-        }
-        bettingMat.appendChild(item);
-    }
-
-    for (let i = 1; i < 34; i++) {
-        const item = document.createElement('div');
-        item.classList.add('verticalGap', 'clickGap');
-        item.dataset.cases = `${i} et ${i + 3}`;
-        item.style.left = `${leftVertical}px`;
-        item.style.top = `${topVertical}px`;
-        topVertical -= 85;
-        if (topVertical < 338) {
-            topVertical = 508;
-            leftVertical += 85;
-        }
-        bettingMat.appendChild(item);
-    }
-
 }
 
 initBettingMat();
-document.querySelectorAll('.clickGap').forEach(gapClick => {
+document.querySelectorAll('.clickRoulette').forEach(gapClick => {
     gapClick.addEventListener('click', e => {
-        alert('Tu as cliqué entre les cases: ' + gapClick.dataset.cases);
+        if (gapClick.querySelector('.rouletteToken')) {
+            return;
+        }
+
+        const token = document.createElement('div');
+        token.classList.add('rouletteToken');
+        token.textContent = '10';
+
+        token.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            token.remove();
+        });
+
+        gapClick.appendChild(token);
     });
 });
