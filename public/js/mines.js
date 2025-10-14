@@ -1,6 +1,67 @@
-(function () {
+﻿(function () {
     const GRID_SIZE = 5; // 5x5
     const TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
+
+    const audioFX = (() => {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) {
+            return {
+                prime: () => null,
+                safe: () => {},
+                mine: () => {}
+            };
+        }
+
+        let ctx = null;
+
+        function ensureContext() {
+            if (!ctx) {
+                ctx = new AudioContext();
+            }
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+            return ctx;
+        }
+
+        function beep({ frequency, duration, type = 'sine', volume = 0.22, delay = 0 }) {
+            const context = ensureContext();
+            if (!context) {
+                return;
+            }
+
+            const start = context.currentTime + delay;
+            const oscillator = context.createOscillator();
+            const gain = context.createGain();
+
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(frequency, start);
+
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.linearRampToValueAtTime(volume, start + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + Math.max(duration - 0.04, 0.05));
+
+            oscillator.connect(gain).connect(context.destination);
+            oscillator.start(start);
+            oscillator.stop(start + duration + 0.08);
+        }
+
+        return {
+            prime: ensureContext,
+            safe() {
+                beep({ frequency: 520, duration: 0.18, type: "triangle", volume: 0.24 });
+                beep({ frequency: 700, duration: 0.16, type: "triangle", volume: 0.2, delay: 0.12 });
+            },
+            mine() {
+                beep({ frequency: 180, duration: 0.32, type: "sawtooth", volume: 0.28 });
+                beep({ frequency: 90, duration: 0.4, type: "square", volume: 0.22, delay: 0.08 });
+            }
+        };
+    })();
+
+    if (typeof audioFX.prime === 'function') {
+        window.addEventListener('pointerdown', () => audioFX.prime(), { once: true });
+    }
 
     let state = {
         bet: 0,
@@ -49,7 +110,7 @@
 
         if (roundInfo) {
             roundInfo.textContent = state.roundActive
-                ? `Mines: ${state.mines} • Cases sûres trouvées: ${state.picks}`
+                ? `Mines: ${state.mines} | Cases sures trouvees: ${state.picks}`
                 : '';
         }
         if (betInfo) {
@@ -66,6 +127,19 @@
 
     function allSafePicks(total, mines) {
         return total - mines;
+    }
+
+    function animateCell(cell, animationClass) {
+        if (!cell) {
+            return;
+        }
+        cell.classList.remove('reveal-safe', 'reveal-mine');
+        void cell.offsetWidth;
+        cell.classList.add(animationClass);
+        cell.addEventListener('animationend', function handler() {
+            cell.classList.remove(animationClass);
+            cell.removeEventListener('animationend', handler);
+        }, { once: true });
     }
 
     function gridBuilder() {
@@ -98,7 +172,7 @@
             if (cell) {
                 cell.classList.add('is-mine');
                 cell.innerHTML = '<img src="/img/mines/mine.png" alt="Mine" class="mine-icon">';
-
+                animateCell(cell, 'reveal-mine');
             }
         });
     }
@@ -117,8 +191,9 @@
                 window.Balance.gain(Math.floor(payout));
             }
         } else {
-            msg.textContent = `Mine trouvée. Vous perdez ${format(state.bet)}.`;
+            msg.textContent = `Mine detectee. Vous perdez ${format(state.bet)}.`;
             dispatchGameEvent('mines:result', { outcome: 'lose', bet: state.bet, payout: 0 });
+            
         }
     }
 
@@ -133,6 +208,8 @@
         if (state.positions.has(idx)) {
             cell.classList.add('is-mine');
             cell.innerHTML = '<img src="/img/mines/mine.png" alt="Mine" class="mine-icon">';
+            animateCell(cell, 'reveal-mine');
+            audioFX.mine();
             revealAllMines();
             finRound(false, 0);
             return;
@@ -140,6 +217,9 @@
 
         cell.classList.add('is-safe');
         cell.innerHTML = '<img src="/img/mines/gem.png" alt="Safe" class="mine-icon">';
+        animateCell(cell, 'reveal-safe');
+        audioFX.safe();
+
         state.picks += 1;
         state.currentMultiplier = multiplicateur(state.picks, TOTAL_CELLS, state.mines);
         state.cashable = true;
@@ -177,9 +257,10 @@
 
     function restart() {
         resetRoundState();
+        state.bet = 0;
         el('gameMat').style.display = 'none';
         el('betContainer').style.display = 'block';
-        el('selectedBet').textContent = $pendingBet;
+        el('selectedBet').textContent = 'Aucune mise selectionnee';
         el('resultMessage').textContent = '';
     }
 
@@ -197,21 +278,22 @@
             btn.addEventListener('click', function () {
                 pendingBet += parseInt(this.getAttribute('data-value'), 10);
                 if (pendingBet > 0) {
-                    selectedBetLabel.textContent = `Mise sélectionnée : ${pendingBet}`;
+                    selectedBetLabel.textContent = `Mise selectionnee : ${pendingBet}`;
                 } else {
-                    selectedBetLabel.textContent = 'Aucune mise sélectionnée';
+                    selectedBetLabel.textContent = 'Aucune mise selectionnee';
                 }
+                audioFX.prime();
             });
         });
 
         clearBetButton.addEventListener('click', function () {
             pendingBet = 0;
-            selectedBetLabel.textContent = 'Aucune mise sélectionnée';
+            selectedBetLabel.textContent = 'Aucune mise selectionnee';
         });
 
         placeBetButton.addEventListener('click', function () {
             if (!pendingBet) {
-                alert('Veuillez sélectionner un jeton de mise !');
+                alert('Veuillez selectionner un jeton de mise !');
                 return;
             }
             if (window.Balance && !window.Balance.canMise(pendingBet)) {
@@ -223,6 +305,7 @@
                 return;
             }
             state.bet = pendingBet;
+            audioFX.prime();
             startRound();
         });
 

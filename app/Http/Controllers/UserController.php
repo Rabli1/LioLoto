@@ -195,6 +195,7 @@ class UserController extends Controller
     public function leaderboard()
     {
         $users = json_decode(file_get_contents('../database/json/users.json'), true);
+        $users = array_filter($users, fn($user) => !$user['banned']);
         array_multisort(array_column($users, 'points'), SORT_DESC, $users);
         $top10 = collect($users)->take(10);
         $apartUser = null;
@@ -278,5 +279,8 @@ class UserController extends Controller
         } else {
             return response()->json(['error' => 'User not found'], 404);
         }
+    }
+    public function support(){
+        return view('user.support');
     }
 }

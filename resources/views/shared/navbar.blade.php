@@ -4,6 +4,10 @@ $currentPage = request()->path();
 $admin = false;
 if($userConnected){
   $admin = session('user')->admin;
+  if(session('user')->banned){
+    session()->forget('user');
+    return redirect('user/connection?message=Votre compte a été banni');
+  }
 }
 @endphp
 
@@ -49,7 +53,7 @@ if($userConnected){
           </li>
         @endif
         <li class="nav-item">
-          <a class="nav-link @if($currentPage == 'support') active @endif" href="/support">Support</a>
+          <a class="nav-link @if($currentPage == 'support') active @endif" href="/user/support">Support</a>
         </li>
 
         <li class="nav-item d-flex align-items-center ms-2 position-relative">

@@ -24,7 +24,7 @@
         <div class="row">
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src='{{ asset("img/blackjack.jpg") }}' alt="BlackJack"></div>
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/blackjack.jpg") }}' alt="BlackJack"></div>
                     <div class="row">
                         <h3>BlackJack</h3>
                     </div>
@@ -33,7 +33,7 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src='{{ asset("img/plinko.webp") }}' alt="Plinko"></div>
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/plinko.webp") }}' alt="Plinko"></div>
                     <div class="row">
                         <h3>Plinko</h3>
                     </div>
@@ -42,7 +42,7 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src='{{ asset("img/mines.webp") }}' alt="Mines"></div>
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/mines.webp") }}' alt="Mines"></div>
                     <div class="row">
                         <h3>Mines</h3>
                     </div>
@@ -51,7 +51,7 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img style="heigh:" src='{{ asset("img/roulette.png") }}' alt="Roulette"></div>
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/roulette.png") }}' alt="Roulette"></div>
                     <div class="row">
                         <h3>Roulette</h3>
                     </div>
@@ -60,12 +60,22 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img src='{{ asset("img/mines.webp") }}' alt="Crash"></div>
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/crash.png") }}' alt="Crash"></div>
                     <div class="row">
                         <h3>Crash</h3>
                     </div>
                     <div class="row"><a href="/game/crash" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/roulette.png") }}' alt="Roulette"></div>
+                    <div class="row">
+                        <h3>Coinflip</h3>
+                    </div>
+                    <div class="row"><a href="/game/coinflip" class="btn btn-danger btn-md">Jouer</a></div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -73,5 +83,4 @@
     </div>
 </body>
 @include('shared.footer')
-
 </html>

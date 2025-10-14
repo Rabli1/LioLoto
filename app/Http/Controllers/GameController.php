@@ -85,6 +85,15 @@ class GameController extends Controller
             'playerBalance' => $balance,
         ]);
     }
+    public function roulette(): View
+    {
+        $player = $this->resolvePlayer();
+        $balance = $player?->points ?? 0;
+
+        return view('game.roulette', [
+            'playerBalance' => $balance,
+        ]);
+    }
     public function crash(): View{
         $balance = 0;
         if(session()->has('user')){
@@ -94,10 +103,17 @@ class GameController extends Controller
             'playerBalance' => $balance
         ]);
     }
+    public function coinflip(): View{
+        $player = $this->resolvePlayer();
+        $balance = $player?->points ?? 0;
+
+        return view('game.coinflip', [
+            'playerBalance' => $balance,
+        ]);
+    }
 
     public function saveBalance(Request $request): JsonResponse
     {
-
         $user = $this->resolvePlayer();
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
@@ -116,15 +132,16 @@ class GameController extends Controller
             if (($entry['id'] ?? null) === $user->id) {
                 $difference = ($validated['balance'] - $entry['points']) / 2; // divisé par deux pcq il redonne la mise
                 $mise = $validated['balance'] - $entry['points'];
-                if($difference > 0){
+                if ($difference > 0) {
                     $this->gameServices->addExp($difference, $entry);
                 }
-                if($difference <= 0){
+                if ($difference <= 0) {
                     $this->gameServices->addPointLost($mise, $entry);
                     $user->pointsLost = $entry['pointsLost'];
                 }
                 $entry['points'] = $validated['balance'];
-                $user->points = $entry['points'];
+                $entry['points'] = (int) $entry['points'];
+                $user->points = (int) $entry['points'];
                 $updated = true;
                 break;
             }

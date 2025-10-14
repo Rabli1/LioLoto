@@ -61,7 +61,7 @@ $lastRank = 0;
                             <i class="fa-solid {{ $user['profileImage'] }} pfp-{{ $user['profileColor'] }} fs-4 me-2"></i>
                             <a class="text-decoration-none {{ $textColor }}"
                                 href="/user/profile?id={{ $user['id'] }}">{{ $user['name'] }}</a>
-                            <div class="user-modal hidden">{{ $user['bio'] != "" ? $user['bio'] : "Pas de bio"}}</div>
+                            <div class="user-modal hidden text-white">{{ $user['bio'] != "" ? $user['bio'] : "Pas de bio"}}</div>
                         </td>
                         <td class="{{ $idMatching ? "bg-" . $user['profileColor'] . " " . $textColor : ""}}">
                             {{ $user['points'] }}
