@@ -193,6 +193,7 @@
         } else {
             msg.textContent = `Mine detectee. Vous perdez ${format(state.bet)}.`;
             dispatchGameEvent('mines:result', { outcome: 'lose', bet: state.bet, payout: 0 });
+            
         }
     }
 

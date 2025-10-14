@@ -103,6 +103,14 @@ class GameController extends Controller
             'playerBalance' => $balance
         ]);
     }
+    public function coinflip(): View{
+        $player = $this->resolvePlayer();
+        $balance = $player?->points ?? 0;
+
+        return view('game.coinflip', [
+            'playerBalance' => $balance,
+        ]);
+    }
 
     public function saveBalance(Request $request): JsonResponse
     {

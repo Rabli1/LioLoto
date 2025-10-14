@@ -15,7 +15,7 @@
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Ouvrez des cases, encaissez avant la mine !
                 </p>
-                <span class="balance">Solde : $<span id="mines-balance" data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
+                <span class="balance">Solde : <span id="mines-balance" data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
             </header>
 
             <section id="betContainer" class="mb-4">
