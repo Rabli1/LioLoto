@@ -163,9 +163,6 @@
                         }
                     });
                 })
-                .catch((err) => {
-                    console.warn('pointLost.persist failed', err);
-                });
         },
     };
 
