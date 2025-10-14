@@ -105,7 +105,6 @@ async function animateGame() {
         });
       }
     }
-
     if (value < 25) {
       const a = Math.min(value / 2, 10) + 1;
       chart.data.datasets[0].data = xValues.map(x => Math.pow(x, a));
@@ -123,7 +122,6 @@ async function animateGame() {
         }
       }
     }
-
     await sleep(sleepTime);
   }
   multiplier.addClass("text-danger");
@@ -141,17 +139,21 @@ playBtn.on("click", async function () {
     balanceError.text("Vous n'avez pas assez de points");
     return;
   }
+  if(bet.val() <= 0){
+    balanceError.text("Mise invalide");
+    return;
+  }
   playBtn.prop('disabled', true);
   await animateGame();
-  cachOutBtn.prop('disabled', true)
+  cachOutBtn.prop('disabled', true);
   playBtn.prop('disabled', false);
 });
 
 cachOutBtn.on("click", function () {
-  window.gameSession.balance = Number(window.gameSession.balance)
-  cachOutBtn.prop('disabled', true)
+  window.gameSession.balance = Number(window.gameSession.balance);
+  cachOutBtn.prop('disabled', true);
   const balance = parseInt(value * betAmount);
-  winMessage.text(`${value.toFixed(2)}x -> ${(balance)} gagné`)
+  winMessage.text(`${value.toFixed(2)}x -> ${(balance)} gagné`);
 
   window.gameSession.balance += balance;
   $.ajax({
@@ -166,6 +168,4 @@ cachOutBtn.on("click", function () {
       console.error('Error saving balance:', error);
     }
   });
-
 });
-
