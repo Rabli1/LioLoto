@@ -1,21 +1,19 @@
 let rouletteNumbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
 let redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+let tokenPlaced = false;
 
 function initBettingMat() {
     const bettingMat = document.getElementById('bettingMat');
     const item0 = document.createElement('div');
-
     let rowCnt = 6;
     let colCnt = 2;
-    let leftHorizontal = 400;
-    let leftVertical = 480;
-    let topVertical = 508;
 
     item0.textContent = 0;
     item0.id = 'item0';
 
     bettingMat.appendChild(item0);
 
+    //Génère les cases numéro
     for (let i = 1; i < 37; i++) {
         const item = document.createElement('div');
         item.textContent = i;
@@ -42,6 +40,9 @@ function initBettingMat() {
         bettingMat.appendChild(item);
     }
 
+    //Génère les cases gap
+    let numCaseGapV = 3;
+    let numCaseGapH = 2;
     for (let i = 2; i < 7; i++) {
         if (i == 2 || i == 4 || i == 6) {
             for (let j = 3; j < 25; j += 2) {
@@ -49,6 +50,13 @@ function initBettingMat() {
                 item.style.gridRow = i;
                 item.style.gridColumn = j;
                 item.classList.add('gap', 'clickRoulette');
+                item.dataset.cases = `${numCaseGapV} et ${numCaseGapV += 3}`;
+                if (numCaseGapV == 36) {
+                    numCaseGapV = 2;
+                }
+                else if (numCaseGapV == 35) {
+                    numCaseGapV = 1;
+                }
                 bettingMat.appendChild(item);
             }
         }
@@ -58,11 +66,17 @@ function initBettingMat() {
                 item.style.gridRow = i;
                 item.style.gridColumn = j;
                 item.classList.add('gap', 'clickRoulette');
+                item.dataset.cases = `${numCaseGapH} et ${numCaseGapH += 1}`;
+                numCaseGapH += 2;
+                if (numCaseGapH == 36) {
+                    numCaseGapH = 1;
+                }
                 bettingMat.appendChild(item);
             }
         }
     }
 
+    //Génère les cases 2:1
     for (let i = 2; i < 7; i++) {
         const rightSideItem = document.createElement('div');
         if (i == 3 || i == 5) {
@@ -74,6 +88,7 @@ function initBettingMat() {
         bettingMat.appendChild(rightSideItem);
     }
 
+    //Génère les cases au top
     for (let i = 2; i < 19; i = i + 8) {
         const topItem = document.createElement('div');
         if (i == 2) {
@@ -90,6 +105,7 @@ function initBettingMat() {
         bettingMat.appendChild(topItem);
     }
 
+    //Génère les cases en bas
     for (let i = 2; i < 23; i = i + 4) {
         const bottomItem = document.createElement('div');
         if (i == 2) {
@@ -118,8 +134,63 @@ function initBettingMat() {
     }
 }
 
+function initRoulette() {
+    const rouletteContainer = document.getElementById('rouletteContainer');
+    const roulette = document.createElement('div');
+    roulette.classList.add('roulette');
+
+    const outerRim = document.createElement('div');
+    outerRim.classList.add('outerRim');
+    roulette.append(outerRim);
+
+    for (let i = 0; i < rouletteNumbers.length; i++) {
+        const rouletteSect = document.createElement('div');
+        const numSect = document.createElement('span');
+        rouletteSect.id = `sect${i}`;
+        rouletteSect.classList.add('rouletteSect');
+        if (rouletteNumbers[i] < 10) {
+            numSect.classList.add('singleNum');
+        }
+        else {
+            numSect.classList.add('doubleNum');
+        }
+        numSect.innerText = rouletteNumbers[i];
+        rouletteSect.append(numSect);
+        const block = document.createElement('div');
+        block.classList.add('block');
+        rouletteSect.append(block);
+        roulette.append(rouletteSect);
+    }
+
+    const rimPocket = document.createElement('div');
+    rimPocket.classList.add('rimPockets');
+    roulette.append(rimPocket);
+
+    const pocketSect = document.createElement('div');
+    pocketSect.classList.add('pocketSect');
+    roulette.append(pocketSect);
+
+    const middleRoulette = document.createElement('div');
+    middleRoulette.classList.add('middleRoulette');
+    roulette.append(middleRoulette);
+
+    const spinButton = document.createElement('button');
+    spinButton.classList.add('spinButton');
+    spinButton.id = 'buttonSpin';
+    spinButton.innerText = 'Spin';
+    if(tokenPlaced == false){
+        spinButton.hidden = true;
+    }
+    roulette.append(spinButton);
+
+    rouletteContainer.append(roulette);
+}
+
 initBettingMat();
-document.querySelectorAll('.clickRoulette').forEach(gapClick => {
+initRoulette();
+let clickRoulette = document.querySelectorAll('.clickRoulette');
+
+clickRoulette.forEach(gapClick => {
     gapClick.addEventListener('click', e => {
         if (gapClick.querySelector('.rouletteToken')) {
             return;
@@ -132,8 +203,16 @@ document.querySelectorAll('.clickRoulette').forEach(gapClick => {
         token.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             token.remove();
+            tokenPlaced = document.querySelector('.rouletteToken') !== null;
+            if(!tokenPlaced){
+                document.getElementById('buttonSpin').hidden = true;
+            }
         });
 
+        tokenPlaced = true;
         gapClick.appendChild(token);
+        if(tokenPlaced){
+            document.getElementById('buttonSpin').hidden = false;
+        }
     });
 });
