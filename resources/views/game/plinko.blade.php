@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lotoli - Plinko</title>
     <link rel="stylesheet" href="{{ asset('css/game.css') }}">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="{{ asset('js/plinko/libraries/matter.js') }}"></script>
-    <script src="{{ asset('js/plinko/libraries/p5.js') }}"></script>
+    <!--<script src="{{ asset('js/plinko/libraries/p5.js') }}"></script>-->
     <script src="{{ asset('js/plinko/particle.js') }}"></script>
     <script src="{{ asset('js/plinko/sketch.js') }}"></script>
     <script src="{{ asset('js/plinko/plinko.js') }}"></script>
