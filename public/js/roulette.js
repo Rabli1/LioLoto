@@ -10,6 +10,7 @@ function initBettingMat() {
 
     item0.textContent = 0;
     item0.id = 'item0';
+    item0.classList.add('clickRoulette');
 
     bettingMat.appendChild(item0);
 
@@ -230,27 +231,25 @@ initRoulette();
 
 const clickRoulette = document.querySelectorAll('.clickRoulette');
 const buttonSpin = document.getElementById('buttonSpin');
-let bet = 10;
+
 
 buttonSpin.addEventListener('click', () => {
     spinRoulette(Math.floor(Math.random() * 37));
 })
 
-clickRoulette.forEach(gapClick => {
-    gapClick.addEventListener('click', e => {
+clickRoulette.forEach(betClick => {
+    betClick.addEventListener('click', e => {
         const token = document.createElement('div');
         token.classList.add('rouletteToken');
-        token.textContent = `${bet}`;
+        token.textContent = `${5}`;
         
-        if (gapClick.querySelector('.rouletteToken')) {
-            bet += bet;
-            token.textContent = `${bet}`;
+        if (betClick.querySelector('.rouletteToken')) {
+            token.textContent = `${5}`;
         }
 
         token.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             token.remove();
-            bet = 10;
             tokenPlaced = document.querySelector('.rouletteToken') !== null;
             if (!tokenPlaced) {
                 buttonSpin.hidden = true;
@@ -258,7 +257,7 @@ clickRoulette.forEach(gapClick => {
         });
 
         tokenPlaced = true;
-        gapClick.appendChild(token);
+        betClick.appendChild(token);
         if (tokenPlaced) {
             buttonSpin.hidden = false;
         }
