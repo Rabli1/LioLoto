@@ -26,8 +26,6 @@ Plinko.prototype.show = function () {
         remaining: 0,
         active: false,
         betPerBall: 0,
-        totalBet: 0,
-        roundPayout: 0,
         dropInterval: 30,
     };
 
@@ -88,13 +86,8 @@ Plinko.prototype.show = function () {
 
             const selectedBalls = parseInt(ballCountSelect?.value, 10);
             const totalBalls = selectedBalls > 0 ? selectedBalls : 1;
-            const totalBet = pendingBet;
 
-            if (
-                !window.Balance ||
-                !window.Balance.canMise(totalBet) ||
-                !window.Balance.miser(totalBet, { meta: { game: 'plinko' } })
-            ) {
+            if (!window.Balance || !window.Balance.canMise(pendingBet) || !window.Balance.miser(pendingBet)) {
                 alert('Solde insuffisant.');
                 return;
             }
@@ -103,8 +96,6 @@ Plinko.prototype.show = function () {
             state.remaining = totalBalls;
             state.dropped = 0;
             state.betPerBall = pendingBet;
-            state.totalBet = totalBet;
-            state.roundPayout = 0;
             state.active = true;
 
             pendingBet = 0;
@@ -121,23 +112,16 @@ Plinko.prototype.show = function () {
         if (value > 0 && window.Balance) {
             const payout = Math.round(state.betPerBall * value);
             if (payout > 0) {
-                state.roundPayout += payout;
-                window.Balance.gain(payout, { persist: false });
+                window.Balance.gain(payout);
             }
         }
 
-        state.dropped += 1;
-        state.remaining = Math.max(0, state.total - state.dropped);
+        state.remaining = Math.max(0, state.remaining - 1);
         if (!state.remaining) {
-            if (window.Balance) {
-                window.Balance.persist({ game: 'plinko' });
-            }
             state.active = false;
             state.total = 0;
             state.dropped = 0;
             state.betPerBall = 0;
-            state.totalBet = 0;
-            state.roundPayout = 0;
         }
     };
 })();
