@@ -1,12 +1,15 @@
-function Particle(x,y,r) {
-        var options = {
-        restitution: 0.5, //les rebonds
-        friction: 0, //friction
-    }
+function Particle(x, y, r) {
+    var options = {
+        restitution: 0.5,  // rebonds
+        friction: -0.0001, // friction
+        label: "particle",
+        collisionFilter: {
+            group: -1 // 🟩 les particules du même groupe ne se collisionnent pas entre elles
+        }
+    };
 
     x += random(-10, 10);
     this.body = Bodies.circle(x, y, r, options);
-    this.body.label = "particle";
     this.r = r;
     World.add(world, this.body);
 }
@@ -22,7 +25,7 @@ Particle.prototype.show = function() {
     stroke(255);
     var pos = this.body.position;
     push();
-    translate (pos.x, pos.y);
+    translate(pos.x, pos.y);
     ellipse(0, 0, this.r * 2);
     pop();
 }

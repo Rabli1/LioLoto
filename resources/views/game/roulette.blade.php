@@ -16,8 +16,11 @@
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Placer des mises et tenter votre chance !
                 </p>
-                <span class="balance">Solde : $<span id="mines-balance" data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
             </header>
+
+            <section>
+                <div id="rouletteContainer"></div>
+            </section>
 
             <section id="betMat">
                 <div id="bettingMat">
