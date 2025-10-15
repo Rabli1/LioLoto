@@ -85,8 +85,8 @@ function setup() {
                 var particleBody = bodyA.label === "particle" ? bodyA : bodyB;
                 var cubeBody = bodyA.label === "cube" ? bodyA : bodyB;
 
-                if (!particleBody.isSettled && typeof window.handlePlinkoSlotHit === 'function') {
-                    window.handlePlinkoSlotHit({
+                if (!particleBody.isSettled && typeof window.handlePlinko === 'function') {
+                    window.handlePlinko({
                         value: cubeBody.plinkoMultiplierValue,
                         label: cubeBody.plinkoMultiplierLabel
                     });
@@ -135,8 +135,8 @@ function draw() {
         var particle = particles[i];
         particle.show();
         if (particle.isOffScreen()) {
-            if (!particle.body.isSettled && typeof window.handlePlinkoSlotHit === 'function') {
-                window.handlePlinkoSlotHit({ value: 0, label: '0x' });
+            if (!particle.body.isSettled && typeof window.handlePlinko === 'function') {
+                window.handlePlinko({ value: 0, label: '0x' });
             }
             particle.body.isSettled = true;
             World.remove(world, particle.body);
