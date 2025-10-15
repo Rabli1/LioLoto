@@ -53,14 +53,13 @@
             </section>
         </div>
     </main>
-    <script>
-    window.gameSession = {
-        userId: {{ session('user')->id ?? 'null' }},
-        balance: {{ (int) $playerBalance }},
-        endpoints: { saveBalance: '{{ url('game/balance') }}' },
-        csrfToken: '{{ csrf_token() }}'
-    };
-    window.plinkoSession = window.gameSession;
+<script>
+  window.gameSession = {
+    userId: {{ session('user')->id ?? 'null' }},
+    balance: {{ (int) $playerBalance }},
+    endpoints: { saveBalance: '{{ url('game/balance') }}' },
+    csrfToken: '{{ csrf_token() }}'
+  };
 </script>
 
 <script defer src="{{ asset('js/plinko/plinko.js') }}"></script>
