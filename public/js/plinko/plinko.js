@@ -1,9 +1,9 @@
 function Plinko(x, y, r) {
     var options = {
         isStatic: true,
-        restitution: 0.5, //les rebonds
-        friction: 0 //friction
-    }
+        restitution: 0.5,
+        friction: 0,
+    };
     this.body = Bodies.circle(x, y, r, options);
     this.r = r;
     World.add(world, this.body);
@@ -17,53 +17,127 @@ Plinko.prototype.show = function () {
     translate(pos.x, pos.y);
     ellipse(0, 0, this.r * 2);
     pop();
-}
+};
 
+(function () {
+    const state = window.plinkoGame = window.plinkoGame || {
+        total: 0,
+        dropped: 0,
+        remaining: 0,
+        active: false,
+        betPerBall: 0,
+        totalBet: 0,
+        roundPayout: 0,
+        dropInterval: 30,
+    };
 
-let totalParticles = 0;
-let particlesDropped = 0;
-let dropInterval = 30;
-
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.Balance) {
-        window.Balance.init({
-            session: window.gameSession || {},
-            displaySelectors: ['#mines-balance']
-        });
+    function format(value) {
+        return Number(value || 0).toLocaleString('fr-FR');
     }
 
-    const betTokens = document.querySelectorAll('.betToken');
-    const selectedBetLabel = document.getElementById('selectedBet');
-    const clearBetButton = document.getElementById('clearBet');
-    const placeBetButton = document.getElementById('placeBet');
+    function updateBetLabel(label, pending) {
+        if (!label) return;
+        label.textContent = pending
+            ? 'Mise selectionnee : ' + format(pending)
+            : 'Aucune mise selectionnee';
+    }
 
-    let pendingBet = 0;
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.Balance) {
+            window.Balance.init({
+                session: window.plinkoSession || window.gameSession || {},
+                displaySelectors: ['#plinko-balance'],
+            });
+        }
 
-    betTokens.forEach((btn) => {
-        btn.addEventListener('click', function () {
-            pendingBet += parseInt(this.getAttribute('data-value'), 10);
-            selectedBetLabel.textContent = pendingBet > 0 ? `Mise sélectionnée : ${pendingBet}` : 'Aucune mise sélectionnée';
+        const betTokens = document.querySelectorAll('.betToken');
+        if (!betTokens.length) return;
+
+        const selectedBetLabel = document.getElementById('selectedBet');
+        const clearBetButton = document.getElementById('clearBet');
+        const placeBetButton = document.getElementById('placeBet');
+        const ballCountSelect = document.getElementById('minesCount');
+
+        let pendingBet = 0;
+        updateBetLabel(selectedBetLabel, pendingBet);
+
+        betTokens.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const value = parseInt(btn.getAttribute('data-value'), 10);
+                pendingBet += value;
+                updateBetLabel(selectedBetLabel, pendingBet);
+            });
+        });
+
+        clearBetButton?.addEventListener('click', () => {
+            if (state.active) return;
+            pendingBet = 0;
+            updateBetLabel(selectedBetLabel, pendingBet);
+        });
+
+        placeBetButton?.addEventListener('click', () => {
+            if (state.active) {
+                alert('Une manche est deja en cours.');
+                return;
+            }
+
+            if (!pendingBet) {
+                alert('Veuillez selectionner une mise !');
+                return;
+            }
+
+            const selectedBalls = parseInt(ballCountSelect?.value, 10);
+            const totalBalls = selectedBalls > 0 ? selectedBalls : 1;
+            const totalBet = pendingBet;
+
+            if (
+                !window.Balance ||
+                !window.Balance.canMise(totalBet) ||
+                !window.Balance.miser(totalBet, { meta: { game: 'plinko' } })
+            ) {
+                alert('Solde insuffisant.');
+                return;
+            }
+
+            state.total = totalBalls;
+            state.remaining = totalBalls;
+            state.dropped = 0;
+            state.betPerBall = pendingBet;
+            state.totalBet = totalBet;
+            state.roundPayout = 0;
+            state.active = true;
+
+            pendingBet = 0;
+            updateBetLabel(selectedBetLabel, pendingBet);
         });
     });
 
-    clearBetButton.addEventListener('click', function () {
-        pendingBet = 0;
-        selectedBetLabel.textContent = 'Aucune mise sélectionnée';
-    });
-
-    placeBetButton.addEventListener('click', function () {
-        if (!pendingBet) return alert('Veuillez sélectionner un jeton de mise !');
-
-        if (!window.Balance.canMise(pendingBet)) {
-            console.log("Solde insuffisant pour la mise de :", pendingBet, "Montant :", window.Balance._state.balance);
-            return alert('Solde insuffisant.');
+    window.handlePlinko = function (hit) {
+        if (!state.active) {
+            return;
         }
 
-        window.Balance.miser(pendingBet);
+        const value = Number(typeof hit === 'object' ? hit.value : hit);
+        if (value > 0 && window.Balance) {
+            const payout = Math.round(state.betPerBall * value);
+            if (payout > 0) {
+                state.roundPayout += payout;
+                window.Balance.gain(payout, { persist: false });
+            }
+        }
 
-        totalParticles = parseInt(document.getElementById('minesCount').value, 10);
-        particlesDropped = 0;
-        console.log("Mise validée :", pendingBet, "| Billes :", totalParticles);
-        console.log("Montant :", window.Balance._state);
-    });
-});
+        state.dropped += 1;
+        state.remaining = Math.max(0, state.total - state.dropped);
+        if (!state.remaining) {
+            if (window.Balance) {
+                window.Balance.persist({ game: 'plinko' });
+            }
+            state.active = false;
+            state.total = 0;
+            state.dropped = 0;
+            state.betPerBall = 0;
+            state.totalBet = 0;
+            state.roundPayout = 0;
+        }
+    };
+})();

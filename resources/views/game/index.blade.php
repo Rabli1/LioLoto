@@ -69,7 +69,7 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img style="height: 210px;" src='{{ asset("img/roulette.png") }}' alt="Roulette"></div>
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/coinflip.png") }}' alt="Roulette"></div>
                     <div class="row">
                         <h3>Coinflip</h3>
                     </div>

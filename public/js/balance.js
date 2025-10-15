@@ -12,7 +12,6 @@
     const Balance = {
         _state: {
             balance: 0,
-            pointLost: 0,
             userId: null,
             saveUrl: '/game/balance',
             csrfToken: null,
@@ -24,7 +23,6 @@
 
             this._state.userId = config.userId ?? session.userId ?? null;
             this._state.balance = toInteger(config.balance ?? session.balance ?? this._state.balance);
-            this._state.pointLost = toInteger(config.pointLost ?? session.pointLost ?? this._state.pointLost)
             this._state.saveUrl = config.saveUrl || session.endpoints?.saveBalance || this._state.saveUrl;
             this._state.csrfToken = config.csrfToken || session.csrfToken || this._findCsrfToken();
 
@@ -49,7 +47,6 @@
             this._render();
             if (options.persist !== false) {
                 this.ajouterMontantJSON();
-                this.ajouterPointLostJSON()
             }
             return true;
         },
@@ -129,40 +126,6 @@
         _findCsrfToken() {
             const meta = document.querySelector('meta[name="csrf-token"]'); //Doit utiliser le token pas applicable dans JSON
             return meta ? meta.content : null;
-        },
-
-        ajouterPointLostJSON() {
-            if (!this._state.userId || !this._state.saveUrl) return;
-            const payload = {
-                pointLost: toInteger(this._state.pointLost),
-            };
-
-            fetch(this._state.saveUrl, {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': this._state.csrfToken || this._findCsrfToken(),
-                },
-                body: JSON.stringify(payload),
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        return response
-                            .json()
-                            .catch(() => null)
-                            .then((error) => {
-                                console.warn('pointLost.persist failed', { status: response.status, error });
-                            });
-                    }
-
-                    return response.json().then((data) => {
-                        if (data && typeof data.pointLost === 'number') {
-                            this._state.pointLost = toInteger(data.pointLost);
-                            this._render();
-                        }
-                    });
-                })
         },
     };
 

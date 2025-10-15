@@ -260,7 +260,7 @@
         state.bet = 0;
         el('gameMat').style.display = 'none';
         el('betContainer').style.display = 'block';
-        el('selectedBet').textContent = 'Aucune mise selectionnee';
+        el('selectedBet').textContent = `Mise selectionnee : ${pendingBet}` ?? 'Aucune mise selectionnee';
         el('resultMessage').textContent = '';
     }
 

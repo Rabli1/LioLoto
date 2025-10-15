@@ -1,5 +1,4 @@
 <html>
-
 <head>
     @include('shared.header')
     @include('shared.navbar')
@@ -10,9 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="{{ asset('js/plinko/libraries/matter.js') }}"></script>
     <!--<script src="{{ asset('js/plinko/libraries/p5.js') }}"></script>-->
-    <script src="{{ asset('js/plinko/particle.js') }}"></script>
-    <script src="{{ asset('js/plinko/sketch.js') }}"></script>
-    <script src="{{ asset('js/plinko/boundaries.js') }}"></script>
 
 </head>
 
@@ -25,7 +21,7 @@
                     <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                         Laissez tomber la balle et voyez où elle atterrit !
                     </p>
-                    <span class="balance">Solde : $<span id="blackjack-balance" data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
+                    <span class="balance">Solde : $<span id="plinko-balance" data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
                 </header>
                 
                 <div id="canvas-container" style="display: flex; justify-content: center; margin: 20px auto;">
@@ -64,10 +60,14 @@
         endpoints: { saveBalance: '{{ url('game/balance') }}' },
         csrfToken: '{{ csrf_token() }}'
     };
-    console.log(window.gameSession);
+    window.plinkoSession = window.gameSession;
 </script>
 
-<script src="{{ asset('js/plinko/plinko.js') }}"></script>
+<script defer src="{{ asset('js/plinko/plinko.js') }}"></script>
+    <script defer src="{{ asset('js/plinko/particle.js') }}"></script>
+    <script defer src="{{ asset('js/plinko/sketch.js') }}"></script>
+    <script defer src="{{ asset('js/plinko/boundaries.js') }}"></script>
+
 </body>
 @include('shared.footer')
 
