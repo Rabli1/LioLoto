@@ -166,6 +166,13 @@ function initRoulette() {
     rimPocket.classList.add('rimPockets');
     roulette.append(rimPocket);
 
+    const ballContainer = document.createElement('div');
+    ballContainer.classList.add('ballContainer');
+    const ball = document.createElement('div');
+    ball.classList.add('ball');
+    ballContainer.append(ball);
+    roulette.append(ballContainer);
+
     const pocketSect = document.createElement('div');
     pocketSect.classList.add('pocketSect');
     roulette.append(pocketSect);
@@ -178,7 +185,7 @@ function initRoulette() {
     spinButton.classList.add('spinButton');
     spinButton.id = 'buttonSpin';
     spinButton.innerText = 'Spin';
-    if(tokenPlaced == false){
+    if (tokenPlaced == false) {
         spinButton.hidden = true;
     }
     roulette.append(spinButton);
@@ -186,33 +193,74 @@ function initRoulette() {
     rouletteContainer.append(roulette);
 }
 
+function spinRoulette(winningNumber) {
+    const roulette = document.querySelector('.roulette');
+    const ballContainer = document.querySelector('.ballContainer');
+
+    for (let i = 0; i < rouletteNumbers.length; i++) {
+        if (rouletteNumbers[i] == winningNumber) {
+            var degree = (i * -9.73) + 362;
+        }
+    }
+    roulette.style.cssText = 'animation: wheelRotate 5s linear infinite;';
+    ballContainer.style.cssText = 'animation: ballRotate 1s linear infinite;';
+
+    setTimeout(function () {
+        ballContainer.style.cssText = 'animation: ballRotate 2s linear infinite;';
+        style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerText = '@keyframes ballStop {from {transform: rotate(0deg);}to{transform: rotate(-' + degree + 'deg);}}';
+        document.head.appendChild(style);
+    }, 2000);
+    setTimeout(function () {
+        ballContainer.style.cssText = 'animation: ballStop 3s linear;';
+    }, 6000);
+    setTimeout(function () {
+        ballContainer.style.cssText = 'transform: rotate(-' + degree + 'deg);';
+    }, 9000);
+    setTimeout(function () {
+        roulette.style.cssText = '';
+        style.remove();
+    }, 10000);
+
+}
+
 initBettingMat();
 initRoulette();
-let clickRoulette = document.querySelectorAll('.clickRoulette');
+
+const clickRoulette = document.querySelectorAll('.clickRoulette');
+const buttonSpin = document.getElementById('buttonSpin');
+let bet = 10;
+
+buttonSpin.addEventListener('click', () => {
+    spinRoulette(Math.floor(Math.random() * 37));
+})
 
 clickRoulette.forEach(gapClick => {
     gapClick.addEventListener('click', e => {
-        if (gapClick.querySelector('.rouletteToken')) {
-            return;
-        }
-
         const token = document.createElement('div');
         token.classList.add('rouletteToken');
-        token.textContent = '10';
+        token.textContent = `${bet}`;
+        
+        if (gapClick.querySelector('.rouletteToken')) {
+            bet += bet;
+            token.textContent = `${bet}`;
+        }
 
         token.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             token.remove();
+            bet = 10;
             tokenPlaced = document.querySelector('.rouletteToken') !== null;
-            if(!tokenPlaced){
-                document.getElementById('buttonSpin').hidden = true;
+            if (!tokenPlaced) {
+                buttonSpin.hidden = true;
             }
         });
 
         tokenPlaced = true;
         gapClick.appendChild(token);
-        if(tokenPlaced){
-            document.getElementById('buttonSpin').hidden = false;
+        if (tokenPlaced) {
+            buttonSpin.hidden = false;
         }
     });
 });
