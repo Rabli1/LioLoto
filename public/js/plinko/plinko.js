@@ -26,6 +26,8 @@ Plinko.prototype.show = function () {
         remaining: 0,
         active: false,
         betPerBall: 0,
+        totalBet: 0,
+        roundPayout: 0,
         dropInterval: 30,
     };
 
@@ -87,7 +89,11 @@ Plinko.prototype.show = function () {
             const selectedBalls = parseInt(ballCountSelect?.value, 10);
             const totalBalls = selectedBalls > 0 ? selectedBalls : 1;
 
-            if (!window.Balance || !window.Balance.canMise(pendingBet) || !window.Balance.miser(pendingBet)) {
+            if (
+                !window.Balance ||
+                !window.Balance.canMise(pendingBet) ||
+                !window.Balance.miser(pendingBet, { persist: false })
+            ) {
                 alert('Solde insuffisant.');
                 return;
             }
@@ -96,6 +102,8 @@ Plinko.prototype.show = function () {
             state.remaining = totalBalls;
             state.dropped = 0;
             state.betPerBall = pendingBet;
+            state.totalBet = pendingBet;
+            state.roundPayout = 0;
             state.active = true;
 
             pendingBet = 0;
@@ -109,19 +117,27 @@ Plinko.prototype.show = function () {
         }
 
         const value = Number(typeof hit === 'object' ? hit.value : hit);
-        if (value > 0 && window.Balance) {
+        if (value > 0) {
             const payout = Math.round(state.betPerBall * value);
             if (payout > 0) {
-                window.Balance.gain(payout);
+                state.roundPayout += payout;
             }
         }
 
         state.remaining = Math.max(0, state.remaining - 1);
         if (!state.remaining) {
+            if (window.Balance) {
+                if (state.roundPayout > 0) {
+                    window.Balance.gain(state.roundPayout, { persist: false });
+                }
+                window.Balance.ajouterMontantJSON();
+            }
             state.active = false;
             state.total = 0;
             state.dropped = 0;
             state.betPerBall = 0;
+            state.totalBet = 0;
+            state.roundPayout = 0;
         }
     };
 })();
