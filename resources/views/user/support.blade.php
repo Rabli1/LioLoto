@@ -228,8 +228,6 @@
                                 <li>Pair/Impair, Rouge/Noir : 1:1</li>
                             </ul>
 
-                            <h5>Exemple</h5>
-
                             <h5>Stratégies & Conseils</h5>
                             <div class="strategy">
                                 <ul>

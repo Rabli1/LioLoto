@@ -77,7 +77,7 @@
             </div>
         </div>
     </div>
-
+<!--
 <div class="container mt-5">
     <h1 style="text-align: center; margin-top: 20px;">Jeux disponibles</h1>
         <div class="row">
@@ -113,6 +113,7 @@
     </div>
 
 </div>
+-->
 @include('shared.footer')
 
 

@@ -75,7 +75,15 @@
                     </div>
                     <div class="row"><a href="/game/coinflip" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
-
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/poker.png") }}' alt="Poker"></div>
+                    <div class="row">
+                        <h3>Poker</h3>
+                    </div>
+                    <div class="row"><a href="/game/poker" class="btn btn-danger btn-md">Jouer</a></div>
+                </div>
             </div>
         </div>
     </div>

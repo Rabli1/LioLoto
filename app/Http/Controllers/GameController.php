@@ -102,6 +102,15 @@ class GameController extends Controller
         return view('game.crash', [
             'playerBalance' => $balance
         ]);
+    }    
+    public function poker(): View{
+        $balance = 0;
+        if(session()->has('user')){
+            $balance = session('user')->points;
+        }
+        return view('game.poker', [
+            'playerBalance' => $balance
+        ]);
     }
     public function coinflip(): View{
         $player = $this->resolvePlayer();
