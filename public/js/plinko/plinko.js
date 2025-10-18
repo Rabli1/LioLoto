@@ -35,11 +35,14 @@ Plinko.prototype.show = function () {
         return Number(value || 0).toLocaleString('fr-FR');
     }
 
-    function updateBetLabel(label, pending) {
+    function updateBetLabel(label, pending, ballCount = 1) {
         if (!label) return;
-        label.textContent = pending
-            ? 'Mise selectionnee : ' + format(pending)
-            : 'Aucune mise selectionnee';
+        if (!pending) {
+            label.textContent = 'Aucune mise sélectionnée';
+            return;
+        }
+        const total = pending * ballCount;
+        label.textContent = `Mise sélectionnée : ${format(pending)} × ${ballCount} = ${format(total)}`;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -56,43 +59,51 @@ Plinko.prototype.show = function () {
         const selectedBetLabel = document.getElementById('selectedBet');
         const clearBetButton = document.getElementById('clearBet');
         const placeBetButton = document.getElementById('placeBet');
-        const ballCountSelect = document.getElementById('minesCount');
+        const ballCountSelect = document.getElementById('plinkosCount');
 
         let pendingBet = 0;
-        updateBetLabel(selectedBetLabel, pendingBet);
+        let currentBallCount = parseInt(ballCountSelect?.value, 10) || 1;
+
+        ballCountSelect?.addEventListener('change', () => {
+            currentBallCount = parseInt(ballCountSelect?.value, 10) || 1;
+            updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
+        });
+
+        updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
 
         betTokens.forEach((btn) => {
             btn.addEventListener('click', () => {
                 const value = parseInt(btn.getAttribute('data-value'), 10);
                 pendingBet += value;
-                updateBetLabel(selectedBetLabel, pendingBet);
+                updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
             });
         });
 
         clearBetButton?.addEventListener('click', () => {
             if (state.active) return;
             pendingBet = 0;
-            updateBetLabel(selectedBetLabel, pendingBet);
+            updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
         });
 
         placeBetButton?.addEventListener('click', () => {
             if (state.active) {
-                alert('Une manche est deja en cours.');
+                alert('Une manche est déjà en cours.');
                 return;
             }
 
             if (!pendingBet) {
-                alert('Veuillez selectionner une mise !');
+                alert('Veuillez sélectionner une mise !');
                 return;
             }
 
             const selectedBalls = parseInt(ballCountSelect?.value, 10);
             const totalBalls = selectedBalls > 0 ? selectedBalls : 1;
+            const totalBetAmount = pendingBet * totalBalls;
 
             if (
                 !window.Balance ||
-                !window.Balance.canMise(pendingBet) ||
-                !window.Balance.miser(pendingBet, { persist: false })
+                !window.Balance.canMise(totalBetAmount) ||
+                !window.Balance.miser(totalBetAmount, { persist: false })
             ) {
                 alert('Solde insuffisant.');
                 return;
@@ -102,12 +113,13 @@ Plinko.prototype.show = function () {
             state.remaining = totalBalls;
             state.dropped = 0;
             state.betPerBall = pendingBet;
-            state.totalBet = pendingBet;
+            state.totalBet = totalBetAmount;
             state.roundPayout = 0;
             state.active = true;
 
             pendingBet = 0;
-            updateBetLabel(selectedBetLabel, pendingBet);
+            updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
+
         });
     });
 

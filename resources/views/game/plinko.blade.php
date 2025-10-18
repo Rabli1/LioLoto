@@ -38,8 +38,8 @@
                     <button class="betToken btn btn-outline-light" data-value="500">500</button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-3">
-                    <label for="minesCount" class="form-label mb-0">Billes:</label>
-                    <select id="minesCount" class="form-select form-select-sm" style="width: 90px;">
+                    <label for="plinkosCount" class="form-label mb-0">Billes:</label>
+                    <select id="plinkosCount" class="form-select form-select-sm" style="width: 90px;">
                         @for($i=1; $i<=10; $i++)
                             <option value="{{ $i }}">{{ $i }}</option>
                         @endfor
