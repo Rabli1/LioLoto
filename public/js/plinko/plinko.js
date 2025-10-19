@@ -35,11 +35,14 @@ Plinko.prototype.show = function () {
         return Number(value || 0).toLocaleString('fr-FR');
     }
 
-    function updateBetLabel(label, pending) {
+    function updateBetLabel(label, pending, ballCount = 1) {
         if (!label) return;
-        label.textContent = pending
-            ? 'Mise selectionnee : ' + format(pending)
-            : 'Aucune mise selectionnee';
+        if (!pending) {
+            label.textContent = 'Aucune mise sélectionnée';
+            return;
+        }
+        const total = pending * ballCount;
+        label.textContent = `Mise sélectionnée : ${format(pending)} × ${ballCount} = ${format(total)}`;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -56,75 +59,92 @@ Plinko.prototype.show = function () {
         const selectedBetLabel = document.getElementById('selectedBet');
         const clearBetButton = document.getElementById('clearBet');
         const placeBetButton = document.getElementById('placeBet');
-        const ballCountSelect = document.getElementById('minesCount');
+        const ballCountSelect = document.getElementById('plinkosCount');
 
         let pendingBet = 0;
-        updateBetLabel(selectedBetLabel, pendingBet);
+        let currentBallCount = parseInt(ballCountSelect?.value, 10) || 1;
+
+        ballCountSelect?.addEventListener('change', () => {
+            currentBallCount = parseInt(ballCountSelect?.value, 10) || 1;
+            updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
+        });
+
+        updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
 
         betTokens.forEach((btn) => {
             btn.addEventListener('click', () => {
                 const value = parseInt(btn.getAttribute('data-value'), 10);
                 pendingBet += value;
-                updateBetLabel(selectedBetLabel, pendingBet);
+                updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
             });
         });
 
         clearBetButton?.addEventListener('click', () => {
             if (state.active) return;
             pendingBet = 0;
-            updateBetLabel(selectedBetLabel, pendingBet);
+            updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
         });
 
         placeBetButton?.addEventListener('click', () => {
             if (state.active) {
-                alert('Une manche est deja en cours.');
+                alert('Une manche est déjà en cours.');
                 return;
             }
 
             if (!pendingBet) {
-                alert('Veuillez selectionner une mise !');
+                alert('Veuillez sélectionner une mise !');
                 return;
             }
 
             const selectedBalls = parseInt(ballCountSelect?.value, 10);
             const totalBalls = selectedBalls > 0 ? selectedBalls : 1;
+            const totalBetAmount = pendingBet * totalBalls;
 
             if (
                 !window.Balance ||
-                !window.Balance.canMise(pendingBet) ||
-                !window.Balance.miser(pendingBet, { persist: false })
+                !window.Balance.canMise(totalBetAmount) ||
+                !window.Balance.miser(totalBetAmount, { persist: false })
             ) {
                 alert('Solde insuffisant.');
                 return;
             }
 
+            const statsList = document.getElementById('statsList');
+            const totalSpan = document.getElementById('totalGain');
+            if (statsList) statsList.innerHTML = '';
+            if (totalSpan) totalSpan.textContent = '0';
+            totalGain = 0;
+
             state.total = totalBalls;
             state.remaining = totalBalls;
             state.dropped = 0;
             state.betPerBall = pendingBet;
-            state.totalBet = pendingBet;
+            state.totalBet = totalBetAmount;
             state.roundPayout = 0;
             state.active = true;
 
             pendingBet = 0;
-            updateBetLabel(selectedBetLabel, pendingBet);
+            updateBetLabel(selectedBetLabel, pendingBet, currentBallCount);
+
         });
     });
 
     window.handlePlinko = function (hit) {
-        if (!state.active) {
-            return;
-        }
+        if (!state.active) return;
 
         const value = Number(typeof hit === 'object' ? hit.value : hit);
+        const mise = state.betPerBall;
+        let gain = 0;
+
         if (value > 0) {
-            const payout = Math.round(state.betPerBall * value);
-            if (payout > 0) {
-                state.roundPayout += payout;
-            }
+            gain = Math.round(mise * value);
+            state.roundPayout += gain;
         }
 
+        onBouleTerminee(mise, value);
+
         state.remaining = Math.max(0, state.remaining - 1);
+
         if (!state.remaining) {
             if (window.Balance) {
                 if (state.roundPayout > 0) {
@@ -140,4 +160,29 @@ Plinko.prototype.show = function () {
             state.roundPayout = 0;
         }
     };
+    let totalGain = 0;
+
+    // Fonction pour ajouter une ligne de stats
+    function ajouterStat(mise, multiplicateur, gain) {
+        const statsList = document.getElementById('statsList');
+        const totalSpan = document.getElementById('totalGain');
+
+        const div = document.createElement('div');
+        div.classList.add('d-flex', 'justify-content-between', 'mb-1');
+        div.innerHTML = `
+        <span>${mise} x ${multiplicateur}</span>
+        <span> ${gain}</span>
+    `;
+
+        statsList.appendChild(div);
+
+        totalGain += gain;
+        totalSpan.textContent = totalGain.toFixed(2);
+    }
+
+    // Exemple d’utilisation (à appeler à chaque fois qu’une boule termine)
+    function onBouleTerminee(mise, multiplicateur) {
+        const gain = mise * multiplicateur;
+        ajouterStat(mise, multiplicateur, gain);
+    }
 })();

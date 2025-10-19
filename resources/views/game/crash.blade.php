@@ -1,5 +1,9 @@
 @include('shared.header')
+
 @include('shared.navbar')
+
+@viteReactRefresh
+@vite(['resources/js/app.jsx'])
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0"></script>
 
 <main class="blackjack-page py-4">
@@ -22,7 +26,8 @@
             <form class="w-100">
               <div class="mb-4">
                 <label for="bet" class="form-label">Montant :</label>
-                <input type="number" class="form-control" min="1" max="{{ $playerBalance }}" value="1" name="bet" id="bet">
+                <input type="number" class="form-control" min="1" max="{{ $playerBalance }}" value="1" name="bet"
+                  id="bet">
                 <span id="balance-error" class="text-danger"></span>
               </div>
 
@@ -37,9 +42,10 @@
               </div>
 
               <div class="d-flex flex-wrap gap-2 mt-4">
-                <button id="play" class="btn btn-light flex-fill" type="button" @if(!session()->has('user')) disabled @endif>Jouer</button>
-                <button id="cashOut" class="btn btn-danger flex-fill" type="button" 
-                  @if(!session()->has('user')) disabled @endif>
+                <button id="play" class="btn btn-light flex-fill" type="button" @if(!session()->has('user')) disabled
+                @endif>Jouer</button>
+                <button id="cashOut" class="btn btn-danger flex-fill" type="button" @if(!session()->has('user'))
+                disabled @endif>
                   Retirer
                 </button>
               </div>
@@ -82,4 +88,5 @@
   });
 </script>
 @include('shared.footer')
+
 </html>

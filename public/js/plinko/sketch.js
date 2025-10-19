@@ -59,9 +59,9 @@ function setup() {
     var y = height - cubeSize / 2 - 50;
 
     var multipliers = [
-        "500x", "80x", "25x", "10x", "4x", "1x", "0.5x",
-        "0.2x", "0.2x", "0.2x",
-        "0.5x", "1x", "4x", "10x", "25x", "80x", "500x"
+        "500x", "90x", "30x", "12x", "5x", "2x", "1x",
+        "0.4x", "0.4x", "0.4x",
+        "1x", "2x", "5x", "12x", "30x", "90x", "500x"
     ];
 
     for (var k = 0; k < numCubes; k++) {

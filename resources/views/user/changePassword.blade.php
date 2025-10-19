@@ -1,5 +1,9 @@
 @include('shared.header')
+
 @include('shared.navbar')
+
+@viteReactRefresh
+@vite(['resources/js/app.jsx'])
 
 @php
     $connectedUserId = session()->has('user') ? session('user')->id : null;
@@ -30,17 +34,20 @@
 
             <div class="mb-3">
                 <label for="current_password" class="form-label">Mot de passe actuel</label>
-                <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Mot de passe actuel" required>
+                <input type="password" class="form-control" id="current_password" name="current_password"
+                    placeholder="Mot de passe actuel" required>
             </div>
 
             <div class="mb-3">
                 <label for="new_password" class="form-label">Nouveau mot de passe</label>
-                <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Nouveau mot de passe" required>
+                <input type="password" class="form-control" id="new_password" name="new_password"
+                    placeholder="Nouveau mot de passe" required>
             </div>
 
             <div class="mb-3">
                 <label for="new_password_confirmation" class="form-label">Confirmer le nouveau mot de passe</label>
-                <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="Confirmez le mot de passe" required>
+                <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation"
+                    placeholder="Confirmez le mot de passe" required>
             </div>
 
             <div class="d-flex justify-content-center">
