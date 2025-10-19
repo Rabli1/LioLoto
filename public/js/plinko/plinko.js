@@ -109,6 +109,12 @@ Plinko.prototype.show = function () {
                 return;
             }
 
+            const statsList = document.getElementById('statsList');
+            const totalSpan = document.getElementById('totalGain');
+            if (statsList) statsList.innerHTML = '';
+            if (totalSpan) totalSpan.textContent = '0';
+            totalGain = 0;
+
             state.total = totalBalls;
             state.remaining = totalBalls;
             state.dropped = 0;
@@ -124,19 +130,21 @@ Plinko.prototype.show = function () {
     });
 
     window.handlePlinko = function (hit) {
-        if (!state.active) {
-            return;
-        }
+        if (!state.active) return;
 
         const value = Number(typeof hit === 'object' ? hit.value : hit);
+        const mise = state.betPerBall;
+        let gain = 0;
+
         if (value > 0) {
-            const payout = Math.round(state.betPerBall * value);
-            if (payout > 0) {
-                state.roundPayout += payout;
-            }
+            gain = Math.round(mise * value);
+            state.roundPayout += gain;
         }
 
+        onBouleTerminee(mise, value);
+
         state.remaining = Math.max(0, state.remaining - 1);
+
         if (!state.remaining) {
             if (window.Balance) {
                 if (state.roundPayout > 0) {
@@ -152,4 +160,29 @@ Plinko.prototype.show = function () {
             state.roundPayout = 0;
         }
     };
+    let totalGain = 0;
+
+    // Fonction pour ajouter une ligne de stats
+    function ajouterStat(mise, multiplicateur, gain) {
+        const statsList = document.getElementById('statsList');
+        const totalSpan = document.getElementById('totalGain');
+
+        const div = document.createElement('div');
+        div.classList.add('d-flex', 'justify-content-between', 'mb-1');
+        div.innerHTML = `
+        <span>${mise} x ${multiplicateur}</span>
+        <span> ${gain}</span>
+    `;
+
+        statsList.appendChild(div);
+
+        totalGain += gain;
+        totalSpan.textContent = totalGain.toFixed(2);
+    }
+
+    // Exemple d’utilisation (à appeler à chaque fois qu’une boule termine)
+    function onBouleTerminee(mise, multiplicateur) {
+        const gain = mise * multiplicateur;
+        ajouterStat(mise, multiplicateur, gain);
+    }
 })();

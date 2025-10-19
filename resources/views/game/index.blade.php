@@ -17,6 +17,7 @@
 <body>
 
     @include('shared.header')
+
     @include('shared.navbar')
 
     <div class="container mt-5">
