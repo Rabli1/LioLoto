@@ -9,10 +9,12 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
     const hoveredPillTextColor = '#dc3545';
     const resolvedPillTextColor = baseColor;
 
+    // search state
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [localUsers, setLocalUsers] = useState(users || []);
 
+    // refs for pills + DOM container for fallback dataset
     const circleRefs = useRef([]);
     const tlRefs = useRef([]);
     const activeTweenRefs = useRef([]);
@@ -20,6 +22,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
     const searchBoxRef = useRef(null);
     const inputRef = useRef(null);
 
+    // menu items
     const items = [
         { href: '/game', label: 'Jeux' },
         { href: '/leaderboard', label: 'Classement' },
@@ -36,6 +39,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
         { href: '/user/support', label: 'Support' },
     ];
 
+    // fallback: si on n'a pas passé users en prop, chercher data-users sur le conteneur
     useEffect(() => {
         if ((users == null || users.length === 0) && navItemsRef.current) {
             const datasetUsers = navItemsRef.current.closest('nav')?.dataset?.users;
@@ -44,6 +48,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
                     const parsed = JSON.parse(datasetUsers);
                     setLocalUsers(Array.isArray(parsed) ? parsed : []);
                 } catch (err) {
+                    // ignore parse error
                 }
             }
         } else {
@@ -51,6 +56,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
         }
     }, [users]);
 
+    // filtered results
     const filteredUsers = searchQuery.trim() !== ''
         ? localUsers
             .filter(u => {
@@ -60,6 +66,14 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
             .slice(0, 5)
         : [];
 
+    // Debug
+    useEffect(() => {
+        console.log('SearchQuery:', searchQuery);
+        console.log('LocalUsers:', localUsers);
+        console.log('FilteredUsers:', filteredUsers);
+    }, [searchQuery, localUsers, filteredUsers]);
+
+    // GSAP layout
     useEffect(() => {
         const layout = () => {
             circleRefs.current.forEach(circle => {
@@ -115,6 +129,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
         activeTweenRefs.current[i] = tl.tweenTo(0, { duration: 0.2, ease });
     };
 
+    // search open/close handlers
     const toggleSearch = () => {
         setSearchOpen(prev => {
             const next = !prev;
@@ -132,6 +147,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
         setSearchQuery('');
     };
 
+    // click outside to close
     useEffect(() => {
         const onDocClick = (e) => {
             if (!searchOpen) return;
@@ -186,6 +202,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
                     </ul>
                 </div>
 
+                {/* Bouton Loupe + Recherche utilisateur */}
                 <div className="nav-item d-flex align-items-center ms-2 position-relative">
                     <button 
                         className="btn btn-link p-0 text-white btn-search-toggle" 

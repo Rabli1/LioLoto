@@ -1,5 +1,9 @@
 @include('shared.header')
+
 @include('shared.navbar')
+
+@viteReactRefresh
+@vite(['resources/js/app.jsx'])
 <div class="form-container mt-5">
     <h3 class="text-center mb-4">Inscription</h3>
     <form action="{{ url('/user/addUser') }}" method="post">

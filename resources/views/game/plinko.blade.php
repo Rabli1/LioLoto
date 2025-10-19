@@ -2,7 +2,11 @@
 
 <head>
     @include('shared.header')
+
     @include('shared.navbar')
+
+    @viteReactRefresh
+    @vite(['resources/js/app.jsx'])
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lotoli - Plinko</title>
@@ -26,7 +30,8 @@
                             data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
                 </header>
 
-                <div id="canvas-container" style="display: flex; justify-content: center; margin: 20px auto; padding-right: 20%;">
+                <div id="canvas-container"
+                    style="display: flex; justify-content: center; margin: 20px auto; padding-right: 20%;">
                     <div class="col-md-3" style="padding-right: 20px;">
                         <div id="statsContainer" class="p-3 bg-dark text-white shadow">
                             <h5 class="text-center">Statistiques</h5>

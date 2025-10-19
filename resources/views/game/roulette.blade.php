@@ -1,13 +1,18 @@
 {{-- resources/views/game/mines.blade.php --}}
 <html>
-    <head>
-        @include('shared.header')
-        @include('shared.navbar')
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Loto Lio - Roulette</title>
-        <link rel="stylesheet" href="{{ asset('css/game.css') }}">
-    </head>
+
+<head>
+    @include('shared.header')
+
+    @include('shared.navbar')
+
+    @viteReactRefresh
+    @vite(['resources/js/app.jsx'])
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loto Lio - Roulette</title>
+    <link rel="stylesheet" href="{{ asset('css/game.css') }}">
+</head>
 <main class="py-4">
     <div class="container">
         <section class="game-outline text-center">
@@ -40,4 +45,5 @@
 </script>
 <script defer src="{{ asset('js/roulette.js') }}"></script>
 @include('shared.footer')
+
 </html>

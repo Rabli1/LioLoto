@@ -1,5 +1,9 @@
 @include('shared.header')
+
 @include('shared.navbar')
+
+@viteReactRefresh
+@vite(['resources/js/app.jsx'])
 <style>
     body {
         background-color: #121212;
@@ -63,12 +67,14 @@
                             <h5>Déroulement</h5>
                             <ul>
                                 <li>À 00:00 heure de l'est, tout les joueurs voient leur solde se remettre à 1000.</li>
-                                <li>Les joueurs faisant partie du top 3 recevront une médail d'or d'argent et de bronze et seront visible sur leur profil.</li>
+                                <li>Les joueurs faisant partie du top 3 recevront une médail d'or d'argent et de bronze
+                                    et seront visible sur leur profil.</li>
                             </ul>
 
                             <h5>informations</h5>
                             <ul>
-                                <li>Le classement quotidient est disponible en tout temps <a href="/leaderboard">ici</a></li>
+                                <li>Le classement quotidient est disponible en tout temps <a href="/leaderboard">ici</a>
+                                </li>
                                 <li>Vous pourrez alors consulter votre position pour la journée en cours</li>
                             </ul>
 
