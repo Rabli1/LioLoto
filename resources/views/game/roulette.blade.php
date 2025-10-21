@@ -21,7 +21,18 @@
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Placer des mises et tenter votre chance !
                 </p>
+                <span class="balance">Solde : $<span id="roulette-balance"
+                        data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
             </header>
+
+            <section id="betContainer" class="mb-4">
+                <h2 class="h5 mb-3">Sélectionnez votre mise</h2>
+                <div class="tokenWage">10</div>
+                <div class="tokenWage">50</div>
+                <div class="tokenWage">100</div>
+                <div class="tokenWage">250</div>
+                <div class="tokenWage">500</div>
+            </section>
 
             <section>
                 <div id="rouletteContainer"></div>
