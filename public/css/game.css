@@ -423,6 +423,14 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.tokenWage:hover{
+    border: 2px solid white;
+}
+
+.tokenWageSelected{
+    border: 2px solid white;
+}
+
 .roulette {
     height: 312px;
     width: 312px;
@@ -743,6 +751,10 @@
     font-size: large;
     font-weight: bold;
     z-index: 3;
+}
+
+#clearMat{
+    margin-bottom: 5px;
 }
 
 @keyframes wheelRotate {
