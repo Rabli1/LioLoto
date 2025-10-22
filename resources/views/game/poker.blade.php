@@ -118,7 +118,7 @@
         </section>
     </div>
 </main>
-<script defer src="{{ asset('js/poker.js') }}"></script>
+@vite(['resources/js/poker.js'])
 <script>
     const betInput = document.getElementById('betAmount');
     const betRange = document.getElementById('betRange');
@@ -133,7 +133,8 @@
         userId: {{ session('user')->id ?? 'null' }},
         balance: {{ (int) $playerBalance }},
         endpoints: { saveBalance: '{{ url('game/balance') }}' },
-        csrfToken: '{{ csrf_token() }}'
+        csrfToken: '{{ csrf_token() }}',
+        encryptKey: '{{ env('APP_ENCRYPTION_KEY') }}'
     };
 </script>
 @include('shared.footer')

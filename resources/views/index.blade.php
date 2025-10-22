@@ -38,10 +38,7 @@
 
 @include('shared.header')
 
-@include('shared.navbar') 
-
-@viteReactRefresh
-@vite(['resources/js/app.jsx']) 
+@include('shared.navbar')  
 
 
 
