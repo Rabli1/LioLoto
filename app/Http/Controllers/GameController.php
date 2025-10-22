@@ -85,6 +85,17 @@ class GameController extends Controller
             'playerBalance' => $balance,
         ]);
     }
+
+    public function chickenRoad(): View
+    {
+        $player = $this->resolvePlayer();
+        $balance = $player?->points ?? 0;
+
+        return view('game.chicken-road', [
+            'playerBalance' => $balance,
+        ]);
+    }
+
     public function roulette(): View
     {
         $player = $this->resolvePlayer();

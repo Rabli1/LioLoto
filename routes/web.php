@@ -27,6 +27,7 @@ Route::get('/game', function () {
 Route::get('game/blackjack', [GameController::class, 'blackjack']);
 Route::get('game/plinko', [GameController::class, 'plinko']);
 Route::get('game/mines', [GameController::class, 'mines']);
+Route::get('game/chicken-road', [GameController::class, 'chickenRoad']);
 Route::get('game/roulette', [GameController::class, 'roulette']);
 Route::get('game/crash', [GameController::class, 'crash']);
 Route::get('game/coinflip',[GameController::class, 'coinflip']);
