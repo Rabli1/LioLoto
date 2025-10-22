@@ -1,0 +1,238 @@
+.chicken-road-page {
+        padding-bottom: 4rem;
+    }
+
+    .road-viewport {
+        --cell-size: 72px;
+        --visible-columns: 10;
+        --column-gap: 12px;
+        margin: 0 auto 1.5rem;
+        width: calc(var(--visible-columns) * var(--cell-size) + (var(--visible-columns) - 1) * var(--column-gap));
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(26, 26, 26, 0.92);
+    }
+
+    @media (max-width: 1024px) {
+        .road-viewport {
+            --cell-size: 60px;
+            --column-gap: 10px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .road-viewport {
+            --cell-size: 48px;
+            --column-gap: 8px;
+        }
+    }
+
+    .road-track {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        gap: var(--column-gap);
+        padding: 30px 12px 18px;
+    }
+
+    .road-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        min-width: var(--cell-size);
+    }
+
+    .road-cell {
+        position: relative;
+        width: calc(var(--cell-size) * 0.94);
+        height: calc(var(--cell-size) * 0.94);
+        border-radius: 26px;
+        background-color: rgba(36, 36, 36, 0.92);
+        background-image: url("/img/chicken-road/drain.svg");
+        background-repeat: no-repeat;
+        background-position: center 58%;
+        background-size: 64%;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .road-cell:hover:not(:disabled) {
+        transform: translateY(-6px);
+        border-color: rgba(110, 160, 255, 0.45);
+        box-shadow: 0 10px 20px rgba(110, 160, 255, 0.18);
+    }
+
+    .road-cell:disabled {
+        cursor: default;
+    }
+
+    .road-cell.is-active {
+        border-color: rgba(110, 160, 255, 0.9);
+        box-shadow: 0 0 16px rgba(110, 160, 255, 0.46);
+    }
+
+    .road-cell.safe {
+        background-color: rgba(82, 122, 94, 0.85);
+        border-color: rgba(130, 186, 148, 0.7);
+        box-shadow: 0 0 12px rgba(130, 186, 148, 0.36);
+    }
+
+    .road-cell.is-boom {
+        background-color: rgba(210, 72, 72, 0.92);
+        background-image: url("/img/chicken-road/explosion.svg");
+        background-size: 78%;
+        border-color: rgba(235, 110, 110, 0.9);
+        box-shadow: 0 0 24px rgba(220, 88, 88, 0.42);
+        animation: boom-pop 0.6s ease both;
+    }
+
+    .road-column-index {
+        position: absolute;
+        top: -22px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    .column-multiplier {
+        min-width: calc(var(--cell-size) * 0.8);
+        padding: 0.32rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(34, 34, 34, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.8rem;
+    }
+
+    .road-column.is-passed .column-multiplier {
+        background: rgba(92, 140, 100, 0.85);
+        border-color: rgba(124, 188, 144, 0.6);
+        color: #dafbe5;
+    }
+
+    .road-column.is-passed .road-cell {
+        border-color: rgba(124, 188, 144, 0.7);
+    }
+
+    .road-column.is-current .road-cell {
+        background-color: rgba(55, 85, 160, 0.88);
+        border-color: rgba(118, 162, 255, 0.85);
+        box-shadow: 0 0 20px rgba(78, 132, 255, 0.36);
+    }
+
+    .road-column.is-current .column-multiplier {
+        background: rgba(52, 102, 255, 0.86);
+        border-color: rgba(128, 170, 255, 0.75);
+        color: #f5f7ff;
+    }
+
+    .road-column.is-next:not(.is-current) .road-cell {
+        background-color: rgba(46, 66, 120, 0.74);
+        border-color: rgba(102, 148, 255, 0.45);
+    }
+
+    .road-column.is-next:not(.is-current) .column-multiplier {
+        border-color: rgba(102, 148, 255, 0.35);
+    }
+
+    .road-column.has-chicken .road-cell::after {
+        content: '';
+        position: absolute;
+        bottom: 19%;
+        left: 50%;
+        width: 42%;
+        aspect-ratio: 1;
+        transform: translateX(-50%);
+        background: url("/img/chicken-road/chicken.svg") center/contain no-repeat;
+        pointer-events: none;
+    }
+
+    .road-column.has-chicken .road-cell {
+        border-color: rgba(255, 214, 122, 0.82);
+        box-shadow: 0 0 18px rgba(255, 214, 122, 0.35);
+        background-color: rgba(55, 85, 160, 0.88);
+    }
+
+    .road-column.has-chicken .column-multiplier {
+        background: rgba(255, 214, 122, 0.82);
+        border-color: rgba(255, 226, 150, 0.88);
+        color: #2d2410;
+    }
+
+    .road-column.is-placeholder {
+        display: none;
+    }
+
+    .road-column.is-placeholder .road-cell {
+        pointer-events: none;
+    }
+
+    .road-column.is-placeholder .column-multiplier {
+        visibility: hidden;
+    }
+
+    .road-column.is-placeholder .road-cell {
+        pointer-events: none;
+    }
+
+    .road-column.is-placeholder .column-multiplier {
+        visibility: hidden;
+    }
+
+    .hud {
+        display: grid;
+        gap: 0.6rem;
+        justify-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .hud .badge {
+        background: rgba(34, 34, 34, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
+    }
+
+    .action-buttons button {
+        min-width: 160px;
+    }
+
+    #resultMessage {
+        min-height: 1.6rem;
+    }
+
+    #resultMessage.result-win {
+        color: #9de3b0;
+    }
+
+    #resultMessage.result-loss {
+        color: #ff6f6f;
+    }
+
+    #betContainer {
+        border-radius: 16px;
+        background: rgba(19, 19, 19, 0.72);
+        padding: 1.8rem;
+        border: 1px solid rgba(252, 240, 240, 0.05);
+        box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.25);
+    }
+
+    #difficultyLevel {
+        width: 120px;
+    }
+
+    @keyframes boom-pop {
+        0% { transform: scale(1); opacity: 1; }
+        40% { transform: scale(1.15); opacity: 1; }
+        100% { transform: scale(0.6); opacity: 0; }
+    }

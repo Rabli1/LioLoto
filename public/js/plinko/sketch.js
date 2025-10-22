@@ -1,16 +1,30 @@
 var Engine = Matter.Engine,
     World = Matter.World,
     Bodies = Matter.Bodies,
-    Events = Matter.Events; // 🟩 pour écouter les collisions
+    Events = Matter.Events;
 
 var engine;
 var world;
 var particles = [];
 var plinkos = [];
 var bounds = [];
-var cubes = []; // 🟩 liste des cubes du bas
+var cubes = [];
 var cols = 19;
 var rows = 16;
+
+function gameState() {
+    if (!window.plinkoGame) {
+        window.plinkoGame = {
+            total: 0,
+            dropped: 0,
+            remaining: 0,
+            active: false,
+            betPerBall: 0,
+            dropInterval: 30,
+        };
+    }
+    return window.plinkoGame;
+}
 
 function setup() {
     let canvas = createCanvas(600, 625);
@@ -23,7 +37,6 @@ function setup() {
     var centerX = width / 2;
     var minPlinkos = 3;
 
-    // --- triangle inversé ---
     for (var j = 0; j < rows; j++) {
         var numPlinkos = minPlinkos + j;
         if (numPlinkos > cols) numPlinkos = cols;
@@ -38,7 +51,6 @@ function setup() {
         }
     }
 
-    // --- cubes du bas ---
     var numCubes = 17;
     var cubeSize = 25;
     var margin = 30;
@@ -46,38 +58,47 @@ function setup() {
     var startX = margin + spacing / 2;
     var y = height - cubeSize / 2 - 50;
 
-    // 🟩 multiplicateurs symétriques
     var multipliers = [
-        "500x", "80x", "25x", "10x", "4x", "1x", "0.5x",
-        "0.2x", "0.2x", "0.2x", // centre (3x 0.2x total)
-        "0.5x", "1x", "4x", "10x", "25x", "80x", "500x"
+        "500x", "90x", "30x", "12x", "5x", "2x", "1x",
+        "0.4x", "0.4x", "0.4x",
+        "1x", "2x", "5x", "12x", "30x", "90x", "500x"
     ];
 
-    for (var i = 0; i < numCubes; i++) {
-        var x = startX + i * spacing;
-        var cube = new Boundary(x, y, cubeSize, cubeSize);
+    for (var k = 0; k < numCubes; k++) {
+        var cubeX = startX + k * spacing;
+        var cube = new Boundary(cubeX, y, cubeSize, cubeSize);
         cube.body.label = "cube";
-        cube.multiplier = multipliers[i];
+        cube.multiplier = multipliers[k];
+        cube.body.plinkoMultiplierValue = parseFloat(multipliers[k]);
+        cube.body.plinkoMultiplierLabel = multipliers[k];
         bounds.push(cube);
         cubes.push(cube);
     }
 
-    // 🟩 Détection de collisions
-    Events.on(engine, "collisionStart", function(event) {
+    Events.on(engine, "collisionStart", function (event) {
         var pairs = event.pairs;
         for (var i = 0; i < pairs.length; i++) {
             var bodyA = pairs[i].bodyA;
             var bodyB = pairs[i].bodyB;
 
-            // on vérifie si c’est une particule et un cube
             if (isParticleAndCube(bodyA, bodyB)) {
-                removeParticle(bodyA.label === "particle" ? bodyA : bodyB);
+                var particleBody = bodyA.label === "particle" ? bodyA : bodyB;
+                var cubeBody = bodyA.label === "cube" ? bodyA : bodyB;
+
+                if (!particleBody.isSettled && typeof window.handlePlinko === 'function') {
+                    window.handlePlinko({
+                        value: cubeBody.plinkoMultiplierValue,
+                        label: cubeBody.plinkoMultiplierLabel
+                    });
+                }
+
+                particleBody.isSettled = true;
+                removeParticle(particleBody);
             }
         }
     });
 }
 
-// 🟩 fonction utilitaire pour détecter particule-cube
 function isParticleAndCube(a, b) {
     return (
         (a.label === "particle" && b.label === "cube") ||
@@ -85,7 +106,6 @@ function isParticleAndCube(a, b) {
     );
 }
 
-// 🟩 supprime la particule du monde et du tableau
 function removeParticle(body) {
     for (var i = 0; i < particles.length; i++) {
         if (particles[i].body === body) {
@@ -105,34 +125,36 @@ function draw() {
     background(51);
     Engine.update(engine);
 
-    // --- Drop automatique des billes si le round est en cours ---
-    if (particlesDropped < totalParticles && frameCount % dropInterval === 0) {
+    const state = gameState();
+    if (state.active && state.dropped < state.total && frameCount % state.dropInterval === 0) {
         newParticle();
-        particlesDropped++;
+        state.dropped += 1;
     }
 
-    // --- Affichage des particules ---
     for (var i = 0; i < particles.length; i++) {
-        particles[i].show();
-        if (particles[i].isOffScreen()) {
-            World.remove(world, particles[i].body);
+        var particle = particles[i];
+        particle.show();
+        if (particle.isOffScreen()) {
+            if (!particle.body.isSettled && typeof window.handlePlinko === 'function') {
+                window.handlePlinko({ value: 0, label: '0x' });
+            }
+            particle.body.isSettled = true;
+            World.remove(world, particle.body);
             particles.splice(i, 1);
             i--;
         }
     }
 
-    // --- Affichage des plinkos ---
     for (var j = 0; j < plinkos.length; j++) {
         plinkos[j].show();
     }
 
-    // --- Affichage des cubes ---
     for (var k = 0; k < bounds.length; k++) {
         bounds[k].show();
         fill(0);
         textAlign(CENTER, CENTER);
         textSize(k === 0 || k === bounds.length - 1 ? 11 : 13);
-        let pos = bounds[k].body.position;
+        var pos = bounds[k].body.position;
         text(bounds[k].multiplier, pos.x, pos.y);
     }
 }

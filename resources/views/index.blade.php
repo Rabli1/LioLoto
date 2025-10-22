@@ -36,9 +36,12 @@
 
 <body>
 
-  <!-- Navbar -->
-  @include('shared.header')
-  @include('shared.navbar')
+@include('shared.header')
+
+@include('shared.navbar') 
+
+@viteReactRefresh
+@vite(['resources/js/app.jsx']) 
 
 
 

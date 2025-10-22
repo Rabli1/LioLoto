@@ -10,6 +10,7 @@ function Particle(x, y, r) {
 
     x += random(-10, 10);
     this.body = Bodies.circle(x, y, r, options);
+    this.body.isSettled = false;
     this.r = r;
     World.add(world, this.body);
 }

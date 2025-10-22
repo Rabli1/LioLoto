@@ -1,11 +1,16 @@
 <html>
-    <head>
-        @include('shared.header')
-        @include('shared.navbar')
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Loto Lio - Blackjack</title>
-    </head>
+
+<head>
+    @include('shared.header')
+
+    @include('shared.navbar')
+
+    @viteReactRefresh
+    @vite(['resources/js/app.jsx'])
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loto Lio - Blackjack</title>
+</head>
 <main class="blackjack-page py-4">
     <div class="container">
         <section class="game-outline text-center">
@@ -14,7 +19,8 @@
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Atteignez 21 sans dépasser et battez le croupier!
                 </p>
-                <span class="balance">Solde : $<span id="blackjack-balance" data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
+                <span class="balance">Solde : <span id="blackjack-balance"
+                        data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
             </header>
 
             <section id="betContainer" class="mb-4">
@@ -29,7 +35,8 @@
                 <p id="selectedBet" class="fw-semibold mt-3">Aucune mise sélectionnée</p>
                 <div class="d-flex flex-row justify-content-center">
                     <button id="clearBet" class="btn btn-light mt-2 me-3" type="button">Effacer la mise</button>
-                    <button id="placeBet" class="btn btn-danger mt-2" type="button" @if(!session()->has('user')) disabled @endif>Placer la mise</button>
+                    <button id="placeBet" class="btn btn-danger mt-2" type="button" @if(!session()->has('user'))
+                    disabled @endif>Placer la mise</button>
                 </div>
             </section>
 
@@ -76,4 +83,5 @@
 <script defer src="{{ asset('js/blackjack_balance.js') }}"></script>
 <script defer src="{{ asset('js/blackjack.js') }}"></script>
 @include('shared.footer')
+
 </html>
