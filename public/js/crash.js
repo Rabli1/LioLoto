@@ -86,9 +86,9 @@ async function animateGame() {
     multiplier.text(value.toFixed(2) + "x");
 
     if (autoCashout) {
-      if (cashOut < value) {
-        const win = parseInt(value * betAmount);
-        winMessage.text(`${value.toFixed(2)}x -> ${win} gagné`)
+      if (cashOut <= value) {
+        const win = parseInt(cashOut * betAmount);
+        winMessage.text(`${cashOut.toFixed(2)}x -> ${win} gagné`)
         autoCashout = false;
         window.gameSession.balance += win;
         $.ajax({

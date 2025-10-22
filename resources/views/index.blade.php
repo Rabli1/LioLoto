@@ -38,10 +38,7 @@
 
 @include('shared.header')
 
-@include('shared.navbar') 
-
-@viteReactRefresh
-@vite(['resources/js/app.jsx']) 
+@include('shared.navbar')  
 
 
 
@@ -80,7 +77,7 @@
             </div>
         </div>
     </div>
-
+<!--
 <div class="container mt-5">
     <h1 style="text-align: center; margin-top: 20px;">Jeux disponibles</h1>
         <div class="row">
@@ -116,6 +113,7 @@
     </div>
 
 </div>
+-->
 @include('shared.footer')
 
 

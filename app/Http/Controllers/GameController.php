@@ -85,6 +85,17 @@ class GameController extends Controller
             'playerBalance' => $balance,
         ]);
     }
+
+    public function chickenRoad(): View
+    {
+        $player = $this->resolvePlayer();
+        $balance = $player?->points ?? 0;
+
+        return view('game.chicken-road', [
+            'playerBalance' => $balance,
+        ]);
+    }
+
     public function roulette(): View
     {
         $player = $this->resolvePlayer();
@@ -100,6 +111,15 @@ class GameController extends Controller
             $balance = session('user')->points;
         }
         return view('game.crash', [
+            'playerBalance' => $balance
+        ]);
+    }    
+    public function poker(): View{
+        $balance = 0;
+        if(session()->has('user')){
+            $balance = session('user')->points;
+        }
+        return view('game.poker', [
             'playerBalance' => $balance
         ]);
     }

@@ -49,3 +49,5 @@
       </div>
     </div>
 </nav>
+@viteReactRefresh
+@vite(['resources/js/app.jsx'])

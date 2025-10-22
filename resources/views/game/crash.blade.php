@@ -88,5 +88,4 @@
   });
 </script>
 @include('shared.footer')
-
 </html>

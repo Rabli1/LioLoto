@@ -19,7 +19,7 @@
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Atteignez 21 sans dépasser et battez le croupier!
                 </p>
-                <span class="balance">Solde : $<span id="blackjack-balance"
+                <span class="balance">Solde : <span id="blackjack-balance"
                         data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
             </header>
 
