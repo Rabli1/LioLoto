@@ -59,3 +59,8 @@ text-decoration: none; /* Remove underline */
     left: 40px;
 }
 
+@media (max-width: 800px) {
+  #profile {
+    display: none !important;
+  }
+}

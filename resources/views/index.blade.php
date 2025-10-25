@@ -118,36 +118,44 @@
 
 
 <script>
-const profile = document.getElementById('profile')
+const profile = document.getElementById('profile');
 let startX = 0;
 let startY = 0;
 let offsetX = 0;
 let offsetY = 0;
 
-profile.addEventListener('mousedown', e => {
-    startX = e.clientX;
-    startY = e.clientY;
+function onDragStart(e) {
+    e.preventDefault();
+    const point = e.touches ? e.touches[0] : e;
+    startX = point.clientX;
+    startY = point.clientY;
 
-    const mouseMove = e => {
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
+    document.addEventListener(e.touches ? 'touchmove' : 'mousemove', onDragMove);
+    document.addEventListener(e.touches ? 'touchend' : 'mouseup', onDragEnd);
+}
 
-        offsetX += dx;
-        offsetY += dy;
+function onDragMove(e) {
+    const point = e.touches ? e.touches[0] : e;
+    const dx = point.clientX - startX;
+    const dy = point.clientY - startY;
 
-        profile.style.top = (profile.offsetTop + dy) + 'px';
-        profile.style.left = (profile.offsetLeft + dx) + 'px';
+    offsetX += dx;
+    offsetY += dy;
 
-        startX = e.clientX;
-        startY = e.clientY;
-    }
+    profile.style.top = (profile.offsetTop + dy) + 'px';
+    profile.style.left = (profile.offsetLeft + dx) + 'px';
 
-    const mouseUp = () => {
-        document.removeEventListener('mousemove', mouseMove);
-        document.removeEventListener('mouseup', mouseUp);
-    }
+    startX = point.clientX;
+    startY = point.clientY;
+}
 
-    document.addEventListener('mousemove', mouseMove);
-    document.addEventListener('mouseup', mouseUp);
-})
+function onDragEnd(e) {
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', onDragEnd);
+}
+
+profile.addEventListener('mousedown', onDragStart);
+profile.addEventListener('touchstart', onDragStart);
 </script>
