@@ -1,6 +1,6 @@
 <footer class="bg-danger text-light py-5 mt-5 align-items-end" style="margin-top: 300px;">
-  <div class="container">
-    <div class="row text-center text-md-start">
+  <div class="container text-center">
+    <div class="row text-center text-md-start" style="margin-left: 14%;">
       <div class="col-md-3 mb-4">
         <h5 class="fw-bold">Justin Lessard</h5>
         <ul class="list-unstyled">
