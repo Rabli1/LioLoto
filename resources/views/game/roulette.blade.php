@@ -23,7 +23,19 @@
                 </p>
             </header>
 
+            <section id="betContainer" class="mb-4">
+                <h2 class="h5 mb-3">Sélectionnez votre mise</h2>
+                <div class="tokenWage" data-value="10">10</div>
+                <div class="tokenWage" data-value="50">50</div>
+                <div class="tokenWage" data-value="100">100</div>
+                <div class="tokenWage" data-value="250">250</div>
+                <div class="tokenWage" data-value="500">500</div>
+                <button id="clearMat" class="btn btn-light" type="button">Effacer les mises</button>
+            </section>
+
             <section>
+                <span class="balance">Solde : $<span id="roulette-balance"
+                        data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
                 <div id="rouletteContainer"></div>
             </section>
 
