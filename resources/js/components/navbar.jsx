@@ -204,8 +204,8 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
 
                 {/* Bouton Loupe + Recherche utilisateur */}
                 <div className="nav-item d-flex align-items-center ms-2 position-relative">
-                    <button 
-                        className="btn btn-link p-0 text-white btn-search-toggle" 
+                    <button
+                        className="btn btn-link p-0 text-white btn-search-toggle"
                         onClick={toggleSearch}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -214,14 +214,14 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
                     </button>
 
                     {searchOpen && (
-                        <div 
+                        <div
                             ref={searchBoxRef}
                             className="position-absolute end-0 top-100 mt-2 bg-white rounded shadow p-2"
                             style={{ width: '250px', zIndex: 1000 }}
                         >
-                            <input 
+                            <input
                                 ref={inputRef}
-                                type="text" 
+                                type="text"
                                 className="form-control mb-1"
                                 placeholder="Rechercher utilisateur"
                                 value={searchQuery}
@@ -233,8 +233,8 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
                                 {filteredUsers.map(u => (
                                     <div key={u.id} className="d-flex align-items-center p-1 border-bottom">
                                         <i className={`fa-solid ${u.profileImage} pfp-${u.profileColor} me-2`}></i>
-                                        <a 
-                                            href={`/user/profile?id=${u.id}`} 
+                                        <a
+                                            href={`/user/profile?id=${u.id}`}
                                             className="text-dark text-decoration-none"
                                             onClick={closeSearch}
                                         >
@@ -243,15 +243,17 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
                                     </div>
                                 ))}
                             </div>
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 className="btn btn-link p-0 position-absolute"
-                                style={{ top: '10px', right: '5px' }}
+                                style={{ top: '10px', right: '10px' }}
                                 onClick={closeSearch}
                             >
-                                <svg width="16" height="16" viewBox="0 0 14 14" fill="black" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z" />
-                                </svg>
+                                <div class="icon-container">
+                                    <svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z" />
+                                    </svg>
+                                </div>
                             </button>
                         </div>
                     )}
