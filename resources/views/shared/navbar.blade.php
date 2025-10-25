@@ -45,7 +45,7 @@
       href="/">Lotoli</a>
     <div id="mainNav" style="flex-grow: 1;">
       <div id="react-navbar" class="navbar-nav" style="margin-left: 62%; margin-bottom: 4%; width: 50%;"
-        data-user='@json($userArray)' data-current-page="{{ $currentPage }}" data-users='@json($users)'>
+        data-user='@json($userArray)' data-curresnt-page="{{ $currentPage }}" data-users='@json($users)'>
       </div>
     </div>
 </nav>

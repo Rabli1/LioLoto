@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Services;
-
+use Illuminate\Support\Facades\Crypt;
 
 class GameServices
 {
@@ -21,5 +21,11 @@ class GameServices
     public function addPointLost($pointsLost, &$user){
 
         $user['pointsLost'] += abs($pointsLost);
+    }
+    public function Encrypt(string $data): string{
+        return Crypt::encryptString($data);
+    }
+    public function Decrypt(string $data): string{
+        return Crypt::decryptString($data);
     }
 }
