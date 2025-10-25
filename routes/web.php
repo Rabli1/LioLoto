@@ -36,11 +36,12 @@ Route::get('game/poker', [GameController::class, 'poker']);
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
 Route::post('/game/balance', [GameController::class, 'saveBalance']);
+Route::post('/game/updateEtag', [GameController::class, 'updateEtag']);
+Route::post('/game/getPokerState', [GameController::class, 'getPokerState']);
+Route::post('/game/joinPoker', [GameController::class, 'joinPoker']);
 
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 Route::post('admin/fixPoints', [AdminController::class, 'fixPoints']);
 Route::post('admin/toggleBan', [AdminController::class, 'toggleBan']);
 Route::post('admin/toggleAdmin', [AdminController::class, 'toggleAdmin']);
-Route::post('/test-form', function (Request $request) {
-    dd($request);
-});
+

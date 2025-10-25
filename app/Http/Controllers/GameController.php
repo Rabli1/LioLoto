@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\User;
 use App\Services\GameServices;
+use Illuminate\Support\Str;
 
 class GameController extends Controller
 {
@@ -17,6 +18,8 @@ class GameController extends Controller
         $this->gameServices = $gameServices;
     }
     private const USERS_PATH = 'database/json/users.json';
+    private const POKER_STATE_PATH = 'database/json/pokerState.json';
+    private const ETAG_PATH = 'database/json/Etag.json';
 
     private function resolvePlayer(): ?User
     {
@@ -53,7 +56,6 @@ class GameController extends Controller
 
         return $sessionUser;
     }
-
     public function blackjack(): View
     {
 
@@ -105,25 +107,73 @@ class GameController extends Controller
             'playerBalance' => $balance,
         ]);
     }
-    public function crash(): View{
+    public function crash(): View
+    {
         $balance = 0;
-        if(session()->has('user')){
+        if (session()->has('user')) {
             $balance = session('user')->points;
         }
         return view('game.crash', [
             'playerBalance' => $balance
         ]);
-    }    
-    public function poker(): View{
+    }
+    public function poker(): View
+    {
         $balance = 0;
-        if(session()->has('user')){
+        if (session()->has('user')) {
             $balance = session('user')->points;
         }
         return view('game.poker', [
             'playerBalance' => $balance
         ]);
     }
-    public function coinflip(): View{
+    public function getEtag(): JsonResponse
+    {
+        $Etag = json_decode(@file_get_contents(base_path(self::ETAG_PATH)), true) ?? [];
+        return response()->json([
+            'Etag' => $Etag
+        ]);
+    }
+    public function updateEtag(): JsonResponse
+    {
+        $Etag = [ 'Etag' => (string) Str::uuid()];
+        file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        return response()->json([
+            'newEtag' => $Etag
+        ]);
+    }
+    public function getPokerState(): JsonResponse
+    {
+        $state = json_decode(@file_get_contents(base_path(self::POKER_STATE_PATH)), true) ?? [];
+        return response()->json([
+            'gameState' => $state
+        ]);
+    }
+    public function joinPoker(): void
+    {
+        $user = session('user');
+        $path = base_path(self::POKER_STATE_PATH);
+        $state = json_decode(@file_get_contents($path), true) ?? [];
+
+        $players = $state['queue'] ?? [];
+
+        $players[] = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'balance' => $user->points,
+            'profileImage' => $user->profileImage,
+            'profileColor' => $user->profileColor,
+            'currentBet' => 0,
+            'isAllIn' => false,
+            'hasFolded' => false,
+            'cards' => [],
+        ];
+        $state['queue'] = $players;
+
+        file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    }
+    public function coinflip(): View
+    {
         $player = $this->resolvePlayer();
         $balance = $player?->points ?? 0;
 
