@@ -37,7 +37,7 @@
 
         <div class="mb-1 text-center">
             <label class="form-check-label" for="remember">Se souvenir de moi</label>
-            <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ $username ? 'checked' : '' }}>
+            <input type="checkbox" class="form-check-input" style="margin-left: 1%;" id="remember" name="remember" {{ $username ? 'checked' : '' }}>
         </div>
 
         <div class="d-flex justify-content-center">
