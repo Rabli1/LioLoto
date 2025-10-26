@@ -12,6 +12,7 @@
         body {
             background-color: #000;
             color: #fff;
+            overflow-x: hidden;
         }
 
         .leaderboard-card {

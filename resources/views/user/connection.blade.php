@@ -20,17 +20,24 @@
             $textColor = "text-success";
         }
     @endphp
-    <span class="text-center <?=$textColor?>" style="display: block;"><?=$message?></span>
+    <span class="text-center {{$textColor}}" style="display: block;">{{$message}}</span>
     <form action="{{ url('/user/connection') }}" method="post">
         @csrf
         <div class="mb-3">
             <label for="username" class="form-label">Nom d'utilisateur</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="Nom d'utilisateur">
+            <input type="text" class="form-control" id="username" name="username" placeholder="Nom d'utilisateur"
+                value="{{ $username }}">
         </div>
 
         <div class="mb-3">
             <label for="password" class="form-label">Mot de passe</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe"
+                value="{{ $password }}">
+        </div>
+
+        <div class="form-check mt-2 text-center">
+            <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ $username ? 'checked' : '' }}>
+            <label class="form-check-label" for="remember">Se souvenir de moi</label>
         </div>
 
         <div class="d-flex justify-content-center">
@@ -40,4 +47,5 @@
         </div>
     </form>
 </div>
+
 @include('shared.footer')
