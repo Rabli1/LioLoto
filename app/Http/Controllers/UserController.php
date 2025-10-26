@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordChangedMail;
+use App\Mail\AccountConfirmationMail;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -33,6 +35,8 @@ class UserController extends Controller
         $password = $request->input("password");
         $users = $this->userService->all();
         $lastId = $users[count($users) - 1]['id'];
+        $confirmationToken = Str::random(60);
+
         $newUser = [
             "id" => $lastId + 1,
             "name" => $username,
@@ -47,15 +51,42 @@ class UserController extends Controller
             "pointsLost" => 0,
             "bio" => "",
             "admin" => false,
-            "confirmed" => true,
+            "confirmed" => false,
             "banned" => false,
             "lvl" => 1,
             "exp" => 0,
             "last_update" => date("Y-m-d"),
+            "confirmation_token" => $confirmationToken
         ];
         $users[] = $newUser;
         file_put_contents('../database/json/users.json', json_encode($users));
-        return redirect('user/connection?message=votre compte à été créé');
+        $confirmationUrl = url('/user/confirm/' . $confirmationToken);
+        Mail::to($email)->send(new AccountConfirmationMail($newUser, $confirmationUrl));
+        return redirect('user/connection?message=Votre compte à été créé. Un email de confirmation vous a été envoyé.');
+    }
+
+    public function confirmAccount($token)
+    {
+        $path = base_path('database/json/users.json');
+        $users = json_decode(file_get_contents($path), true);
+        
+        $userFound = false;
+        foreach ($users as &$user) {
+            if (isset($user['confirmation_token']) && $user['confirmation_token'] === $token) {
+                $user['confirmed'] = true;
+                $user['confirmation_token'] = null;
+                $userFound = true;
+                break;
+            }
+        }
+        unset($user);
+        
+        if ($userFound) {
+            file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            return redirect('user/connection?message=Compte confirmé avec succès! Vous pouvez maintenant vous connecter.');
+        } else {
+            return redirect('user/connection?message=Lien de confirmation invalide ou expiré.');
+        }
     }
 
     public function connection(Request $request)
@@ -153,6 +184,10 @@ class UserController extends Controller
         if ($userArray['banned'] ?? false) {
             return redirect('user/connection?message=Votre compte a été banni');
         }
+
+          if (!($userArray['confirmed'] ?? true)) {
+        return redirect('user/connection?message=Votre compte n\'est pas confirmé. Veuillez vérifier votre email.');
+    }
 
         $user = (object) $userArray;
         session(['user' => $user]);

@@ -35,6 +35,7 @@ Route::get('game/poker', [GameController::class, 'poker']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
+Route::get('/user/confirm/{token}', [UserController::class, 'confirmAccount'])->name('user.confirm');
 Route::post('/game/balance', [GameController::class, 'saveBalance']);
 Route::post('/game/updateEtag', [GameController::class, 'updateEtag']);
 Route::post('/game/getPokerState', [GameController::class, 'getPokerState']);
