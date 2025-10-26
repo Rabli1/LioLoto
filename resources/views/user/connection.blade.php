@@ -14,7 +14,7 @@
 <div class="form-container mt-5">
     <h3 class="text-center mb-4">Connexion</h3>
     @php
-        if ($message == "Nom d'utilisateur ou mot de passe incorrect" || $message == "Votre compte a été banni") {
+        if ($message == "Nom d'utilisateur ou mot de passe incorrect" || $message == "Votre compte a été banni" || $message == "Votre compte n'est pas confirmé. Veuillez vérifier votre email." || $message == "Lien de confirmation invalide ou expiré.") {
             $textColor = "text-danger";
         } else {
             $textColor = "text-success";
@@ -35,9 +35,9 @@
                 value="{{ $password }}">
         </div>
 
-        <div class="form-check mt-2 text-center">
-            <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ $username ? 'checked' : '' }}>
+        <div class="mb-1 text-center">
             <label class="form-check-label" for="remember">Se souvenir de moi</label>
+            <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ $username ? 'checked' : '' }}>
         </div>
 
         <div class="d-flex justify-content-center">
@@ -47,5 +47,12 @@
         </div>
     </form>
 </div>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 @include('shared.footer')
