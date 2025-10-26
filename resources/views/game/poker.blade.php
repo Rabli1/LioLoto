@@ -146,7 +146,7 @@
         </section>
     </div>
 </main>
-@vite(['resources/js/poker.js'])
+<script defer src="{{ asset('js/poker.js') }}"></script>
 <script>
     const betInput = document.getElementById('betAmount');
     const betRange = document.getElementById('betRange');
