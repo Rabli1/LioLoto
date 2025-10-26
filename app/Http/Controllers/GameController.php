@@ -166,6 +166,8 @@ class GameController extends Controller
             'currentBet' => 0,
             'isAllIn' => false,
             'hasFolded' => false,
+            'hasPlayed' => false,
+            'toKick' => false,
             'cards' => [],
         ];
         $state['queue'] = $players;
@@ -229,5 +231,138 @@ class GameController extends Controller
             'balance' => $user->points,
             'game' => $validated['game'] ?? null,
         ]);
+    }
+    public function initRound(Request $request): JsonResponse
+    {
+        $path = base_path(self::POKER_STATE_PATH);
+        $state = json_decode(@file_get_contents($path), true) ?? [];
+        
+        // Kick players
+        $state['players'] = array_filter($state['players'], function($player) {
+            return !($player['toKick'] ?? false);
+        });
+        $state['players'] = array_values($state['players']);
+
+        // Pop Queue
+        if (count($state['players']) < 6) {
+            $spacesAvailable = 6 - count($state['players']);
+            for ($i = 0; $i < $spacesAvailable; $i++) {
+                if (empty($state['queue'])) break;
+                $state['players'][] = array_shift($state['queue']);
+            }
+        }
+
+        $values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        $suits = ['C', 'D', 'H', 'S'];
+        $deck = [];
+
+        foreach ($suits as $suit) {
+            foreach ($values as $value) {
+                $deck[] = "{$value}-{$suit}";
+            }
+        }
+
+        // Shuffle
+        $deckSize = count($deck);
+        for ($i = $deckSize - 1; $i > 0; $i--) {
+            $j = random_int(0, $i);
+            [$deck[$i], $deck[$j]] = [$deck[$j], $deck[$i]];
+        }
+        
+        // Reset game state
+        $state['roundStep'] = 'preFlop';
+        $state['communityCards'] = [];
+        $state['pot'] = 0;
+        $state['requiredBet'] = 25;
+        $state['deck'] = $deck;
+        
+        // Reset player states and deal cards
+        foreach ($state['players'] as &$player) {
+            $player['hasFolded'] = false;
+            $player['isAllIn'] = false;
+            $player['currentBet'] = 0;
+            $player['hasPlayed'] = false;
+            $player['toKick'] = false;
+            $player['cards'] = [array_pop($state['deck']), array_pop($state['deck'])];
+        }
+
+        file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        return response()->json(['success' => true]);
+    }
+
+    public function placeBet(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'amount' => 'required|integer|min:0',
+            'playerId' => 'required|integer'
+        ]);
+
+        $path = base_path(self::POKER_STATE_PATH);
+        $state = json_decode(@file_get_contents($path), true) ?? [];
+        
+        foreach ($state['players'] as &$player) {
+            if ($player['id'] === $validated['playerId']) {
+                $player['currentBet'] += $validated['amount'];
+                $player['hasPlayed'] = true;
+                $state['pot'] += $validated['amount'];
+                break;
+            }
+        }
+
+        file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        return response()->json(['success' => true]);
+    }
+
+    public function nextRound(): JsonResponse
+    {
+        $path = base_path(self::POKER_STATE_PATH);
+        $state = json_decode(@file_get_contents($path), true) ?? [];
+        
+        $rounds = ['preFlop', 'flop', 'turn', 'river', 'showdown'];
+        $currentIndex = array_search($state['roundStep'], $rounds);
+        $state['roundStep'] = $rounds[$currentIndex + 1];
+
+        switch ($state['roundStep']) {
+            case 'flop':
+                $state['communityCards'] = array_slice($state['deck'], 0, 3);
+                $state['deck'] = array_slice($state['deck'], 3);
+                break;
+            case 'turn':
+                $state['communityCards'][] = $state['deck'][0];
+                $state['deck'] = array_slice($state['deck'], 1);
+                break;
+            case 'river':
+                $state['communityCards'][] = $state['deck'][0];
+                $state['deck'] = array_slice($state['deck'], 1);
+                break;
+        }
+
+        foreach ($state['players'] as &$player) {
+            $player['currentBet'] = 0;
+            $player['hasPlayed'] = false;
+        }
+
+        file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        return response()->json(['success' => true]);
+    }
+
+    public function quitPoker(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'playerId' => 'required|integer'
+        ]);
+
+        $path = base_path(self::POKER_STATE_PATH);
+        $state = json_decode(@file_get_contents($path), true) ?? [];
+        
+        foreach($state['players'] as &$player) {
+            if ($player['id'] === $validated['playerId']) {
+                $player['toKick'] = true;
+                break;
+            }
+        }
+
+        file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        return response()->json(['success' => true]);
     }
 }

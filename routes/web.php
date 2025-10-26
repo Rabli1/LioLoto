@@ -39,6 +39,11 @@ Route::post('/game/balance', [GameController::class, 'saveBalance']);
 Route::post('/game/updateEtag', [GameController::class, 'updateEtag']);
 Route::post('/game/getPokerState', [GameController::class, 'getPokerState']);
 Route::post('/game/joinPoker', [GameController::class, 'joinPoker']);
+Route::post('/game/initRound', [GameController::class, 'initRound']);
+Route::post('/game/placeBet', [GameController::class, 'placeBet']);
+Route::post('/game/nextRound', [GameController::class, 'nextRound']);
+Route::post('/game/settleRound', [GameController::class, 'settleRound']);
+Route::post('/game/quitPoker', [GameController::class, 'quitPoker']);
 
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 Route::post('admin/fixPoints', [AdminController::class, 'fixPoints']);

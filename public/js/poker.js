@@ -3,18 +3,32 @@ const pot = $("#pot");
 const joinButton = $("#join-button");
 const requiredCall = $("#required-call");
 const centerCards = $('#poker-center img');
+const gameMessage = $("#game-message");
+const pokerError = $("#poker-error");
+const betAmount = $("#betAmount");
+const betRange = $("#betRange");
+const betSection = $("#bet-section");
 
-const intervalTime = 10 * 1000; // 10 seconds
+const intervalTime = 10 * 1000;
+const turnTime = 15 * 1000;
+let turnStart = Date.now();
 let gameState = {};
 let currentEtag = "";
 const csrfToken = window.gameSession.csrfToken;
 let deck = [];
+const roundSteps = ['pre-flop', 'flop', 'turn', 'river', 'showdown'];
+let currentRound = 0;
+
+
 joinButton.on('click', () => {
     joinGame();
     joinButton.hide();
+    gameMessage.text("Vous avez rejoint la partie. Vous êtes en file d'attente...");
 });
 
-
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function startRefreshInterval() {
     setInterval(async () => {
@@ -32,7 +46,7 @@ function getGameState() {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrfToken },
         success: function (response) {
-            gameState = response.gameState || {};
+            gameState = response.gameState;
             updateUI();
         },
         error: function (xhr, status, error) {
@@ -62,11 +76,16 @@ function updateEtag() {
 
 function updateUI() {
     if (!gameState) return;
-
+    if(turnStart + turnTime < Date.now()){
+        gameState.players[gameState.playersTurn].toKick = true;
+        gameState.players[gameState.playersTurn].hasFolded = true;
+        gameState.playersTurn = (gameState.playersTurn + 1) % gameState.players.length;
+    }
     let playersList = gameState.players;
     const potValue = Number(gameState.pot) || 0;
     pot.text(`Pot : ${potValue.toLocaleString('en-US').replace(/,/g, ' ')}`);
-
+    let maxBet = Infinity;
+    let toNextRound = true;
     playerSeats.each(function (index) {
         const seat = $(this);
         const playerData = playersList[index];
@@ -104,18 +123,55 @@ function updateUI() {
 
             seat.toggleClass('dimmed', !!playerData.hasFolded);
             seat.removeClass('emptySeat');
+            if(playerData.balance < maxBet){
+                maxBet = playerData.balance;
+            }
+            if(index === Number(gameState.playersTurn)){
+                betSection.show();
+            }
+            else{
+                betSection.hide();
+            }
+
+            if(toNextRound){
+                if(!playerData.hasPlayed || playerData.currentBet !== gameState.requiredBet || !playerData.hasFolded){
+                    toNextRound = false;
+                }
+            }
         } else {
             seat.removeClass('dimmed activeTurn').addClass('emptySeat');
         }
     });
-
-
-    if (gameState.requiredBet)
-        requiredCall.text(`(${gameState.requiredBet} pour call)`);
-
-    (gameState.cardsShown || []).forEach((card, idx) => {
+    requiredCall.text(`(${gameState.requiredBet} pour call)`);
+    betRange.attr('max', maxBet);
+    betAmount.attr('max', maxBet);
+    betRange.attr('min', gameState.requiredBet);
+    betAmount.attr('min', gameState.requiredBet);
+    (gameState.communityCards || []).forEach((card, idx) => {
         if (idx < centerCards.length)
             centerCards.eq(idx).attr('src', `/img/cards/${card}.png`);
+    });
+    if(toNextRound){
+        nextRound();
+    }
+}
+
+function updateBalance(amount) {
+    let player = gameState.players.find(p => p.id === window.gameSession.userId);
+    const newBalance = player.balance + amount;
+    $.ajax({
+        url: '/game/balance',
+        method: 'POST',
+        data: { balance: parseInt(newBalance) },
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        success: function (response) {
+            player.balance = response.balance;
+            updateUI();
+            updateEtag();
+        },
+        error: function (xhr, status, error) {
+            console.error('Error saving balance:', error);
+        }
     });
 }
 
@@ -133,21 +189,76 @@ function joinGame() {
     });
 }
 
-function buildDeck() {
-    const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-    const suits = ['C', 'D', 'H', 'S'];
-    deck = [];
-
-    suits.forEach((suit) => {
-        values.forEach((value) => {
-            deck.push(`${value}-${suit}`);
-        });
+function quitGame() {
+    $.ajax({
+        url: '/game/quitPoker',
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        data: { playerId: window.gameSession.userId },
+        success: function(response) {
+            gameMessage.text("Vous allez quitter la table à la fin de cette manche");
+            updateEtag();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error quitting game:', error);
+        }
     });
-    // Shuffle
-    for (let i = deck.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
+}
+
+function initRound() {
+    $.ajax({
+        url: '/game/initRound',
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        success: function(response) {
+            updateEtag();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error initializing round:', error);
+        }
+    });
+}
+
+function placeBet(amount) {
+    pokerError.text("");
+    $.ajax({
+        url: '/game/placeBet',
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        data: {
+            amount: amount,
+            playerId: window.gameSession.userId
+        },
+        success: function(response) {
+            updateBalance(-amount);
+            updateEtag();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error placing bet:', error);
+            pokerError.text("Error placing bet");
+        }
+    });
+}
+
+function nextRound() {
+    $.ajax({
+        url: '/game/nextRound',
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrfToken },
+        success: function(response) {
+            updateEtag();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error moving to next round:', error);
+        }
+    });
+}
+
+function addCommunityCard() {
+    gameState.communityCards.push(deck.pop());
+}
+async function settleRound() {
+    await sleep(5000);
 }
 
 startRefreshInterval();
