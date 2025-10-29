@@ -1,3 +1,5 @@
+/*https://reactbits.dev/components/pill-nav*/
+
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import '../../css/nav.css';

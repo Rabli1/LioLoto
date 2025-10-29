@@ -12,9 +12,9 @@ export default defineConfig({
         react(),
     ],
     server: {
-        host: 'localhost',
+        host: 'lioto',
         port: 5173,
         cors: true,
-        allowedHosts: ['localhost']
+        allowedHosts: ['lioto']
     },
 });
