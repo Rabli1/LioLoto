@@ -1,3 +1,9 @@
+function playBall() {
+    const audio = new Audio('../sounds/plinko.mp3');
+    audio.load();
+    audio.play();
+}
+
 function Particle(x, y, r) {
     var options = {
         restitution: 0.5,  // rebonds
@@ -8,6 +14,8 @@ function Particle(x, y, r) {
         }
     };
 
+    playBall();
+
     x += random(-10, 10);
     this.body = Bodies.circle(x, y, r, options);
     this.body.isSettled = false;
@@ -15,13 +23,13 @@ function Particle(x, y, r) {
     World.add(world, this.body);
 }
 
-Particle.prototype.isOffScreen = function() {
+Particle.prototype.isOffScreen = function () {
     var x = this.body.position.x;
     var y = this.body.position.y;
     return (x < -50 || x > width + 50 || y > height + 50);
 }
 
-Particle.prototype.show = function() {
+Particle.prototype.show = function () {
     fill(255);
     stroke(255);
     var pos = this.body.position;
