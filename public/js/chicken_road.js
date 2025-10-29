@@ -18,6 +18,8 @@
             visibleStart: 0,
             boomColumn: null,
             chickenColumn: null,
+            lastRenderedChickenColumn: null,
+            chickenSprite: null,
         };
 
         const elements = {
@@ -38,6 +40,120 @@
             newRound: document.getElementById('newRoundButton'),
             betContainer: document.getElementById('betContainer'),
         };
+
+        function createAudioToolkit() {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) {
+                return {
+                    resume() {},
+                    playJump() {},
+                    playExplosion() {},
+                };
+            }
+
+            let context = null;
+
+            function ensureContext() {
+                if (!context) {
+                    context = new AudioContextClass();
+                }
+                return context;
+            }
+
+            function resume() {
+                const ctx = ensureContext();
+                if (!ctx) return;
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+            }
+
+            function playJump() {
+                const ctx = ensureContext();
+                if (!ctx) return;
+
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(460, now);
+                osc.frequency.exponentialRampToValueAtTime(920, now + 0.08);
+                osc.frequency.exponentialRampToValueAtTime(380, now + 0.24);
+
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.26, now + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+
+                osc.connect(gain).connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.34);
+            }
+
+            function playExplosion() {
+                const ctx = ensureContext();
+                if (!ctx) return;
+
+                const now = ctx.currentTime;
+
+                const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.45, ctx.sampleRate);
+                const noiseData = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < noiseData.length; i += 1) {
+                    noiseData[i] = (Math.random() * 2 - 1) * (1 - i / noiseData.length);
+                }
+
+                const noise = ctx.createBufferSource();
+                noise.buffer = noiseBuffer;
+                const noiseGain = ctx.createGain();
+                noiseGain.gain.setValueAtTime(0, now);
+                noiseGain.gain.linearRampToValueAtTime(0.8, now + 0.02);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                noise.connect(noiseGain).connect(ctx.destination);
+                noise.start(now);
+                noise.stop(now + 0.5);
+            }
+
+            let chickenSoundBase = null;
+
+            function getChickenSound() {
+                if (!chickenSoundBase) {
+                    chickenSoundBase = new Audio('/sounds/chicken_noise.mp3');
+                    chickenSoundBase.preload = 'auto';
+                    chickenSoundBase.volume = 0.85;
+                }
+                return chickenSoundBase;
+            }
+
+            function playChickenSound() {
+                const base = getChickenSound();
+                if (!base) return;
+
+                const play = (audioNode) => {
+                    audioNode.currentTime = 0;
+                    const promise = audioNode.play();
+                    if (promise && typeof promise.catch === 'function') {
+                        promise.catch(() => {});
+                    }
+                };
+
+                if (base.paused) {
+                    play(base);
+                } else {
+                    const clone = base.cloneNode(true);
+                    clone.volume = base.volume;
+                    play(clone);
+                }
+            }
+
+            return {
+                resume,
+                playJump,
+                playExplosion,
+                playChickenSound,
+            };
+        }
+
+        const audio = createAudioToolkit();
 
         function format(value) {
             return Math.floor(value).toLocaleString('fr-FR');
@@ -101,6 +217,88 @@
             return null;
         }
 
+        function ensureChickenSprite() {
+            if (!elements.track) return null;
+
+            if (!state.chickenSprite) {
+                const sprite = document.createElement('div');
+                sprite.className = 'chicken-sprite is-hidden';
+
+                const spriteImage = document.createElement('div');
+                spriteImage.className = 'chicken-sprite__img';
+                spriteImage.addEventListener('animationend', (event) => {
+                    if (event.animationName === 'chicken-hop') {
+                        sprite.classList.remove('is-jumping');
+                    }
+                });
+
+                sprite.appendChild(spriteImage);
+                state.chickenSprite = sprite;
+            }
+
+            if (!state.chickenSprite.isConnected) {
+                elements.track.appendChild(state.chickenSprite);
+            }
+
+            return state.chickenSprite;
+        }
+
+        function hideChickenSprite() {
+            if (!state.chickenSprite) return;
+            state.chickenSprite.classList.add('is-hidden');
+        }
+
+        function updateChickenSpritePosition(columnIndex, { immediate = false } = {}) {
+            const sprite = ensureChickenSprite();
+            if (!sprite) return;
+
+            if (!Number.isInteger(columnIndex)) {
+                sprite.classList.add('is-hidden');
+                return;
+            }
+
+            const cell = elements.track.querySelector(`.road-column[data-column="${columnIndex}"] .road-cell`);
+            if (!cell) {
+                sprite.classList.add('is-hidden');
+                return;
+            }
+
+            const offsetX = cell.offsetLeft;
+            const offsetY = cell.offsetTop;
+
+            sprite.style.width = `${cell.offsetWidth}px`;
+            sprite.style.height = `${cell.offsetHeight}px`;
+
+            if (immediate) {
+                sprite.classList.add('no-transition');
+            } else {
+                sprite.classList.remove('no-transition');
+            }
+
+            sprite.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+            sprite.classList.remove('is-hidden');
+
+            if (immediate) {
+                requestAnimationFrame(() => {
+                    if (state.chickenSprite) {
+                        state.chickenSprite.classList.remove('no-transition');
+                    }
+                });
+            }
+        }
+
+        function triggerChickenJump() {
+            const sprite = ensureChickenSprite();
+            if (!sprite) return;
+
+            audio.resume();
+            audio.playJump();
+
+            sprite.classList.remove('is-jumping');
+            void sprite.offsetWidth;
+            sprite.classList.add('is-jumping');
+        }
+
 
         function resetRoundState() {
             state.bet = 0;
@@ -116,6 +314,7 @@
             state.visibleStart = 0;
             state.boomColumn = null;
             state.chickenColumn = null;
+            state.lastRenderedChickenColumn = null;
 
             elements.cashout.disabled = true;
             elements.newRound.style.display = 'none';
@@ -127,7 +326,9 @@
             if (elements.track) {
                 elements.track.innerHTML = '';
             }
-            
+
+            hideChickenSprite();
+
         }
 
         function renderGrid() {
@@ -185,26 +386,29 @@
 
             elements.track.innerHTML = '';
             elements.track.appendChild(fragment);
+
+            const previousColumn = state.lastRenderedChickenColumn;
+            const isChickenColumnInt = Number.isInteger(chickenColumn);
+            const shouldAnimate = Number.isInteger(previousColumn) && isChickenColumnInt && chickenColumn !== previousColumn;
+
+            updateChickenSpritePosition(chickenColumn, { immediate: !shouldAnimate });
+
+            if (shouldAnimate) {
+                triggerChickenJump();
+            }
+
+            state.lastRenderedChickenColumn = isChickenColumnInt ? chickenColumn : null;
         }
         function updateHud() {
             const difficultyLabel = ['Facile', 'Medium', 'Difficile'][state.mineCount - 1] || `x${state.mineCount}`;
             const hasProgress = state.progress > 0 || state.boomColumn !== null;
 
             elements.roundInfo.textContent = (state.roundActive || hasProgress)
-                ? `Difficulte : ${difficultyLabel} (${state.mineCount} mine${state.mineCount > 1 ? 's' : ''})`
-                : '';
-
-            elements.progressInfo.textContent = hasProgress
-                ? `Distance parcourue : ${state.progress}`
+                ? `Difficulte : ${difficultyLabel}`
                 : '';
 
             elements.multiplierInfo.textContent = hasProgress
                 ? `Multiplicateur actuel : ${multiplierText(state.multiplier)}`
-                : '';
-
-            const nextMultiplier = state.roundActive ? calculMultiplier(state.progress + 1) : null;
-            elements.nextMultiplierInfo.textContent = state.roundActive && state.currentColumn < GOAL_COLUMNS
-                ? `Prochaine etape : ${multiplierText(nextMultiplier)}`
                 : '';
 
             const potential = state.bet * state.multiplier;
@@ -227,6 +431,9 @@
                 state.roundActive = false;
                 state.cashable = false;
                 state.currentColumn = column;
+                audio.resume();
+                audio.playExplosion();
+                audio.playChickenSound();
                 renderGrid();
                 updateHud();
                 endRound(false, 0);
@@ -287,6 +494,7 @@
             state.visibleStart = 0;
             state.boomColumn = null;
             state.chickenColumn = state.currentColumn;
+            state.lastRenderedChickenColumn = null;
 
             elements.betContainer.style.display = 'none';
             elements.mat.style.display = 'block';
@@ -362,6 +570,10 @@
             elements.clearBet.addEventListener('click', clearBet);
             elements.cashout.addEventListener('click', cashout);
             elements.newRound.addEventListener('click', newRound);
+
+            window.addEventListener('resize', () => {
+                updateChickenSpritePosition(getChickenColumn(), { immediate: true });
+            });
 
             if (window.Balance) {
                 window.Balance.init({
