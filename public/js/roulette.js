@@ -3,12 +3,6 @@
     let redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
     let tokenPlaced = false;
     let resultSpin;
-    const clickRoulette = document.querySelectorAll('.clickRoulette');
-    const buttonSpin = document.getElementById('buttonSpin');
-    const wageButton = document.querySelectorAll('.tokenWage');
-    wageButton[0].classList.add('tokenWageSelected');
-    const clearMat = document.getElementById('clearMat');
-    let tokenValue = 10;
 
 
     function initBettingMat() {
@@ -241,6 +235,12 @@
 
     initBettingMat();
     initRoulette();
+    const buttonSpin = document.getElementById('buttonSpin');
+    const clickRoulette = document.querySelectorAll('.clickRoulette');
+    const wageButton = document.querySelectorAll('.tokenWage');
+    wageButton[0].classList.add('tokenWageSelected');
+    const clearMat = document.getElementById('clearMat');
+    let tokenValue = 10;
 
     if (window.Balance) {
         window.Balance.init({
