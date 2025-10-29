@@ -15,9 +15,17 @@ let value = 1;
 let autoCashout = false;
 let xValues = [];
 
+cachOutBtn.prop("disabled", true);
+
 function playCashout() {
   const audio = new Audio('/sounds/cashout.mp3');
   audio.load();
+  audio.play();
+}
+
+function playCrash() {
+  const audio = new Audio('/sounds/explosion.mp3');
+  audio.volume = 0.5;
   audio.play();
 }
 
@@ -135,6 +143,7 @@ async function animateGame() {
     await sleep(sleepTime);
   }
 
+  playCrash();
   multiplier.addClass("text-danger");
   let list = lastCrash.find('div');
   if (list.length > 10) {
