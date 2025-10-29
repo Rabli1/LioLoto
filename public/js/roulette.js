@@ -3,6 +3,13 @@
     let redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
     let tokenPlaced = false;
     let resultSpin;
+    const clickRoulette = document.querySelectorAll('.clickRoulette');
+    const buttonSpin = document.getElementById('buttonSpin');
+    const wageButton = document.querySelectorAll('.tokenWage');
+    wageButton[0].classList.add('tokenWageSelected');
+    const clearMat = document.getElementById('clearMat');
+    let tokenValue = 10;
+
 
     function initBettingMat() {
         const bettingMat = document.getElementById('bettingMat');
@@ -224,6 +231,10 @@
         setTimeout(function () {
             roulette.style.cssText = '';
             style.remove();
+
+            if (window.Balance) {
+                window.Balance.ajouterMontantJSON();
+            }
         }, 10000);
 
     }
@@ -231,12 +242,12 @@
     initBettingMat();
     initRoulette();
 
-    const clickRoulette = document.querySelectorAll('.clickRoulette');
-    const buttonSpin = document.getElementById('buttonSpin');
-    const wageButton = document.querySelectorAll('.tokenWage');
-    wageButton[0].classList.add('tokenWageSelected');
-    const clearMat = document.getElementById('clearMat');
-    let tokenValue = 10;
+    if (window.Balance) {
+        window.Balance.init({
+            session: window.plinkoSession || window.gameSession || {},
+            displaySelectors: ['#roulette-balance'],
+        });
+    }
 
     buttonSpin.addEventListener('click', () => {
         resultSpin = Math.floor(Math.random() * 37);
@@ -247,12 +258,16 @@
         betClick.addEventListener('click', e => {
             const existingToken = betClick.querySelector('.rouletteToken');
 
+            if (!window.Balance.miser(tokenValue, { persist: false })) {
+                alert('Solde insuffisant.');
+                return;
+            }
+
             if (existingToken) {
                 const currentValue = parseInt(existingToken.textContent);
                 const newValue = currentValue + tokenValue;
                 existingToken.textContent = newValue;
             } else {
-
                 const token = document.createElement('div');
                 token.classList.add('rouletteToken');
                 token.textContent = tokenValue;
@@ -263,7 +278,13 @@
 
                     if (currentValue > tokenValue) {
                         token.textContent = currentValue - tokenValue;
+                        if (window.Balance) {
+                            window.Balance.gain(tokenValue, { persist: false });
+                        }
                     } else {
+                        if (window.Balance) {
+                            window.Balance.gain(currentValue, { persist: false });
+                        }
                         token.remove();
                     }
 
@@ -293,9 +314,17 @@
 
     clearMat.addEventListener('click', () => {
         const tokens = document.querySelectorAll('.rouletteToken');
+        let totalRefund = 0;
+
         tokens.forEach(token => {
+            totalRefund += parseInt(token.textContent);
             token.remove();
         });
+
+        if (window.Balance && totalRefund > 0) {
+            window.Balance.gain(totalRefund, { persist: false });
+        }
+
         tokenPlaced = false;
         buttonSpin.hidden = true;
     });
