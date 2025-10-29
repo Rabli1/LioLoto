@@ -219,6 +219,8 @@
             buttonSpin.disabled = true;
         }
 
+        playRoulette();
+
         for (let i = 0; i < rouletteNumbers.length; i++) {
             if (rouletteNumbers[i] == winningNumber) {
                 var degree = (i * -9.73) + 362;
@@ -377,6 +379,12 @@
     const wageButton = document.querySelectorAll('.tokenWage');
     wageButton[0].classList.add('tokenWageSelected');
     const clearMat = document.getElementById('clearMat');
+    function playToken() {
+        new Audio('/sounds/token.wav').play();
+    }
+    function playRoulette() {
+        new Audio('/sounds/roulette.wav').play();
+    }
     let tokenValue = 10;
 
     if (window.Balance) {
@@ -403,6 +411,7 @@
             if (existingToken) {
                 const currentValue = parseInt(existingToken.textContent);
                 const newValue = currentValue + tokenValue;
+                playToken();
                 existingToken.textContent = newValue;
             } else {
                 const token = document.createElement('div');
@@ -431,6 +440,7 @@
                     }
                 });
 
+                playToken();
                 betClick.appendChild(token);
             }
 
