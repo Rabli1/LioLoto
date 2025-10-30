@@ -13,6 +13,8 @@ const csrfToken = $('meta[name="csrf-token"]').attr('content');
 let betAmount = 0;
 let value = 1;
 let autoCashout = false;
+let sleepTime = 30;
+let increment = 0.01;
 let xValues = [];
 for (let x = 0; x < 10; x += 0.1) {
   xValues.push(x);
@@ -53,9 +55,9 @@ function sleep(ms) {
 
 async function animateGame() {
   value = 1;
-  let sleepTime = 30;
-  let increment = 0.01;
   let gameEnd = 1 / Math.random() * 0.99;
+  sleepTime = 30;
+  increment = 0.01;
   multiplier.removeClass("text-danger");
   betAmount = bet.val();
   autoCashout = auto.is(":checked")
@@ -87,7 +89,7 @@ async function animateGame() {
 
     if (autoCashout) {
       if (cashOut < value) {
-        console.log( value + " " + cashOut);
+        console.log(value + " " + cashOut);
         const win = parseInt(cashOut * betAmount);
         winMessage.text(`${cashOut}x -> ${win} gagné`)
         autoCashout = false;
@@ -104,6 +106,8 @@ async function animateGame() {
             console.error('Error saving balance:', error);
           }
         });
+        sleepTime = 10;
+        increment = 0.02;
       }
     }
     if (value < 25) {
@@ -127,7 +131,7 @@ async function animateGame() {
   }
   multiplier.addClass("text-danger");
   let list = lastCrash.find('div');
-  if(list.length > 10){
+  if (list.length > 10) {
     list.eq(0).remove();
   }
   lastCrash.append(`<div class="bg-secondary rounded p-1">${value.toFixed(2) + "x"}</div>`);
@@ -136,11 +140,11 @@ async function animateGame() {
 playBtn.on("click", async function () {
   window.gameSession.balance = Number(window.gameSession.balance)
   balanceError.text("");
-  if(window.gameSession.balance < bet.val()){
+  if (window.gameSession.balance < bet.val()) {
     balanceError.text("Vous n'avez pas assez de points");
     return;
   }
-  if(bet.val() <= 0){
+  if (bet.val() <= 0) {
     balanceError.text("Mise invalide");
     return;
   }
@@ -169,4 +173,6 @@ cachOutBtn.on("click", function () {
       console.error('Error saving balance:', error);
     }
   });
+  sleepTime = 10;
+  increment = 0.02;
 });

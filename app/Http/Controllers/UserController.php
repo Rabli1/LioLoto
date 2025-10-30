@@ -187,7 +187,7 @@ class UserController extends Controller
 
           if (!($userArray['confirmed'] ?? true)) {
         return redirect('user/connection?message=Votre compte n\'est pas confirmé. Veuillez vérifier votre email.');
-    }
+        }
 
         $user = (object) $userArray;
         session(['user' => $user]);
