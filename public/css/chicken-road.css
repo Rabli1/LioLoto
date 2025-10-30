@@ -143,18 +143,6 @@
         border-color: rgba(102, 148, 255, 0.35);
     }
 
-    .road-column.has-chicken .road-cell::after {
-        content: '';
-        position: absolute;
-        bottom: 19%;
-        left: 50%;
-        width: 42%;
-        aspect-ratio: 1;
-        transform: translateX(-50%);
-        background: url("/img/chicken-road/chicken.svg") center/contain no-repeat;
-        pointer-events: none;
-    }
-
     .road-column.has-chicken .road-cell {
         border-color: rgba(255, 214, 122, 0.82);
         box-shadow: 0 0 18px rgba(255, 214, 122, 0.35);
@@ -165,6 +153,43 @@
         background: rgba(255, 214, 122, 0.82);
         border-color: rgba(255, 226, 150, 0.88);
         color: #2d2410;
+    }
+
+    .chicken-sprite {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: calc(var(--cell-size) * 0.94);
+        height: calc(var(--cell-size) * 0.94);
+        pointer-events: none;
+        transform: translate3d(-9999px, -9999px, 0);
+        transition: transform 0.35s cubic-bezier(0.45, 1.4, 0.55, 1), opacity 0.2s ease;
+        transform-origin: center bottom;
+        will-change: transform;
+        z-index: 5;
+        opacity: 1;
+    }
+
+    .chicken-sprite.no-transition {
+        transition: none;
+    }
+
+    .chicken-sprite.is-hidden {
+        opacity: 0;
+    }
+
+    .chicken-sprite__img {
+        position: absolute;
+        bottom: 18%;
+        left: 50%;
+        width: 58%;
+        aspect-ratio: 1;
+        transform: translate(-50%, 0);
+        background: url("/img/chicken-road/chicken.svg") center/contain no-repeat;
+    }
+
+    .chicken-sprite.is-jumping .chicken-sprite__img {
+        animation: chicken-hop 0.35s ease-out;
     }
 
     .road-column.is-placeholder {
@@ -229,6 +254,14 @@
 
     #difficultyLevel {
         width: 120px;
+    }
+
+    @keyframes chicken-hop {
+        0% { transform: translate(-50%, 0) scale(0.94); }
+        20% { transform: translate(-50%, -22%) scale(1.06); }
+        50% { transform: translate(-50%, -70%) scale(1.18); }
+        80% { transform: translate(-50%, -26%) scale(1.05); }
+        100% { transform: translate(-50%, 0) scale(0.97); }
     }
 
     @keyframes boom-pop {

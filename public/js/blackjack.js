@@ -20,6 +20,18 @@
     let playerHandSplit = [];
     let dealerHand = [];
 
+    function playCardDeal() {
+        const audio1 = new Audio('/sounds/cards.mp3');
+        audio1.volume = 0.1;
+        audio1.play();
+    }
+
+    function playCardHit() {
+        const audio1 = new Audio('/sounds/cardHit.mp3');
+        audio1.volume = 0.1;
+        audio1.play();
+    }
+
     function dispatchGameEvent(name, detail = {}) {
         document.dispatchEvent(new CustomEvent(name, { detail }));
     }
@@ -81,6 +93,7 @@
         const dealerContainer = document.getElementById('dealerContainer');
         const playerContainer = document.getElementById('playerContainer');
         const playerContainerSplit = document.getElementById('playerContainerSplit');
+
 
         if (dealerContainer) {
             dealerHand.forEach((card, index) => {
@@ -188,6 +201,7 @@
         playerSum = SommeMain(playerHand);
         dealerSum = SommeMain(dealerHand);
 
+        playCardDeal();
         afficheMains();
         updateScore();
         if ((getCardValue(playerHand[0]) === getCardValue(playerHand[1])) && (window.Balance.get() >= betAmount * 2)) {
@@ -294,6 +308,7 @@
     function dealerDraw() {
         document.getElementById('playerHand1').style.opacity = '1';
         document.getElementById('playerHand2').style.opacity = '1';
+        playCardHit();
         if (dealerSum < 17) {
             const card = deck.pop();
             dealerHand.push(card);
@@ -391,6 +406,7 @@
             playerSum = SommeMain(playerHand);
             document.getElementById('double').disabled = true;
 
+            playCardHit();
             afficheMains();
             updateScore();
 

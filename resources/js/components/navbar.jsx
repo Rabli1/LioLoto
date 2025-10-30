@@ -1,3 +1,5 @@
+/*https://reactbits.dev/components/pill-nav*/
+
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import '../../css/nav.css';
@@ -12,6 +14,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [localUsers, setLocalUsers] = useState(users || []);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     const circleRefs = useRef([]);
     const tlRefs = useRef([]);
@@ -35,6 +38,15 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
         ...(admin ? [{ href: '/admin/dashboard', label: 'Admin' }] : []),
         { href: '/user/support', label: 'Support' },
     ];
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         if ((users == null || users.length === 0) && navItemsRef.current) {
@@ -186,61 +198,63 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
                     </ul>
                 </div>
 
-                <div className="nav-item d-flex align-items-center ms-2 position-relative">
-                    <button
-                        className="btn btn-link p-0 text-white btn-search-toggle"
-                        onClick={toggleSearch}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-                        </svg>
-                    </button>
-
-                    {searchOpen && (
-                        <div
-                            ref={searchBoxRef}
-                            className="position-absolute end-0 top-100 mt-2 bg-white rounded shadow p-2"
-                            style={{ width: '250px', zIndex: 1000 }}
+                {windowWidth > 700 && (
+                    <div className="nav-item d-flex align-items-center ms-2 position-relative">
+                        <button
+                            className="btn btn-link p-0 text-white btn-search-toggle"
+                            onClick={toggleSearch}
                         >
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                className="form-control mb-1"
-                                placeholder="Rechercher utilisateur"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onFocus={(e) => e.target.style.outline = 'none'}
-                                style={inputStyle}
-                            />
-                            <div className="w-100" style={{ maxHeight: '250px', overflowY: 'auto' }}>
-                                {filteredUsers.map(u => (
-                                    <div key={u.id} className="d-flex align-items-center p-1 border-bottom">
-                                        <i className={`fa-solid ${u.profileImage} pfp-${u.profileColor} me-2`}></i>
-                                        <a
-                                            href={`/user/profile?id=${u.id}`}
-                                            className="text-dark text-decoration-none"
-                                            onClick={closeSearch}
-                                        >
-                                            {u.name}
-                                        </a>
-                                    </div>
-                                ))}
-                            </div>
-                            <button
-                                type="button"
-                                className="btn btn-link p-0 position-absolute"
-                                style={{ top: '10px', right: '10px' }}
-                                onClick={closeSearch}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                            </svg>
+                        </button>
+
+                        {searchOpen && (
+                            <div
+                                ref={searchBoxRef}
+                                className="position-absolute end-0 top-100 mt-2 bg-white rounded shadow p-2"
+                                style={{ width: '250px', zIndex: 1000 }}
                             >
-                                <div class="icon-container">
-                                    <svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z" />
-                                    </svg>
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    className="form-control mb-1"
+                                    placeholder="Rechercher utilisateur"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onFocus={(e) => e.target.style.outline = 'none'}
+                                    style={inputStyle}
+                                />
+                                <div className="w-100" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                                    {filteredUsers.map(u => (
+                                        <div key={u.id} className="d-flex align-items-center p-1 border-bottom">
+                                            <i className={`fa-solid ${u.profileImage} pfp-${u.profileColor} me-2`}></i>
+                                            <a
+                                                href={`/user/profile?id=${u.id}`}
+                                                className="text-dark text-decoration-none"
+                                                onClick={closeSearch}
+                                            >
+                                                {u.name}
+                                            </a>
+                                        </div>
+                                    ))}
                                 </div>
-                            </button>
-                        </div>
-                    )}
-                </div>
+                                <button
+                                    type="button"
+                                    className="btn btn-link p-0 position-absolute"
+                                    style={{ top: '10px', right: '10px' }}
+                                    onClick={closeSearch}
+                                >
+                                    <div class="icon-container">
+                                        <svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M14 1.41L12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41Z" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </nav>
         </div>
     );

@@ -16,6 +16,21 @@ let autoCashout = false;
 let sleepTime = 30;
 let increment = 0.01;
 let xValues = [];
+
+cachOutBtn.prop("disabled", true);
+
+function playCashout() {
+  const audio = new Audio('/sounds/cashout.mp3');
+  audio.load();
+  audio.play();
+}
+
+function playCrash() {
+  const audio = new Audio('/sounds/explosion.mp3');
+  audio.volume = 0.5;
+  audio.play();
+}
+
 for (let x = 0; x < 10; x += 0.1) {
   xValues.push(x);
 }
@@ -84,11 +99,13 @@ async function animateGame() {
   });
 
   while (value < gameEnd) {
+
     value += increment;
     multiplier.text(value.toFixed(2) + "x");
 
     if (autoCashout) {
       if (cashOut < value) {
+        playCashout();
         console.log(value + " " + cashOut);
         const win = parseInt(cashOut * betAmount);
         winMessage.text(`${cashOut}x -> ${win} gagné`)
@@ -129,6 +146,8 @@ async function animateGame() {
     }
     await sleep(sleepTime);
   }
+
+  playCrash();
   multiplier.addClass("text-danger");
   let list = lastCrash.find('div');
   if (list.length > 10) {
@@ -155,6 +174,7 @@ playBtn.on("click", async function () {
 });
 
 cachOutBtn.on("click", function () {
+  playCashout();
   window.gameSession.balance = Number(window.gameSession.balance);
   cachOutBtn.prop('disabled', true);
   const balance = parseInt(value * betAmount);

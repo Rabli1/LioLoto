@@ -2,13 +2,19 @@
     const GRID_SIZE = 5; // 5x5
     const TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
 
+    function playCashout() {
+        const audio = new Audio('/sounds/cashout.mp3');
+        audio.load();
+        audio.play();
+    }
+
     const audioFX = (() => {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) {
             return {
                 prime: () => null,
-                safe: () => {},
-                mine: () => {}
+                safe: () => { },
+                mine: () => { }
             };
         }
 
@@ -193,7 +199,7 @@
         } else {
             msg.textContent = `Mine detectee. Vous perdez ${format(state.bet)}.`;
             dispatchGameEvent('mines:result', { outcome: 'lose', bet: state.bet, payout: 0 });
-            
+
         }
     }
 
@@ -251,6 +257,7 @@
 
     function paiement() {
         if (!state.roundActive || !state.cashable) return;
+        playCashout();
         const payout = Math.floor(state.bet * state.currentMultiplier);
         finRound(true, payout);
     }
