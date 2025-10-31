@@ -190,25 +190,6 @@ function updateUI() {
     );
 }
 
-function updateBalance(amount) {
-    let player = gameState.players.find(p => p.id === window.gameSession.userId);
-    const newBalance = player.balance + amount;
-    console.log('Updating balance to:', newBalance, 'bet amount:', amount);
-    $.ajax({
-        url: '/game/balance',
-        method: 'POST',
-        data: { balance: parseInt(newBalance) },
-        headers: { 'X-CSRF-TOKEN': csrfToken },
-        success: function (response) {
-            balanceUI.text("solde : " + response.balance.toLocaleString('en-US').replace(/,/g, ' '));
-            updateUI();
-        },
-        error: function (xhr, status, error) {
-            console.error('Error saving balance:', error);
-        }
-    });
-}
-
 function joinGame() {
     $.ajax({
         url: '/game/joinPoker',
@@ -261,9 +242,8 @@ function placeBet(bet) {
             playerId: window.gameSession.userId
         },
         success: function (response) {
-            if (bet !== -1) {
-                updateBalance();
-            }
+            balanceUI.text(`Solde : ${response.newBalance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
+            console.log("new balance: " + response.newBalance);
         },
         error: function (xhr, status, error) {
             console.error('Error placing bet:', error);

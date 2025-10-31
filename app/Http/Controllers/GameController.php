@@ -301,19 +301,21 @@ class GameController extends Controller
             'amount' => 'required|integer',
             'playerId' => 'required|integer',
         ]);
+        $validatedAmount = $validated['amount'];
+        $pokerPath = base_path(self::POKER_STATE_PATH);
+        $userPath = base_path(self::USERS_PATH);
+        $state = json_decode(@file_get_contents($pokerPath), true) ?? [];
 
-        $path = base_path(self::POKER_STATE_PATH);
-        $state = json_decode(@file_get_contents($path), true) ?? [];
-
-        $state['requiredBet'] = max((int) $state['requiredBet'], (int) $validated['amount']);
+        $state['requiredBet'] = max((int) $state['requiredBet'], (int) $validatedAmount);
 
         $actingIndex = array_search($validated['playerId'], array_column($state['players'], 'id'));
 
         $player = &$state['players'][$actingIndex];
-
-        if ($validated['amount'] === -1) {
+        $valToReturn = 0;
+        if ($validatedAmount === -1) {
+            $valToReturn = $player['balance'];
             $player['hasFolded'] = true;
-
+            
             $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
 
             if (count($activePlayers) === 1) {
@@ -321,14 +323,36 @@ class GameController extends Controller
                 $state['players'][$winnerKey]['hasWon'] = true;
             }
         } else {
-            $player['currentBet'] += $validated['amount'];
+            $valToReturn = $player['balance'] - $validatedAmount;
+            $player['currentBet'] += $validatedAmount;
             $player['hasPlayed'] = true;
-            $player['balance'] -= $validated['amount'];
-            $state['pot'] += $validated['amount'];
+            $player['balance'] -= $validatedAmount;
+
+            $state['pot'] += $validatedAmount;
+
+            // change in users.json
+            $users = json_decode(@file_get_contents($userPath), true) ?? [];
+            $user = clone session('user');
+            foreach ($users as &$entry) {
+                if (($entry['id'] ?? null) === $user->id) {
+                    if ($validatedAmount > 0) {
+                        $this->gameServices->addExp($validatedAmount, $entry);
+                    }
+                    $entry['points'] -= $validatedAmount;
+                    $entry['points'] = (int) $entry['points'];
+                    $valToReturn = $entry['points'];
+                    $user->points = (int) $entry['points'];
+                    break;
+                }
+            }
+            session(['user' => $user]);
+            file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            unset($entry);
         }
 
         unset($player);
 
+        // Determine next player
         $playerCount = count($state['players']);
         $nextIndex = $actingIndex;
         for ($i = 0; $i < $playerCount; $i++) {
@@ -340,8 +364,7 @@ class GameController extends Controller
         }
 
         $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
-        $maxBet = max(array_column($activePlayers, 'currentBet'));
-        $roundEnd = count(array_filter($activePlayers, fn($p) => $p['currentBet'] === $maxBet)) === count($activePlayers);
+        $roundEnd = count(array_filter($activePlayers, fn($p) => $p['currentBet'] === $state['requiredBet'] && $p['hasPlayed'])) === count($activePlayers);
 
         if ($roundEnd) {
             $rounds = ['preFlop', 'flop', 'turn', 'river', 'showdown'];
@@ -369,10 +392,10 @@ class GameController extends Controller
             }
 
         }
-        file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
         file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        return response()->json(['success' => true]);
+        return response()->json(['newBalance' => $valToReturn]);
     }
 
     public function quitPoker(Request $request): JsonResponse
