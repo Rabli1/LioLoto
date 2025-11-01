@@ -703,6 +703,45 @@
   }
 }
 
+@media (max-width: 450px) {
+  #react-navbar {
+    margin-left: 2% !important;
+    margin-bottom: 10% !important;
+    position: relative;
+    bottom: 5px !important;
+    right: 0px !important;
+    width: 0% !important;
+    transform: scale(0.85);
+    transform-origin: center;
+  }
+
+  .pill-nav {
+    --nav-h: 35px;
+  }
+
+  .pill-list>li a,
+  .pill {
+    font-size: 0.65rem !important;
+    padding: 2px 4px !important;
+  }
+
+  .pill-logo {
+    width: 45px !important;
+    height: 45px !important;
+    padding: 3px !important;
+  }
+
+  .btn-search-toggle svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  .pill-nav input.form-control {
+    font-size: 0.70rem !important;
+    padding: 1px 4px !important;
+  }
+}
+
 @media (max-width: 400px) {
   #react-navbar {
     margin-left: 2% !important;

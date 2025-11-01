@@ -198,7 +198,7 @@ const PillNav = ({ activeHref, user, admin, users = [] }) => {
                     </ul>
                 </div>
 
-                {windowWidth > 700 && (
+                {windowWidth > 750 && (
                     <div className="nav-item d-flex align-items-center ms-2 position-relative">
                         <button
                             className="btn btn-link p-0 text-white btn-search-toggle"
