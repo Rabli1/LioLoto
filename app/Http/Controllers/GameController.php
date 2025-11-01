@@ -81,6 +81,17 @@ class GameController extends Controller
         ]);
     }
 
+    public function wordle(): View
+    {
+
+        $player = $this->resolvePlayer();
+        $balance = $player?->points ?? 0;
+
+        return view('game.wordle', [
+            'playerBalance' => $balance,
+        ]);
+    }
+
     public function mines(): View
     {
         $player = $this->resolvePlayer();
@@ -315,7 +326,7 @@ class GameController extends Controller
         if ($validatedAmount === -1) {
             $valToReturn = $player['balance'];
             $player['hasFolded'] = true;
-            
+
             $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
 
             if (count($activePlayers) === 1) {
@@ -418,5 +429,31 @@ class GameController extends Controller
         $Etag = ['Etag' => (string) Str::uuid()];
         file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         return response()->json(['success' => true]);
+    }
+
+    public function wordleWord(): JsonResponse
+    {
+        $wordsFile = storage_path('app/json/wordle.json');
+        $words = json_decode(file_get_contents($wordsFile), true);
+
+        $randomWord = $words[array_rand($words)];
+
+        return response()->json(['word' => $randomWord]);
+    }
+
+    public function checkWord(Request $request): JsonResponse
+    {
+        $request->validate([
+            'word' => 'required|string|size:5'
+        ]);
+
+        $inputWord = strtolower($request->query('word'));
+
+        $wordsFile = storage_path('app/json/wordle.json');
+        $words = array_map('strtolower', json_decode(file_get_contents($wordsFile), true));
+
+        $isValid = in_array($inputWord, $words);
+
+        return response()->json(['valid' => $isValid]);
     }
 }

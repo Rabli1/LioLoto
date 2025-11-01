@@ -32,6 +32,9 @@ Route::get('game/roulette', [GameController::class, 'roulette']);
 Route::get('game/crash', [GameController::class, 'crash']);
 Route::get('game/coinflip',[GameController::class, 'coinflip']);
 Route::get('game/poker', [GameController::class, 'poker']);
+Route::get('game/wordle', [GameController::class, 'wordle']);
+Route::get('/game/wordle/word', [GameController::class, 'wordleWord']);
+Route::get('/game/wordle/check', [GameController::class, 'checkWord']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
