@@ -244,6 +244,72 @@
   border-color: #ddd !important;
 }
 
+@media (max-width: 5000px) {
+  #react-navbar {
+    margin-right: 40% !important;
+    padding-left: 65% !important;
+  }
+
+  .pill-nav {
+    --nav-h: 50px;
+  }
+
+  .pill-list>li a,
+  .pill {
+    font-size: 1.30rem !important;
+    padding: 5px 10px !important;
+  }
+
+  .pill-logo {
+    width: 50px !important;
+    height: 50px !important;
+    padding: 6px !important;
+  }
+
+  .btn-search-toggle svg {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .pill-nav input.form-control {
+    font-size: 1rem !important;
+    padding: 4px 8px !important;
+  }
+}
+
+@media (max-width: 2560px) {
+  #react-navbar {
+    margin-right: 40% !important;
+    padding-left: 40% !important;
+  }
+
+  .pill-nav {
+    --nav-h: 50px;
+  }
+
+  .pill-list>li a,
+  .pill {
+    font-size: 1.25rem !important;
+    padding: 5px 10px !important;
+  }
+
+  .pill-logo {
+    width: 50px !important;
+    height: 50px !important;
+    padding: 6px !important;
+  }
+
+  .btn-search-toggle svg {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .pill-nav input.form-control {
+    font-size: 1rem !important;
+    padding: 4px 8px !important;
+  }
+}
+
 @media (max-width: 2000px) {
   #react-navbar {
     margin-right: 40% !important;
