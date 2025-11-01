@@ -24,6 +24,7 @@ const csrfToken = window.gameSession.csrfToken;
 let deck = [];
 const roundSteps = ['pre-flop', 'flop', 'turn', 'river', 'showdown'];
 let currentRound = 0;
+let gameTerminated = false;
 
 
 joinButton.on('click', () => {
@@ -111,14 +112,6 @@ function updateUI() {
     if (gameState.players.length < 2) {
         gameMessage.text("En attente de joueurs pour démarrer la partie...");
     }
-    if (gameState.requiredBet === 0) {
-        checkButton.toggleClass('disabled', false);
-        callButton.toggleClass('disabled', true);
-    }
-    else {
-        checkButton.toggleClass('disabled', true);
-        callButton.toggleClass('disabled', false);
-    }
     let maxBet = Infinity;
     playerSeats.each(function (index) {
         const seat = $(this);
@@ -159,6 +152,9 @@ function updateUI() {
             seat.toggleClass('activeTurn', index === Number(gameState.playersTurn));
             seat.toggleClass('dimmed', playerData.hasFolded);
             seat.removeClass('emptySeat');
+            if(playerData.hasWon){
+                gameTerminated = true;
+            }
             seat.toggleClass('winner', playerData.hasWon);
             if (playerData.balance < maxBet) {
                 maxBet = playerData.balance;
@@ -169,15 +165,24 @@ function updateUI() {
             seat.removeClass('dimmed activeTurn').addClass('emptySeat');
         }
     });
-    if (gameState.players[gameState.playersTurn].id === window.gameSession.userId) {
+    if (gameState.players[gameState.playersTurn].id === window.gameSession.userId && gameState.roundStep !== 'showdown' && gameState.players.length >= 2 && !gameTerminated) {
+        if (gameState.requiredBet === 0) {
+            checkButton.toggleClass('disabled', false);
+            callButton.toggleClass('disabled', true);
+        }
+        else {
+            checkButton.toggleClass('disabled', true);
+            callButton.toggleClass('disabled', false);
+        }
         betSection.show();
-        requiredCall.text(`(${gameState.requiredBet} pour call)`);
+        callAmount = gameState.requiredBet - gameState.players[gameState.playersTurn].currentBet
+        requiredCall.text(`(${callAmount} pour call)`);
         betRange.attr('max', maxBet);
         betAmount.attr('max', maxBet);
-        betRange.attr('min', gameState.requiredBet);
-        betAmount.attr('min', gameState.requiredBet);
-        betRange.val(gameState.requiredBet);
-        betAmount.val(gameState.requiredBet);
+        betRange.attr('min', callAmount);
+        betAmount.attr('min', callAmount);
+        betRange.val(callAmount);
+        betAmount.val(callAmount);
     }
     else {
         betSection.hide();
@@ -219,6 +224,7 @@ function quitGame() {
 }
 
 function initRound() {
+    gameTerminated = false;
     $.ajax({
         url: '/game/initRound',
         method: 'POST',
@@ -250,11 +256,6 @@ function placeBet(bet) {
             pokerError.text("Error placing bet");
         }
     });
-}
-
-
-async function settleRound() {
-    await sleep(5000);
 }
 
 startRefreshInterval();
