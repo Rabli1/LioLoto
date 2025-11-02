@@ -69,7 +69,7 @@
                         <th id="poker-center" colspan="2">
                             <div class="d-flex flex-column align-items-center">
                                 <div id="pot" class="mb-2">pot : 2000</div>
-                                <div>
+                                <div id="community-cards">
                                     <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
@@ -139,10 +139,10 @@
                 </div>
 
                 <div class="d-flex justify-content-between gap-2">
-                    <button class="btn btn-outline-light w-25 fw-bold">Fold</button>
-                    <button class="btn btn-dark w-25 fw-bold">Call</button>
-                    <button class="btn btn-danger w-25 fw-bold">Raise</button>
-                    <button class="btn btn-outline-danger w-25 fw-bold">All in</button>
+                    <button class="btn btn-outline-light w-25 fw-bold" id="fold-button">Fold</button>
+                    <button class="btn btn-dark w-25 fw-bold" id="check-button">Check</button>
+                    <button class="btn btn-danger w-25 fw-bold" id="call-button">Call</button>
+                    <button class="btn btn-outline-danger w-25 fw-bold" id="raise-button">Raise</button>
                 </div>
             </div>
         </section>
@@ -151,13 +151,13 @@
 <script defer src="{{ asset('js/poker.js') }}"></script>
 <script>
     const betInput = document.getElementById('betAmount');
-    const betRange = document.getElementById('betRange');
+    const betRange1 = document.getElementById('betRange');
     betInput.addEventListener('input', () => {
-        let value = Math.min(Math.max(betInput.value, betRange.min), betRange.max);
-        betRange.value = value;
+        let value = Math.min(Math.max(betInput.value, betRange1.min), betRange1.max);
+        betRange1.value = value;
     });
-    betRange.addEventListener('input', () => {
-        betInput.value = betRange.value;
+    betRange1.addEventListener('input', () => {
+        betInput.value = betRange1.value;
     });
     window.gameSession = {
         userId: {{ session('user')->id ?? 'null' }},

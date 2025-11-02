@@ -10,7 +10,7 @@ text-decoration: none; /* Remove underline */
 .pfp-orange { color: orange; }
 .pfp-purple { color: purple; }
 .pfp-pink { color: #ff4d94; }
-.pfp-brown { color: brown; }
+.pfp-brown { color: rgb(75, 44, 9); }
 .pfp-gray { color: gray; }
 .pfp-white { color: rgb(240, 240, 240); }
 

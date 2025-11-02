@@ -13,6 +13,8 @@ const csrfToken = $('meta[name="csrf-token"]').attr('content');
 let betAmount = 0;
 let value = 1;
 let autoCashout = false;
+let sleepTime = 30;
+let increment = 0.01;
 let xValues = [];
 
 cachOutBtn.prop("disabled", true);
@@ -68,9 +70,9 @@ function sleep(ms) {
 
 async function animateGame() {
   value = 1;
-  let sleepTime = 30;
-  let increment = 0.01;
   let gameEnd = 1 / Math.random() * 0.99;
+  sleepTime = 30;
+  increment = 0.01;
   multiplier.removeClass("text-danger");
   betAmount = bet.val();
   autoCashout = auto.is(":checked")
@@ -121,6 +123,8 @@ async function animateGame() {
             console.error('Error saving balance:', error);
           }
         });
+        sleepTime = 10;
+        increment = 0.02;
       }
     }
     if (value < 25) {
@@ -189,4 +193,6 @@ cachOutBtn.on("click", function () {
       console.error('Error saving balance:', error);
     }
   });
+  sleepTime = 10;
+  increment = 0.02;
 });

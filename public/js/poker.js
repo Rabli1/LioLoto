@@ -1,15 +1,21 @@
+const balanceUI = $("#balanceUI");
 const playerSeats = $(".playerSeat");
 const pot = $("#pot");
 const joinButton = $("#join-button");
 const requiredCall = $("#required-call");
-const centerCards = $('#poker-center img');
+const communityCards = $('#community-cards');
 const gameMessage = $("#game-message");
 const pokerError = $("#poker-error");
 const betAmount = $("#betAmount");
 const betRange = $("#betRange");
 const betSection = $("#bet-section");
+const foldButton = $("#fold-button");
+const checkButton = $("#check-button");
+const callButton = $("#call-button");
+const raiseButton = $("#raise-button");
 
-const intervalTime = 10 * 1000;
+
+const intervalTime = 2 * 1000;
 const turnTime = 15 * 1000;
 let turnStart = Date.now();
 let gameState = {};
@@ -18,6 +24,7 @@ const csrfToken = window.gameSession.csrfToken;
 let deck = [];
 const roundSteps = ['pre-flop', 'flop', 'turn', 'river', 'showdown'];
 let currentRound = 0;
+let gameTerminated = false;
 
 
 joinButton.on('click', () => {
@@ -26,8 +33,25 @@ joinButton.on('click', () => {
     gameMessage.text("Vous avez rejoint la partie. Vous êtes en file d'attente...");
 });
 
+foldButton.on('click', () => {
+    placeBet(-1);
+});
+
+checkButton.on('click', () => {
+    placeBet(0);
+});
+
+callButton.on('click', () => {
+    const amountToCall = gameState.requiredBet - gameState.players.find(p => p.id === window.gameSession.userId).currentBet;
+    placeBet(amountToCall);
+});
+raiseButton.on('click', () => {
+    placeBet(parseInt(betAmount.val()));
+});
+
+
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function startRefreshInterval() {
@@ -36,6 +60,11 @@ function startRefreshInterval() {
         if (newEtag !== currentEtag) {
             currentEtag = newEtag;
             getGameState();
+        }
+        if (turnStart + turnTime < Date.now()) {
+            gameState.players[gameState.playersTurn].toKick = true;
+            gameState.players[gameState.playersTurn].hasFolded = true;
+            gameState.playersTurn = (gameState.playersTurn + 1) % gameState.players.length;
         }
     }, intervalTime);
 }
@@ -60,6 +89,7 @@ async function getEtag() {
     const data = await res.json();
     return data.Etag;
 }
+
 function updateEtag() {
     $.ajax({
         url: '/game/updateEtag',
@@ -76,16 +106,13 @@ function updateEtag() {
 
 function updateUI() {
     if (!gameState) return;
-    if(turnStart + turnTime < Date.now()){
-        gameState.players[gameState.playersTurn].toKick = true;
-        gameState.players[gameState.playersTurn].hasFolded = true;
-        gameState.playersTurn = (gameState.playersTurn + 1) % gameState.players.length;
-    }
     let playersList = gameState.players;
     const potValue = Number(gameState.pot) || 0;
     pot.text(`Pot : ${potValue.toLocaleString('en-US').replace(/,/g, ' ')}`);
+    if (gameState.players.length < 2) {
+        gameMessage.text("En attente de joueurs pour démarrer la partie...");
+    }
     let maxBet = Infinity;
-    let toNextRound = true;
     playerSeats.each(function (index) {
         const seat = $(this);
         const playerData = playersList[index];
@@ -99,7 +126,10 @@ function updateUI() {
             const playerNameDiv = seat.find('.player-name');
             const playerBalanceDiv = seat.find('.player-balance');
             const playerCards = seat.find('.player-cards');
+            if (playerData.id === window.gameSession.userId) {
+                joinButton.hide();
 
+            }
             if (playerIcon.length)
                 playerIcon.attr('class', `fa-solid ${playerData.profileImage || 'fa-user'} pfp-${color}`);
             if (playerNameDiv.length)
@@ -120,59 +150,49 @@ function updateUI() {
                 );
             }
             seat.toggleClass('activeTurn', index === Number(gameState.playersTurn));
-
-            seat.toggleClass('dimmed', !!playerData.hasFolded);
+            seat.toggleClass('dimmed', playerData.hasFolded);
             seat.removeClass('emptySeat');
-            if(playerData.balance < maxBet){
+            if(playerData.hasWon){
+                gameTerminated = true;
+            }
+            seat.toggleClass('winner', playerData.hasWon);
+            if (playerData.balance < maxBet) {
                 maxBet = playerData.balance;
             }
-            if(index === Number(gameState.playersTurn)){
-                betSection.show();
-            }
-            else{
-                betSection.hide();
-            }
 
-            if(toNextRound){
-                if(!playerData.hasPlayed || playerData.currentBet !== gameState.requiredBet || !playerData.hasFolded){
-                    toNextRound = false;
-                }
-            }
+
         } else {
             seat.removeClass('dimmed activeTurn').addClass('emptySeat');
         }
     });
-    requiredCall.text(`(${gameState.requiredBet} pour call)`);
-    betRange.attr('max', maxBet);
-    betAmount.attr('max', maxBet);
-    betRange.attr('min', gameState.requiredBet);
-    betAmount.attr('min', gameState.requiredBet);
-    (gameState.communityCards || []).forEach((card, idx) => {
-        if (idx < centerCards.length)
-            centerCards.eq(idx).attr('src', `/img/cards/${card}.png`);
-    });
-    if(toNextRound){
-        nextRound();
-    }
-}
-
-function updateBalance(amount) {
-    let player = gameState.players.find(p => p.id === window.gameSession.userId);
-    const newBalance = player.balance + amount;
-    $.ajax({
-        url: '/game/balance',
-        method: 'POST',
-        data: { balance: parseInt(newBalance) },
-        headers: { 'X-CSRF-TOKEN': csrfToken },
-        success: function (response) {
-            player.balance = response.balance;
-            updateUI();
-            updateEtag();
-        },
-        error: function (xhr, status, error) {
-            console.error('Error saving balance:', error);
+    if (gameState.players[gameState.playersTurn].id === window.gameSession.userId && gameState.roundStep !== 'showdown' && gameState.players.length >= 2 && !gameTerminated) {
+        if (gameState.requiredBet === 0) {
+            checkButton.toggleClass('disabled', false);
+            callButton.toggleClass('disabled', true);
         }
-    });
+        else {
+            checkButton.toggleClass('disabled', true);
+            callButton.toggleClass('disabled', false);
+        }
+        betSection.show();
+        callAmount = gameState.requiredBet - gameState.players[gameState.playersTurn].currentBet
+        requiredCall.text(`(${callAmount} pour call)`);
+        betRange.attr('max', maxBet);
+        betAmount.attr('max', maxBet);
+        betRange.attr('min', callAmount);
+        betAmount.attr('min', callAmount);
+        betRange.val(callAmount);
+        betAmount.val(callAmount);
+    }
+    else {
+        betSection.hide();
+    }
+    communityCards.empty();
+    communityCards.append(
+        (gameState.communityCards).map(card =>
+            `<img src="/img/cards/${card}.png" class="img-fluid" alt="Card">`
+        )
+    );
 }
 
 function joinGame() {
@@ -181,7 +201,6 @@ function joinGame() {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrfToken },
         success: function () {
-            updateEtag();
         },
         error: function (xhr, status, error) {
             console.error('Error joining poker game:', error);
@@ -195,70 +214,49 @@ function quitGame() {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrfToken },
         data: { playerId: window.gameSession.userId },
-        success: function(response) {
+        success: function (response) {
             gameMessage.text("Vous allez quitter la table à la fin de cette manche");
-            updateEtag();
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error quitting game:', error);
         }
     });
 }
 
 function initRound() {
+    gameTerminated = false;
     $.ajax({
         url: '/game/initRound',
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrfToken },
-        success: function(response) {
-            updateEtag();
+        success: function (response) {
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error initializing round:', error);
         }
     });
 }
 
-function placeBet(amount) {
+function placeBet(bet) {
     pokerError.text("");
     $.ajax({
         url: '/game/placeBet',
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrfToken },
         data: {
-            amount: amount,
+            amount: bet,
             playerId: window.gameSession.userId
         },
-        success: function(response) {
-            updateBalance(-amount);
-            updateEtag();
+        success: function (response) {
+            balanceUI.text(`Solde : ${response.newBalance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
+            console.log("new balance: " + response.newBalance);
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error placing bet:', error);
             pokerError.text("Error placing bet");
         }
     });
 }
 
-function nextRound() {
-    $.ajax({
-        url: '/game/nextRound',
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': csrfToken },
-        success: function(response) {
-            updateEtag();
-        },
-        error: function(xhr, status, error) {
-            console.error('Error moving to next round:', error);
-        }
-    });
-}
-
-function addCommunityCard() {
-    gameState.communityCards.push(deck.pop());
-}
-async function settleRound() {
-    await sleep(5000);
-}
-
 startRefreshInterval();
+initRound();
