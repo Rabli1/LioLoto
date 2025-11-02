@@ -11,13 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const keys = document.querySelectorAll(".keyboard-row button");
 
     function getNewWord() {
-        fetch("/game/wordle/word")
-            .then(res => res.json())
-            .then(data => {
-                word = data.word.toLowerCase();
-                console.log("Mot choisi (debug):", word);
-            });
-    }
+    fetch("/game/wordle/word")
+        .then(res => res.json())
+        .then(data => {
+            console.log("Nouvelle partie initialisée");
+        });
+}
 
     function getCurrentWordArr() {
         const numberOfGuessedWords = guessedWords.length;
@@ -60,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    const currentWord = currentWordArr.join("").toLowerCase();
+    const currentWord = currentWordArr.join("").toUpperCase();
 
     fetch("/game/wordle/check?word=" + currentWord)
         .then(res => res.json())
@@ -72,9 +71,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const firstLetterId = guessedWordCount * 5 + 1;
             const interval = 200;
+            
             currentWordArr.forEach((letter, index) => {
                 setTimeout(() => {
-                    const tileColor = getTileColor(letter, index);
+                    const colorMap = {
+                        'correct': 'rgb(83, 141, 78)',
+                        'present': 'rgb(181, 159, 59)',
+                        'absent': 'rgb(58, 58, 60)'
+                    };
+                    
+                    const tileColor = colorMap[data.result[index]];
                     const letterId = firstLetterId + index;
                     const letterEl = document.getElementById(letterId);
                     letterEl.classList.add("animate__flipInX");
@@ -84,17 +90,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             guessedWordCount += 1;
 
-            if (currentWord === word) {
+            if (data.won) {
                 window.alert("Congratulations!");
             }
 
-            if (guessedWords.length === 6) {
-                window.alert(`Sorry, you have no more guesses! The word is ${word}.`);
+            if (guessedWordCount === 6 && !data.won) {
+                window.alert("Sorry, you have no more guesses!");
             }
 
             guessedWords.push([]);
         });
-}
+    }
 
     function createSquares() {
         const gameBoard = document.getElementById("board");

@@ -20,7 +20,7 @@
     <div id="container">
         <div id="game">
             <header>
-                <h1 class="title">WORDLE</h1>
+                <h1 class="title">LIOTODLE</h1>
             </header>
 
             <div id="board-container">
