@@ -176,7 +176,7 @@
                     <div class="row">
                         <h3>Chicken Road</h3>
                     </div>
-                    <div class="row"><a href="/game/chicken" class="btn btn-danger btn-md">Jouer</a></div>
+                    <div class="row"><a href="/game/chicken-road" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
             </div>
         </div>

@@ -178,6 +178,7 @@ class GameController extends Controller
             'hasPlayed' => false,
             "hasWon" => false,
             'toKick' => false,
+            'hand' => "",
             'cards' => [],
         ];
         $state['queue'] = $players;
@@ -246,8 +247,10 @@ class GameController extends Controller
     }
     public function initRound(Request $request): JsonResponse
     {
-        $path = base_path(self::POKER_STATE_PATH);
-        $state = json_decode(@file_get_contents($path), true) ?? [];
+        $pokerPath = base_path(self::POKER_STATE_PATH);
+        $state = json_decode(@file_get_contents($pokerPath), true) ?? [];
+        $userPath = base_path(self::USERS_PATH);
+        $users = json_decode(@file_get_contents($userPath), true) ?? [];
 
         // Kick players
         $state['players'] = array_filter($state['players'], function ($player) {
@@ -264,7 +267,9 @@ class GameController extends Controller
                 $state['players'][] = array_shift($state['queue']);
             }
         }
+        $playerCount = count($state['players']);
 
+        //build deck
         $values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
         $suits = ['C', 'D', 'H', 'S'];
         $deck = [];
@@ -274,7 +279,6 @@ class GameController extends Controller
                 $deck[] = "{$value}-{$suit}";
             }
         }
-
         // Shuffle
         $deckSize = count($deck);
         for ($i = $deckSize - 1; $i > 0; $i--) {
@@ -287,9 +291,8 @@ class GameController extends Controller
         $state['communityCards'] = [];
         $state['pot'] = 0;
         $state['requiredBet'] = 50;
+        $state['smallBlind'] = ($state['smallBlind'] + 1) % $playerCount; 
         $state['deck'] = $deck;
-
-        //blind logic
 
         // Reset player states and deal cards
         foreach ($state['players'] as &$player) {
@@ -299,10 +302,45 @@ class GameController extends Controller
             $player['hasPlayed'] = false;
             $player['hasWon'] = false;
             $player['toKick'] = false;
+            $player['hand'] = "";
             $player['cards'] = [array_pop($state['deck']), array_pop($state['deck'])];
         }
 
-        file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        //blind logic
+        $smallBlindId = $state['players'][$state['smallBlind']]['id'];
+        $bigBlindId = $state['players'][($state['smallBlind'] + 1) % $playerCount]['id'];
+        foreach ($state['players'] as &$player) {
+            if ($player['id'] === $smallBlindId) {
+                $player['balance'] -= 25;
+                $player['currentBet'] += 25;
+                $state['pot'] += 25;
+                $player['hasPlayed'] = true;
+
+            } elseif ($player['id'] === $bigBlindId) {
+                $player['balance'] -= 50;
+                $player['currentBet'] += 50;
+                $state['pot'] += 50;
+                $player['hasPlayed'] = true;
+            }
+        }
+        unset($player);
+        $state['playersTurn'] = ($state['smallBlind'] + 2) % $playerCount;
+
+        // update users.json
+        foreach ($users as &$user) {
+            if ($smallBlindId === $user['id']) {
+                $user['points'] -= 25;
+                $user['points'] = (int) $user['points'];
+            }
+            if ($bigBlindId === $user['id']) {
+                $user['points'] -= 50;
+                $user['points'] = (int) $user['points'];
+            }
+        }
+        unset($user);
+
+        file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
         file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         return response()->json(['success' => true]);
@@ -311,20 +349,21 @@ class GameController extends Controller
     public function placeBet(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'amount' => 'required|integer',
+            'amount' => 'required|integer|min:-1',
             'playerId' => 'required|integer',
         ]);
-        $validatedAmount = $validated['amount'];
+        $validatedAmount = (int)$validated['amount'];
         $pokerPath = base_path(self::POKER_STATE_PATH);
         $userPath = base_path(self::USERS_PATH);
         $state = json_decode(@file_get_contents($pokerPath), true) ?? [];
+        $users = json_decode(@file_get_contents($userPath), true) ?? [];
 
-        $state['requiredBet'] = max((int) $state['requiredBet'], (int) $validatedAmount);
 
         $actingIndex = array_search($validated['playerId'], array_column($state['players'], 'id'));
 
         $player = &$state['players'][$actingIndex];
         $valToReturn = 0;
+
         if ($validatedAmount === -1) {
             $valToReturn = $player['balance'];
             $player['hasFolded'] = true;
@@ -332,10 +371,18 @@ class GameController extends Controller
             $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
 
             if (count($activePlayers) === 1) {
-                $winnerKey = array_key_first($activePlayers);
+                $winnerKey = $activePlayers[0]['id'];
                 $state['players'][$winnerKey]['hasWon'] = true;
+                $winnerId = $state['players'][$winnerKey]['id'];
+                foreach($users as &$user){
+                    if($winnerId === $user['id']){
+                        $user['points'] += $state['pot'];
+                    }
+                }
+                unset($user);
             }
         } else {
+            $state['requiredBet'] = max((int) $state['requiredBet'], (int) $validatedAmount);
             $valToReturn = $player['balance'] - $validatedAmount;
             $player['currentBet'] += $validatedAmount;
             $player['hasPlayed'] = true;
@@ -344,7 +391,6 @@ class GameController extends Controller
             $state['pot'] += $validatedAmount;
 
             // change in users.json
-            $users = json_decode(@file_get_contents($userPath), true) ?? [];
             $user = clone session('user');
             foreach ($users as &$entry) {
                 if (($entry['id'] ?? null) === $user->id) {
@@ -397,6 +443,9 @@ class GameController extends Controller
                     $state['communityCards'][] = $state['deck'][0];
                     $state['deck'] = array_slice($state['deck'], 1);
                     break;
+                case 'showdown':
+                    $this->settleRound($state);
+                    break;
             }
 
             foreach ($state['players'] as &$player) {
@@ -409,6 +458,9 @@ class GameController extends Controller
         $Etag = ['Etag' => (string) Str::uuid()];
         file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         return response()->json(['newBalance' => $valToReturn]);
+    }
+    private function settleRound(&$state){
+        
     }
 
     public function quitPoker(Request $request): JsonResponse
