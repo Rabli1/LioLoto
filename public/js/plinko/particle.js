@@ -6,14 +6,15 @@ function playBall() {
 
 function Particle(x, y, r) {
     var options = {
-        restitution: 0.5,  // rebonds
-        friction: -0.0001, // friction
+        restitution: 0.5,  
+        friction: -0.0001, 
         label: "particle",
         collisionFilter: {
-            group: -1 // 🟩 les particules du même groupe ne se collisionnent pas entre elles
+            group: -1 
         }
     };
 
+    
     playBall();
 
     x += random(-10, 10);
