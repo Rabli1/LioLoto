@@ -417,6 +417,16 @@
                     settleAndRestart('lose');
                 }, 500);
             }
+
+            else if (playerSum === 21) {
+                canHit = false;
+                document.getElementById('stayButton').disabled = true;
+                document.getElementById('hitButton').disabled = true;
+                document.getElementById('double').disabled = true;
+                document.getElementById('split').disabled = true;
+                revealDealerHand();
+                dealerDraw();
+            }
         }
         else {
             if (canHitSplit) {
