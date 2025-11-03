@@ -289,7 +289,7 @@ class GameController extends Controller
         $state['communityCards'] = [];
         $state['pot'] = 0;
         $state['requiredBet'] = 50;
-        $state['smallBlind'] = ($state['smallBlind'] + 1) % $playerCount; 
+        $state['smallBlind'] = ($state['smallBlind'] + 1) % $playerCount;
         $state['deck'] = $deck;
 
         // Reset player states and deal cards
@@ -350,7 +350,7 @@ class GameController extends Controller
             'amount' => 'required|integer|min:-1',
             'playerId' => 'required|integer',
         ]);
-        $validatedAmount = (int)$validated['amount'];
+        $validatedAmount = (int) $validated['amount'];
         $pokerPath = base_path(self::POKER_STATE_PATH);
         $userPath = base_path(self::USERS_PATH);
         $state = json_decode(@file_get_contents($pokerPath), true) ?? [];
@@ -372,8 +372,8 @@ class GameController extends Controller
                 $winnerKey = $activePlayers[0]['id'];
                 $state['players'][$winnerKey]['hasWon'] = true;
                 $winnerId = $state['players'][$winnerKey]['id'];
-                foreach($users as &$user){
-                    if($winnerId === $user['id']){
+                foreach ($users as &$user) {
+                    if ($winnerId === $user['id']) {
                         $user['points'] += $state['pot'];
                     }
                 }
@@ -457,8 +457,157 @@ class GameController extends Controller
         file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         return response()->json(['newBalance' => $valToReturn]);
     }
-    private function settleRound(&$state){
-        
+    private function settleRound(&$state): void
+    {
+        $pokerHands = ['Carte Haute', 'Paire', 'Deux Paires', 'Brelan', 'Quinte', 'Flush', 'Carré', 'Quinte Flush', 'Quinte Flush Royale'];
+        $communityCards = $state['communityCards'];
+        $players = &$state['players'];
+        foreach ($players as &$player) {
+            if (!$player['hasFolded']) {
+                $hand = [];
+                $hand[] = $communityCards;
+                $hand[] = $player['cards'];
+                $player['hand'] = $this->getPokerHand($hand);
+            }
+        }
+        unset($player);
+    }
+    private function getPokerHand($cards)
+    {
+        $rankValues = [
+            '2' => 2,
+            '3' => 3,
+            '4' => 4,
+            '5' => 5,
+            '6' => 6,
+            '7' => 7,
+            '8' => 8,
+            '9' => 9,
+            '10' => 10,
+            'J' => 11,
+            'Q' => 12,
+            'K' => 13,
+            'A' => 14
+        ];
+
+        // Parse ranks and suits
+        $values = [];
+        $suits = [];
+        foreach ($cards as $card) {
+            [$v, $s] = explode('-', $card);
+            $val = $rankValues[$v];
+            $values[] = $val;
+            $suits[$s][] = $val;
+        }
+
+        sort($values);
+        $high = $values[6];
+        $counts = array_count_values($values);
+        arsort($counts);
+        $groups = array_values($counts);
+
+        // Detect flush
+        $flushSuit = null;
+        foreach ($suits as $suit => $vals) {
+            if (count($vals) >= 5) {
+                $flushSuit = $suit;
+                $flushVals = $vals;
+                sort($flushVals);
+                break;
+            }
+        }
+
+        // Helper inline functions
+        $hasStraight = function (array $vals): bool {
+            $vals = array_values(array_unique($vals));
+            if (in_array(14, $vals))
+                $vals[] = 1; // Ace low
+            sort($vals);
+            $consec = 1;
+            for ($i = 1; $i < count($vals); $i++) {
+                if ($vals[$i] == $vals[$i - 1] + 1)
+                    $consec++;
+                elseif ($vals[$i] != $vals[$i - 1])
+                    $consec = 1;
+                if ($consec >= 5)
+                    return true;
+            }
+            return false;
+        };
+
+        $getStraightHigh = function (array $vals): ?int {
+            $vals = array_values(array_unique($vals));
+            if (in_array(14, $vals))
+                $vals[] = 1; // Ace low
+            sort($vals);
+            $consec = 1;
+            for ($i = 1; $i < count($vals); $i++) {
+                if ($vals[$i] == $vals[$i - 1] + 1) {
+                    $consec++;
+                    if ($consec >= 5)
+                        return $vals[$i];
+                } elseif ($vals[$i] != $vals[$i - 1]) {
+                    $consec = 1;
+                }
+            }
+            return null;
+        };
+
+        // Check for straight
+        $isStraight = $hasStraight($values);
+        $straightHigh = $isStraight ? $getStraightHigh($values) : null;
+
+        // Check for straight flush
+        if ($flushSuit) {
+            $flushUnique = array_values(array_unique($flushVals));
+            sort($flushUnique);
+            if ($hasStraight($flushUnique)) {
+                $highStraight = $getStraightHigh($flushUnique);
+                if ($highStraight == 14 && min($flushUnique) == 10)
+                    return "Quinte Flush Royale";
+                return "Quinte Flush";
+            }
+        }
+        $group4val = null;
+        $group3val = null;
+        $group2val = [];
+        foreach($counts as $val => $n){
+            if($n === 4){
+                $group4val = $val;
+            }
+            if($n === 3){
+                if($group3val){
+                    if($val > $group3val){
+                        $group3val = $val;
+                    }
+                }
+                else{
+                    $group3val = $val;
+                }
+            }
+            if($n === 2){
+                $group2val[] = $val;
+            }
+        }
+        sort($group2val);
+        if(count($group2val) > 2){
+            array_shift($group2val);
+        }
+        if ($group4val)
+            return "Carrée";
+        if ($group3val && $group2val)
+            return "Full House," . $group3val . ',' . $group2val[count($group2val) - 1];
+        if ($flushSuit)
+            return "Flush";
+        if ($isStraight)
+            return 'Quinte,' . $straightHigh;
+        if ($group3val)
+            return "Brelan," . $group3val;
+        if (count($group2val) == 2)
+            return "Deux Paires," . $group2val[0] . ',' . $group2val[1];
+        if (count($group2val) == 1)
+            return "Paire," . $group2val[0];
+        return "Carte Haute," . $high;
     }
 
     public function quitPoker(Request $request): JsonResponse
