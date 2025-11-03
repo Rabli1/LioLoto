@@ -181,84 +181,216 @@ Plinko.prototype.show = function () {
     }
 
     function createAudioToolkit() {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) {
-        return {
-            resume() { },
-        };
-    }
-
-    let context = null;
-
-    function ensureContext() {
-        if (!context) {
-            context = new AudioContextClass();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) {
+            return {
+                resume() { },
+            };
         }
-        return context;
-    }
 
-    function resume() {
-        const ctx = ensureContext();
-        if (!ctx) return;
-        if (ctx.state === 'suspended') {
-            ctx.resume();
-        }
-    }
+        let context = null;
 
-    let ballCashBase = null;
-
-    function getBallCashSound() {
-        if (!ballCashBase) {
-            ballCashBase = new Audio('../sounds/plinkoCash.mp3');
-            ballCashBase.preload = 'auto';
-            ballCashBase.volume = 0.85;
-            ballCashBase.load();
-        }
-        return ballCashBase;
-    }
-
-    function playBallCashSound() {
-        const base = getBallCashSound();
-        if (!base) return;
-
-        const play = (audioNode) => {
-            audioNode.currentTime = 0;
-            const promise = audioNode.play();
-            if (promise && typeof promise.catch === 'function') {
-                promise.catch(() => { });
+        function ensureContext() {
+            if (!context) {
+                context = new AudioContextClass();
             }
-        };
+            return context;
+        }
 
-        if (base.paused && base.readyState >= 3) {
-            play(base);
-        } else {
-            const clone = base.cloneNode(true);
-            clone.volume = base.volume;
-            if (clone.readyState >= 3) {
-                play(clone);
+        function resume() {
+            const ctx = ensureContext();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+        }
+
+        let ballCashBase = null;
+
+        function getBallCashSound() {
+            if (!ballCashBase) {
+                ballCashBase = new Audio('../sounds/plinkoCash.mp3');
+                ballCashBase.preload = 'auto';
+                ballCashBase.volume = 0.85;
+                ballCashBase.load();
+            }
+            return ballCashBase;
+        }
+
+        function playBallCashSound() {
+            const base = getBallCashSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
             } else {
-                clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
             }
         }
-    }
 
-    return {
-        resume,
-        playBallCashSound,
-        preloadSounds() {
-            getBallSound();
+        let ballBadCashBase = null;
+
+        function getBallBadCashSound() {
+            if (!ballBadCashBase) {
+                ballBadCashBase = new Audio('../sounds/plinkoBadCash.mp3');
+                ballBadCashBase.preload = 'auto';
+                ballBadCashBase.volume = 0.85;
+                ballBadCashBase.load();
+            }
+            return ballBadCashBase;
         }
-    };
-}
+
+        function playBallBadCashSound() {
+            const base = getBallBadCashSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let ballGoodCashBase = null;
+
+        function getBallGoodCashSound() {
+            if (!ballGoodCashBase) {
+                ballGoodCashBase = new Audio('../sounds/plinkoGoodCash.mp3');
+                ballGoodCashBase.preload = 'auto';
+                ballGoodCashBase.volume = 0.85;
+                ballGoodCashBase.load();
+            }
+            return ballGoodCashBase;
+        }
+
+        function playBallGoodCashSound() {
+            const base = getBallGoodCashSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let ballBestCashBase = null;
+
+        function getBallBestCashSound() {
+            if (!ballBestCashBase) {
+                ballBestCashBase = new Audio('../sounds/plinkoBestCash.mp3');
+                ballBestCashBase.preload = 'auto';
+                ballBestCashBase.volume = 0.85;
+                ballBestCashBase.load();
+            }
+            return ballBestCashBase;
+        }
+
+        function playBallBestCashSound() {
+            const base = getBallBestCashSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        return {
+            resume,
+            playBallCashSound,
+            playBallBadCashSound,
+            playBallGoodCashSound,
+            playBallBestCashSound,
+            preloadSounds() {
+                getBallSound();
+            }
+        };
+    }
 
     const audio = createAudioToolkit();
     audio.preloadSounds();
 
     // Exemple d’utilisation (à appeler à chaque fois qu’une boule termine)
     function onBouleTerminee(mise, multiplicateur) {
-        //Ajout son plinkoCash
-        audio.resume();
-        audio.playBallCashSound();
+        if (multiplicateur <= 1) {
+            audio.resume();
+            audio.playBallBadCashSound();
+        }
+
+        else if (multiplicateur > 1 && multiplicateur <= 12) {
+            audio.resume();
+            audio.playBallCashSound();
+        }
+
+        else if (multiplicateur > 5 && multiplicateur <= 90) {
+            audio.resume();
+            audio.playBallGoodCashSound();
+        }
+
+        else{
+            audio.resume();
+            audio.playBallBestCashSound();
+        }
+
+
         const gain = mise * multiplicateur;
         ajouterStat(mise, multiplicateur, gain);
     }
