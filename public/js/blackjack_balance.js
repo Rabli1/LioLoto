@@ -73,7 +73,12 @@
         });
 
         document.addEventListener('blackjack:resultSplit', (event) => {
-            settleRoundSplit(event.detail?.outcome1, event.detail?.outcome2);
+            settleRoundSplit(
+                event.detail?.outcome1, 
+                event.detail?.outcome2,
+                event.detail?.betAmountHand1,
+                event.detail?.betAmountHand2
+            );
         });
 
         document.addEventListener('blackjack:bet-reset', () => {
@@ -81,45 +86,53 @@
         });
     });
 
-    function settleRoundSplit(outcome1, outcome2) {
+    function settleRoundSplit(outcome1, outcome2, betAmountHand1, betAmountHand2) {
         if (!window.Balance) return;
-        const stake = Number(window.currentBlackjackBet || 0) || 0;
-        if (!stake) return;
-
-        const stakePerHand = stake/2;
+        
+        // Utiliser les montants individuels s'ils sont fournis, sinon fallback à l'ancien système
+        let stakePerHand1, stakePerHand2;
+        if (betAmountHand1 && betAmountHand2) {
+            stakePerHand1 = betAmountHand1;
+            stakePerHand2 = betAmountHand2;
+        } else {
+            const stake = Number(window.currentBlackjackBet || 0) || 0;
+            if (!stake) return;
+            stakePerHand1 = stake / 2;
+            stakePerHand2 = stake / 2;
+        }
 
         let payout1 = 0;
         let images1 = document.querySelectorAll("#playerContainer .playerCard");
         let resultMessage1 = document.getElementById("sumContainer");
         switch (outcome1) {
             case 'blackjack':
-                payout1 = Math.floor(stakePerHand * 5 / 2);
+                payout1 = Math.floor(stakePerHand1 * 5 / 2);
                 images1.forEach(card => card.classList.add("blackjack"));
                 resultMessage1.classList.add("blackjack");
-                resultMessage1.textContent += ` - Main 1 : Blackjack ! Mise ${stakePerHand}, gain ${payout1 - stakePerHand}.`;
+                resultMessage1.textContent += ` - Main 1 : Blackjack ! Mise ${stakePerHand1}, gain ${payout1 - stakePerHand1}.`;
                 break;
             case 'win':
-                payout1 = stakePerHand * 2;
+                payout1 = stakePerHand1 * 2;
                 images1.forEach(card => card.classList.add("win"));
                 resultMessage1.classList.add("win");
-                resultMessage1.textContent += ` - Main 1 : Vous gagnez. Mise ${stakePerHand} gagnée.`;
+                resultMessage1.textContent += ` - Main 1 : Vous gagnez. Mise ${stakePerHand1} gagnée.`;
                 break;
             case 'push':
-                payout1 = stakePerHand;
+                payout1 = stakePerHand1;
                 images1.forEach(card => card.classList.add("draw"));
                 resultMessage1.classList.add("draw");
-                resultMessage1.textContent += ` - Main 1 : Égalité. Mise ${stakePerHand} rendue.`;
+                resultMessage1.textContent += ` - Main 1 : Égalité. Mise ${stakePerHand1} rendue.`;
                 break;
             case 'dealer-blackjack':
                 payout1 = 0;
                 images1.forEach(card => card.classList.add("lose"));
                 resultMessage1.classList.add("lose");
-                resultMessage1.textContent += ` - Main 1 : Le croupier a un blackjack ! Mise ${stakePerHand} perdue.`;
+                resultMessage1.textContent += ` - Main 1 : Le croupier a un blackjack ! Mise ${stakePerHand1} perdue.`;
                 break;
             default:
                 images1.forEach(card => card.classList.add("lose"));
                 resultMessage1.classList.add("lose");
-                resultMessage1.textContent += ` - Main 1 : Vous perdez. Mise ${stakePerHand} perdue.`;
+                resultMessage1.textContent += ` - Main 1 : Vous perdez. Mise ${stakePerHand1} perdue.`;
         }
 
         let payout2 = 0;
@@ -127,33 +140,33 @@
         let resultMessage2 = document.getElementById("sumContainerSplit");
         switch (outcome2) {
             case 'blackjack':
-                payout2 = Math.floor(stakePerHand * 5 / 2);
+                payout2 = Math.floor(stakePerHand2 * 5 / 2);
                 images2.forEach(card => card.classList.add("blackjack"));
                 resultMessage2.classList.add("blackjack");
-                resultMessage2.textContent += ` - Main 2 : Blackjack ! Mise ${stakePerHand}, gain ${payout2 - stakePerHand}.`;
+                resultMessage2.textContent += ` - Main 2 : Blackjack ! Mise ${stakePerHand2}, gain ${payout2 - stakePerHand2}.`;
                 break;
             case 'win':
-                payout2 = stakePerHand * 2;
+                payout2 = stakePerHand2 * 2;
                 images2.forEach(card => card.classList.add("win"));
                 resultMessage2.classList.add("win");
-                resultMessage2.textContent += ` - Main 2 : Vous gagnez. Mise ${stakePerHand} gagnée.`;
+                resultMessage2.textContent += ` - Main 2 : Vous gagnez. Mise ${stakePerHand2} gagnée.`;
                 break;
             case 'push':
-                payout2 = stakePerHand;
+                payout2 = stakePerHand2;
                 images2.forEach(card => card.classList.add("draw"));
                 resultMessage2.classList.add("draw");
-                resultMessage2.textContent += ` - Main 2 : Égalité. Mise ${stakePerHand} rendue.`;
+                resultMessage2.textContent += ` - Main 2 : Égalité. Mise ${stakePerHand2} rendue.`;
                 break;
             case 'dealer-blackjack':
                 payout2 = 0;
                 images2.forEach(card => card.classList.add("lose"));
                 resultMessage2.classList.add("lose");
-                resultMessage2.textContent += ` - Main 2 : Le croupier a un blackjack ! Mise ${stakePerHand} perdue.`;
+                resultMessage2.textContent += ` - Main 2 : Le croupier a un blackjack ! Mise ${stakePerHand2} perdue.`;
                 break;
             default:
                 images2.forEach(card => card.classList.add("lose"));
                 resultMessage2.classList.add("lose");
-                resultMessage2.textContent += ` - Main 2 : Vous perdez. Mise ${stakePerHand} perdue.`;
+                resultMessage2.textContent += ` - Main 2 : Vous perdez. Mise ${stakePerHand2} perdue.`;
         }
 
         if (payout1 > 0) window.Balance.gain(payout1);

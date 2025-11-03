@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lotoli - Plinko</title>
     <link rel="stylesheet" href="{{ asset('css/game.css') }}">
+    <link rel="prefetch" href="sounds/plinko.mp3">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="{{ asset('js/plinko/libraries/matter.js') }}"></script>
     <!--<script src="{{ asset('js/plinko/libraries/p5.js') }}"></script>-->

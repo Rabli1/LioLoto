@@ -9,6 +9,8 @@ use Illuminate\View\View;
 use App\Models\User;
 use App\Services\GameServices;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
+
 
 class GameController extends Controller
 {
@@ -634,12 +636,17 @@ class GameController extends Controller
 
     public function wordleWord(): JsonResponse
     {
+        // Générer un mot secret stocké en session (invisible au client)
         $wordsFile = storage_path('app/json/wordle.json');
         $words = json_decode(file_get_contents($wordsFile), true);
 
-        $randomWord = $words[array_rand($words)];
+        $randomWord = strtoupper($words[array_rand($words)]);
 
-        return response()->json(['word' => $randomWord]);
+        // Stocker le mot en SESSION (pas renvoyé au client)
+        session(['wordle_secret' => $randomWord]);
+
+        // Renvoyer seulement une confirmation
+        return response()->json(['ready' => true]);
     }
 
     public function checkWord(Request $request): JsonResponse
@@ -648,13 +655,49 @@ class GameController extends Controller
             'word' => 'required|string|size:5'
         ]);
 
-        $inputWord = strtolower($request->query('word'));
+        $inputWord = strtoupper($request->query('word'));
+        $secretWord = session('wordle_secret');
 
+        if (!$secretWord) {
+            return response()->json(['error' => 'No game in progress'], 400);
+        }
+
+        // Vérifier si le mot existe dans le dictionnaire
         $wordsFile = storage_path('app/json/wordle.json');
-        $words = array_map('strtolower', json_decode(file_get_contents($wordsFile), true));
+        $words = array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
 
-        $isValid = in_array($inputWord, $words);
+        if (!in_array($inputWord, $words)) {
+            return response()->json(['valid' => false]);
+        }
 
-        return response()->json(['valid' => $isValid]);
+        // Calculer les couleurs des lettres
+        $result = [];
+        $secretLetters = str_split($secretWord);
+        $inputLetters = str_split($inputWord);
+
+        for ($i = 0; $i < 5; $i++) {
+            if ($inputLetters[$i] === $secretLetters[$i]) {
+                $result[$i] = 'correct'; 
+            } elseif (in_array($inputLetters[$i], $secretLetters)) {
+                $result[$i] = 'present'; 
+            } else {
+                $result[$i] = 'absent'; 
+            }
+        }
+
+        return response()->json([
+            'valid' => true,
+            'result' => $result,
+            'won' => $inputWord === $secretWord
+        ]);
+    }
+
+
+    private function getWordList(): array
+    {
+        return Cache::remember('wordle_words', 3600, function () {
+            $wordsFile = storage_path('app/json/wordle.json');
+            return array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
+        });
     }
 }
