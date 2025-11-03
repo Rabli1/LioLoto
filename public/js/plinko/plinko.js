@@ -162,7 +162,6 @@ Plinko.prototype.show = function () {
     };
     let totalGain = 0;
 
-    // Fonction pour ajouter une ligne de stats
     function ajouterStat(mise, multiplicateur, gain) {
         const statsList = document.getElementById('statsList');
         const totalSpan = document.getElementById('totalGain');
@@ -180,7 +179,6 @@ Plinko.prototype.show = function () {
         totalSpan.textContent = totalGain.toFixed(2);
     }
 
-    // Exemple d’utilisation (à appeler à chaque fois qu’une boule termine)
     function onBouleTerminee(mise, multiplicateur) {
         const gain = mise * multiplicateur;
         ajouterStat(mise, multiplicateur, gain);
