@@ -3,12 +3,6 @@
     const GOAL_COLUMNS = 10;
     const VISIBLE_COLUMNS = 10;
 
-    function playCashout() {
-        const audio = new Audio('/sounds/cashout.mp3');
-        audio.load();
-        audio.play();
-    }
-
     const state = {
         pendingBet: 0,
         bet: 0,
@@ -151,11 +145,43 @@
             }
         }
 
+        let cashoutSoundBase = null;
+        function getCashoutSound() {
+            if (!cashoutSoundBase) {
+                cashoutSoundBase = new Audio('/sounds/cashout.mp3');
+                cashoutSoundBase.preload = 'auto';
+                cashoutSoundBase.volume = 0.85;
+            }
+            return cashoutSoundBase;
+        }
+
+        function playCashoutSound() {
+            const base = getCashoutSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                play(clone);
+            }
+        }
+
         return {
             resume,
             playJump,
             playExplosion,
             playChickenSound,
+            playCashoutSound
         };
     }
 
@@ -548,7 +574,8 @@
 
     function cashout() {
         if (!state.roundActive || !state.cashable) return;
-        playCashout();
+        audio.resume();
+        audio.playCashoutSound();
         const payout = Math.floor(state.bet * state.multiplier);
         state.roundActive = false;
         state.cashable = false;
