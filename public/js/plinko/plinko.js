@@ -180,8 +180,85 @@ Plinko.prototype.show = function () {
         totalSpan.textContent = totalGain.toFixed(2);
     }
 
+    function createAudioToolkit() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) {
+        return {
+            resume() { },
+        };
+    }
+
+    let context = null;
+
+    function ensureContext() {
+        if (!context) {
+            context = new AudioContextClass();
+        }
+        return context;
+    }
+
+    function resume() {
+        const ctx = ensureContext();
+        if (!ctx) return;
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+    }
+
+    let ballCashBase = null;
+
+    function getBallCashSound() {
+        if (!ballCashBase) {
+            ballCashBase = new Audio('../sounds/plinkoCash.mp3');
+            ballCashBase.preload = 'auto';
+            ballCashBase.volume = 0.85;
+            ballCashBase.load();
+        }
+        return ballCashBase;
+    }
+
+    function playBallCashSound() {
+        const base = getBallCashSound();
+        if (!base) return;
+
+        const play = (audioNode) => {
+            audioNode.currentTime = 0;
+            const promise = audioNode.play();
+            if (promise && typeof promise.catch === 'function') {
+                promise.catch(() => { });
+            }
+        };
+
+        if (base.paused && base.readyState >= 3) {
+            play(base);
+        } else {
+            const clone = base.cloneNode(true);
+            clone.volume = base.volume;
+            if (clone.readyState >= 3) {
+                play(clone);
+            } else {
+                clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+            }
+        }
+    }
+
+    return {
+        resume,
+        playBallCashSound,
+        preloadSounds() {
+            getBallSound();
+        }
+    };
+}
+
+    const audio = createAudioToolkit();
+    audio.preloadSounds();
+
     // Exemple d’utilisation (à appeler à chaque fois qu’une boule termine)
     function onBouleTerminee(mise, multiplicateur) {
+        //Ajout son plinkoCash
+        audio.resume();
+        audio.playBallCashSound();
         const gain = mise * multiplicateur;
         ajouterStat(mise, multiplicateur, gain);
     }
