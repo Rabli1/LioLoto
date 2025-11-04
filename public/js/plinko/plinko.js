@@ -209,9 +209,10 @@ Plinko.prototype.show = function () {
 
         function getBallCashSound() {
             if (!ballCashBase) {
-                ballCashBase = new Audio('../sounds/plinkoCash.mp3');
+                const soundUrl = window.soundAssets?.plinkoCash || '../../sounds/plinkoCash.mp3';
+                ballCashBase = new Audio(soundUrl);
                 ballCashBase.preload = 'auto';
-                ballCashBase.volume = 0.85;
+                ballCashBase.volume = 0.5;
                 ballCashBase.load();
             }
             return ballCashBase;
@@ -246,9 +247,10 @@ Plinko.prototype.show = function () {
 
         function getBallBadCashSound() {
             if (!ballBadCashBase) {
-                ballBadCashBase = new Audio('../sounds/plinkoBadCash.mp3');
+                const soundUrl = window.soundAssets?.plinkoBadCash || '../../sounds/plinkoBadCash.mp3';
+                ballBadCashBase = new Audio(soundUrl);
                 ballBadCashBase.preload = 'auto';
-                ballBadCashBase.volume = 0.85;
+                ballBadCashBase.volume = 0.5;
                 ballBadCashBase.load();
             }
             return ballBadCashBase;
@@ -283,9 +285,10 @@ Plinko.prototype.show = function () {
 
         function getBallGoodCashSound() {
             if (!ballGoodCashBase) {
-                ballGoodCashBase = new Audio('../sounds/plinkoGoodCash.mp3');
+                const soundUrl = window.soundAssets?.plinkoGoodCash || '../../sounds/plinkoGoodCash.mp3';
+                ballGoodCashBase = new Audio(soundUrl);
                 ballGoodCashBase.preload = 'auto';
-                ballGoodCashBase.volume = 0.85;
+                ballGoodCashBase.volume = 0.5;
                 ballGoodCashBase.load();
             }
             return ballGoodCashBase;
@@ -320,9 +323,10 @@ Plinko.prototype.show = function () {
 
         function getBallBestCashSound() {
             if (!ballBestCashBase) {
-                ballBestCashBase = new Audio('../sounds/plinkoBestCash.mp3');
+                const soundUrl = window.soundAssets?.plinkoBestCash || '../../sounds/plinkoBestCash.mp3';
+                ballBestCashBase = new Audio(soundUrl);
                 ballBestCashBase.preload = 'auto';
-                ballBestCashBase.volume = 0.85;
+                ballBestCashBase.volume = 0.5;
                 ballBestCashBase.load();
             }
             return ballBestCashBase;
@@ -360,7 +364,10 @@ Plinko.prototype.show = function () {
             playBallGoodCashSound,
             playBallBestCashSound,
             preloadSounds() {
-                getBallSound();
+                getBallCashSound();
+                getBallBadCashSound();
+                getBallGoodCashSound();
+                getBallBestCashSound();
             }
         };
     }

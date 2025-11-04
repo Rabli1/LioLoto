@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lotoli - Plinko</title>
     <link rel="stylesheet" href="{{ asset('css/game.css') }}">
-    <link rel="prefetch" href="sounds/plinko.mp3">
+    <link rel="prefetch" href="{{ asset('sounds/plinko.mp3') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="{{ asset('js/plinko/libraries/matter.js') }}"></script>
     <!--<script src="{{ asset('js/plinko/libraries/p5.js') }}"></script>-->
@@ -79,6 +79,13 @@
             balance: {{ (int) $playerBalance }},
             endpoints: { saveBalance: '{{ url('game/balance') }}' },
             csrfToken: '{{ csrf_token() }}'
+        };
+        window.soundAssets = {
+            plinko: '{{ asset('sounds/plinko.mp3') }}',
+            plinkoCash: '{{ asset('sounds/plinkoCash.mp3') }}',
+            plinkoBadCash: '{{ asset('sounds/plinkoBadCash.mp3') }}',
+            plinkoGoodCash: '{{ asset('sounds/plinkoGoodCash.mp3') }}',
+            plinkoBestCash: '{{ asset('sounds/plinkoBestCash.mp3') }}'
         };
     </script>
 

@@ -27,7 +27,8 @@ function createAudioToolkit() {
 
     function getBallSound() {
         if (!ballSoundBase) {
-            ballSoundBase = new Audio('../sounds/plinko.mp3');
+            const soundUrl = window.soundAssets?.plinko || '../../sounds/plinko.mp3';
+            ballSoundBase = new Audio(soundUrl);
             ballSoundBase.preload = 'auto';
             ballSoundBase.volume = 0.5;
             ballSoundBase.load();
