@@ -2,6 +2,7 @@ const balanceUI = $("#balanceUI");
 const playerSeats = $(".playerSeat");
 const pot = $("#pot");
 const joinButton = $("#join-button");
+const quitButton = $("#quit-button");
 const requiredCall = $("#required-call");
 const communityCards = $('#community-cards');
 const gameMessage = $("#game-message");
@@ -13,6 +14,7 @@ const foldButton = $("#fold-button");
 const checkButton = $("#check-button");
 const callButton = $("#call-button");
 const raiseButton = $("#raise-button");
+const timeProgressBar = $(".progress-bar")
 
 
 const intervalTime = 2 * 1000;
@@ -31,6 +33,10 @@ joinButton.on('click', () => {
     joinGame();
     joinButton.hide();
     gameMessage.text("Vous avez rejoint la partie. Vous êtes en file d'attente...");
+});
+
+quitButton.on('click', () => {
+    quitGame(window.gameSession.userId, false)
 });
 
 foldButton.on('click', () => {
@@ -60,11 +66,6 @@ function startRefreshInterval() {
         if (newEtag !== currentEtag) {
             currentEtag = newEtag;
             getGameState();
-        }
-        if (turnStart + turnTime < Date.now()) {
-            gameState.players[gameState.playersTurn].toKick = true;
-            gameState.players[gameState.playersTurn].hasFolded = true;
-            gameState.playersTurn = (gameState.playersTurn + 1) % gameState.players.length;
         }
     }, intervalTime);
 }
@@ -111,8 +112,13 @@ function updateUI() {
     pot.text(`Pot : ${potValue.toLocaleString('en-US').replace(/,/g, ' ')}`);
     if (gameState.players.length < 2) {
         gameMessage.text("En attente de joueurs pour démarrer la partie...");
+        return;
     }
     let maxBet = Infinity;
+    gameTerminated = false;
+    if (gameState.roundStep === 'showdown') {
+        gameTerminated = true;
+    }
     playerSeats.each(function (index) {
         const seat = $(this);
         const playerData = playersList[index];
@@ -121,14 +127,13 @@ function updateUI() {
             const color = playerData.profileColor || 'black';
             const name = playerData.name || 'Joueur';
             const balance = Number(playerData.balance) || 0;
-
             const playerIcon = seat.find('.player-icon');
             const playerNameDiv = seat.find('.player-name');
             const playerBalanceDiv = seat.find('.player-balance');
             const playerCards = seat.find('.player-cards');
+            const handName = seat.find('.hand-name');
             if (playerData.id === window.gameSession.userId) {
                 joinButton.hide();
-
             }
             if (playerIcon.length)
                 playerIcon.attr('class', `fa-solid ${playerData.profileImage || 'fa-user'} pfp-${color}`);
@@ -136,8 +141,9 @@ function updateUI() {
                 playerNameDiv.text(name);
             if (playerBalanceDiv.length)
                 playerBalanceDiv.text(`Solde : ${balance.toLocaleString('en-US').replace(/,/g, ' ')}`);
+            handName.text("");
             playerCards.empty();
-            if (gameState.roundStep === 'showdown' || window.gameSession.userId === playerData.id) {
+            if (gameTerminated || window.gameSession.userId === playerData.id) {
                 playerCards.append(
                     (playerData.cards).map(card =>
                         `<img src="/img/cards/${card}.png" class="img-fluid" alt="Card">`
@@ -149,23 +155,28 @@ function updateUI() {
                     `<img src="/img/cards/BACK.png" class="img-fluid" alt="Card"> <img src="/img/cards/BACK.png" class="img-fluid" alt="Card">`
                 );
             }
-            seat.toggleClass('activeTurn', index === Number(gameState.playersTurn));
+            if (!gameTerminated && gameState.roundStep !== 'winByFold') {
+                seat.toggleClass('activeTurn', index === Number(gameState.playersTurn));
+            }
+            else {
+                seat.toggleClass('activeTurn', false);
+            }
             seat.toggleClass('dimmed', playerData.hasFolded);
             seat.removeClass('emptySeat');
-            if(playerData.hasWon){
-                gameTerminated = true;
-            }
             seat.toggleClass('winner', playerData.hasWon);
             if (playerData.balance < maxBet) {
                 maxBet = playerData.balance;
             }
-
+            if (gameTerminated && playerData.hasFolded === false) {
+                handName.text(playerData.hand?.split(',')[0] || '');
+            }
 
         } else {
             seat.removeClass('dimmed activeTurn').addClass('emptySeat');
         }
     });
-    if (gameState.players[gameState.playersTurn].id === window.gameSession.userId && gameState.roundStep !== 'showdown' && gameState.players.length >= 2 && !gameTerminated) {
+    if (gameState.players[gameState.playersTurn].id === window.gameSession.userId && gameState.players.length >= 2 && !gameTerminated && gameState.roundStep !== 'winByFold') {
+        quitButton.show();
         if (gameState.requiredBet === 0) {
             checkButton.toggleClass('disabled', false);
             callButton.toggleClass('disabled', true);
@@ -174,7 +185,6 @@ function updateUI() {
             checkButton.toggleClass('disabled', true);
             callButton.toggleClass('disabled', false);
         }
-        betSection.show();
         callAmount = gameState.requiredBet - gameState.players[gameState.playersTurn].currentBet
         requiredCall.text(`(${callAmount} pour call)`);
         betRange.attr('max', maxBet);
@@ -183,6 +193,9 @@ function updateUI() {
         betAmount.attr('min', callAmount);
         betRange.val(callAmount);
         betAmount.val(callAmount);
+        timeProgressBar.css("width", "0%")
+        startCountDown();
+        betSection.show();
     }
     else {
         betSection.hide();
@@ -206,19 +219,32 @@ function joinGame() {
             console.error('Error joining poker game:', error);
         }
     });
+
 }
 
-function quitGame() {
+function quitGame(id, force) {
+    if (typeof id === 'undefined' || id === null) {
+        console.warn('quitGame called without player id, aborting');
+        return;
+    }
+
     $.ajax({
         url: '/game/quitPoker',
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrfToken },
-        data: { playerId: window.gameSession.userId },
+        contentType: 'application/json',
+        data: JSON.stringify({ playerId: Number(id), force: !!force }),
         success: function (response) {
-            gameMessage.text("Vous allez quitter la table à la fin de cette manche");
+            if (!force) {
+                gameMessage.text("Vous allez quitter la table à la fin de cette manche");
+            }
         },
         error: function (xhr, status, error) {
-            console.error('Error quitting game:', error);
+            if (xhr.status === 422 && xhr.responseJSON) {
+                console.error('Validation error quitting game:', xhr.responseJSON);
+            } else {
+                console.error('Error quitting game:', status, error, xhr.responseText);
+            }
         }
     });
 }
@@ -244,8 +270,7 @@ function placeBet(bet) {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrfToken },
         data: {
-            amount: bet,
-            playerId: window.gameSession.userId
+            amount: bet
         },
         success: function (response) {
             balanceUI.text(`Solde : ${response.newBalance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
@@ -258,5 +283,25 @@ function placeBet(bet) {
     });
 }
 
+async function startCountDown() {
+    const duration = turnTime;
+    const start = Date.now();
+    
+    while (true) {
+        const elapsed = Date.now() - start;
+        if (elapsed > duration) break;
+        
+        const progress = (elapsed / duration) * 100;
+        timeProgressBar.css("width", `${progress}%`);
+        await sleep(50);
+    }
+
+    const currentPlayer = gameState?.players?.[gameState.playersTurn];
+    if (currentPlayer?.id) {
+        quitGame(currentPlayer.id, true);
+    } else {
+        console.warn('startCountDown: no current player to kick (playerId missing)');
+    }
+}
 startRefreshInterval();
 initRound();

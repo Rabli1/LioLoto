@@ -162,8 +162,10 @@ class GameController extends Controller
         $playerInQueue = array_filter($players, function ($player) use ($user) {
             return $player['id'] == $user->id;
         });
-
-        if (!empty($playerInQueue)) {
+        $playersInGame = array_filter($state['players'], function ($player) use ($user) {
+            return $player['id'] == $user->id;
+        });
+        if (!empty($playerInQueue) || !empty($playersInGame)) {
             return;
         }
         $players[] = [
@@ -350,7 +352,6 @@ class GameController extends Controller
     {
         $validated = $request->validate([
             'amount' => 'required|integer|min:-1',
-            'playerId' => 'required|integer',
         ]);
         $validatedAmount = (int) $validated['amount'];
         $pokerPath = base_path(self::POKER_STATE_PATH);
@@ -358,8 +359,8 @@ class GameController extends Controller
         $state = json_decode(@file_get_contents($pokerPath), true) ?? [];
         $users = json_decode(@file_get_contents($userPath), true) ?? [];
 
-
-        $actingIndex = array_search($validated['playerId'], array_column($state['players'], 'id'));
+        $userId = session('user')->id;
+        $actingIndex = array_search($userId, array_column($state['players'], 'id'));
 
         $player = &$state['players'][$actingIndex];
         $valToReturn = 0;
@@ -371,6 +372,7 @@ class GameController extends Controller
             $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
 
             if (count($activePlayers) === 1) {
+                $state['roundStep'] = 'winByFold';
                 $winnerKey = $activePlayers[0]['id'];
                 $state['players'][$winnerKey]['hasWon'] = true;
                 $winnerId = $state['players'][$winnerKey]['id'];
@@ -461,18 +463,81 @@ class GameController extends Controller
     }
     private function settleRound(&$state): void
     {
-        $pokerHands = ['Carte Haute', 'Paire', 'Deux Paires', 'Brelan', 'Quinte', 'Flush', 'Carré', 'Quinte Flush', 'Quinte Flush Royale'];
+        $pokerHands = ['Carte Haute', 'Paire', 'Deux Paires', 'Brelan', 'Quinte', 'Flush', 'Full House', 'Carrée', 'Quinte Flush', 'Quinte Flush Royale'];
         $communityCards = $state['communityCards'];
         $players = &$state['players'];
+
         foreach ($players as &$player) {
-            if (!$player['hasFolded']) {
-                $hand = [];
-                $hand[] = $communityCards;
-                $hand[] = $player['cards'];
-                $player['hand'] = $this->getPokerHand($hand);
+            if ($player['hasFolded']) {
+                continue;
             }
+            $hand = [];
+            $hand[] = $communityCards;
+            $hand[] = $player['cards'];
+            $player['hand'] = $this->getPokerHand($hand);
         }
         unset($player);
+
+        $winnerSeatId = [];
+        $winnerHand = -1;
+        $bestHandValue = [];
+
+        foreach ($players as $player) {
+            if ($player['hasFolded']) {
+                continue;
+            }
+            $handParts = explode(',', $player['hand']);
+            $handName = $handParts[0];
+            $handValue = array_search($handName, $pokerHands);
+
+            if ($handValue > $winnerHand) {
+                $winnerHand = $handValue;
+                $winnerSeatId = [$player['id']];
+                $bestHandValue = array_slice($handParts, 1);
+            } else if ($handValue === $winnerHand) {
+                $currentHandValue = array_slice($handParts, 1);
+
+                $isPush = true;
+                for ($i = 0; $i < count($bestHandValue); $i++) {
+                    if ((int) $currentHandValue[$i] > (int) $bestHandValue[$i]) {
+                        $winnerSeatId = [$player['id']];
+                        $bestHandValue = $currentHandValue;
+                        $isPush = false;
+                        break;
+                    } else if ((int) $currentHandValue[$i] < (int) $bestHandValue[$i]) {
+                        $isPush = false;
+                        break;
+                    }
+                }
+
+                if ($isPush) {
+                    $winnerSeatId[] = $player['id'];
+                }
+            }
+        }
+
+        if (!empty($winnerSeatId)) {
+            $potShare = floor($state['pot'] / count($winnerSeatId));
+
+            foreach ($players as &$player) {
+                if (in_array($player['id'], $winnerSeatId)) {
+                    $player['hasWon'] = true;
+                    $player['balance'] += $potShare;
+                }
+            }
+
+            $userPath = base_path(self::USERS_PATH);
+            $users = json_decode(@file_get_contents($userPath), true) ?? [];
+
+            foreach ($users as &$user) {
+                if (in_array($user['id'], $winnerSeatId)) {
+                    $user['points'] += $potShare;
+                    $user['points'] = (int) $user['points'];
+                }
+            }
+
+            file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
     }
     private function getPokerHand($cards)
     {
@@ -491,11 +556,19 @@ class GameController extends Controller
             'K' => 13,
             'A' => 14
         ];
-
+        // Flatten the nested array of cards
+        $flatCards = [];
+        foreach ($cards as $cardSet) {
+            if (is_array($cardSet)) {
+                $flatCards = array_merge($flatCards, $cardSet);
+            } else {
+                $flatCards[] = $cardSet;
+            }
+        }
         // Parse ranks and suits
         $values = [];
         $suits = [];
-        foreach ($cards as $card) {
+        foreach ($flatCards as $card) {
             [$v, $s] = explode('-', $card);
             $val = $rankValues[$v];
             $values[] = $val;
@@ -573,26 +646,25 @@ class GameController extends Controller
         $group4val = null;
         $group3val = null;
         $group2val = [];
-        foreach($counts as $val => $n){
-            if($n === 4){
+        foreach ($counts as $val => $n) {
+            if ($n === 4) {
                 $group4val = $val;
             }
-            if($n === 3){
-                if($group3val){
-                    if($val > $group3val){
+            if ($n === 3) {
+                if ($group3val) {
+                    if ($val > $group3val) {
                         $group3val = $val;
                     }
-                }
-                else{
+                } else {
                     $group3val = $val;
                 }
             }
-            if($n === 2){
+            if ($n === 2) {
                 $group2val[] = $val;
             }
         }
         sort($group2val);
-        if(count($group2val) > 2){
+        if (count($group2val) > 2) {
             array_shift($group2val);
         }
         if ($group4val)
@@ -615,16 +687,34 @@ class GameController extends Controller
     public function quitPoker(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'playerId' => 'required|integer'
+            'playerId' => 'required|integer',
+            'force' => 'nullable|boolean'
         ]);
-
         $path = base_path(self::POKER_STATE_PATH);
         $state = json_decode(@file_get_contents($path), true) ?? [];
 
         foreach ($state['players'] as &$player) {
             if ($player['id'] === $validated['playerId']) {
                 $player['toKick'] = true;
-                break;
+                if ($validated['force']) {
+                    $player['hasFolded'] = true;
+                    $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
+
+                    if (count($activePlayers) === 1) {
+                        $state['roundStep'] = 'winByFold';
+                        $winner = reset($activePlayers);
+                        $winnerId = $winner['id'];
+
+                        foreach ($state['players'] as &$p) {
+                            if ($p['id'] === $winnerId) {
+                                $p['hasWon'] = true;
+                                $p['balance'] += ($state['pot'] ?? 0);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
             }
         }
 
@@ -677,11 +767,11 @@ class GameController extends Controller
 
         for ($i = 0; $i < 5; $i++) {
             if ($inputLetters[$i] === $secretLetters[$i]) {
-                $result[$i] = 'correct'; 
+                $result[$i] = 'correct';
             } elseif (in_array($inputLetters[$i], $secretLetters)) {
-                $result[$i] = 'present'; 
+                $result[$i] = 'present';
             } else {
-                $result[$i] = 'absent'; 
+                $result[$i] = 'absent';
             }
         }
 
