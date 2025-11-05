@@ -23,6 +23,8 @@
         activeTimers: [],
         reels: [],
         lastWin: 0,
+        activeBet: 0,
+        history: [],
     };
 
     function formatAmount(value) {
@@ -191,7 +193,7 @@
         }
 
         const intervalTime = 90;
-        const spinDuration = 1200 + reelIndex * 400;
+        const spinDuration = 1200 + reelIndex * 600;
         let elapsed = 0;
         let tickCount = 0;
 
@@ -231,6 +233,7 @@
         const statusLabel = document.getElementById('slot-status');
         const currentBetLabel = document.getElementById('slot-current-bet');
         const lastWinLabel = document.getElementById('slot-last-win');
+        const statsBody = document.getElementById('slot-history-body');
 
         state.reels = Array.from(document.querySelectorAll('.slot-reel'));
         state.reels.forEach((reel) => {
@@ -241,6 +244,42 @@
         });
 
         const defaultSpinLabel = spinButton.textContent.trim() || 'Lancer';
+
+        function renderHistory() {
+            if (!statsBody) return;
+            if (!state.history.length) {
+                statsBody.innerHTML = '<tr class="slot-history-empty"><td colspan="5">Aucun spin enregistre pour le moment.</td></tr>';
+                return;
+            }
+
+            const rows = state.history.map((entry) => {
+                const labels = entry.symbols
+                    .map((name) => SYMBOL_LOOKUP[name]?.label || name)
+                    .join(' - ');
+                const rowClass = entry.payout > 0 ? 'slot-history-row is-win' : 'slot-history-row';
+                return `<tr class="${rowClass}">
+                    <td>${labels}</td>
+                    <td>${formatAmount(entry.bet)}</td>
+                    <td>${formatAmount(entry.payout)}</td>
+                </tr>`;
+            }).join('');
+
+            statsBody.innerHTML = rows;
+        }
+
+        function recordHistory(results, outcome, betValue) {
+            state.history.unshift({
+                bet: betValue,
+                payout: outcome.payout,
+                symbols: results.map((symbol) => symbol.name),
+            });
+            if (state.history.length > 10) {
+                state.history.length = 10;
+            }
+            renderHistory();
+        }
+
+        renderHistory();
 
         function updateBetUI() {
             const formatted = formatAmount(state.bet);
@@ -282,8 +321,11 @@
 
             highlightWinningReels(outcome.winningSymbol ? outcome.winningSymbol.name : null);
 
+            const wager = state.activeBet || state.bet;
+            recordHistory(results, outcome, wager);
+
             dispatchGameEvent('slotmachine:result', {
-                bet: state.bet,
+                bet: wager,
                 payout: outcome.payout,
                 symbols: results.map((symbol) => symbol.name),
             });
@@ -320,6 +362,7 @@
                 }
             }
 
+            state.activeBet = state.bet;
             state.spinning = true;
             state.lastWin = 0;
             state.activeTimers.forEach((timerId) => clearInterval(timerId));
@@ -336,7 +379,7 @@
                 lastWinLabel.textContent = '0';
             }
 
-            if(statusLabel) {
+            if (statusLabel) {
                 statusLabel.textContent = '';
             }
 
@@ -344,7 +387,7 @@
             spinButton.textContent = 'En cours...';
 
             audioFX.spin();
-            dispatchGameEvent('slotmachine:spin', { bet: state.bet });
+            dispatchGameEvent('slotmachine:spin', { bet: state.activeBet });
 
             const results = [randomSymbol(), randomSymbol(), randomSymbol()];
             let completed = 0;
