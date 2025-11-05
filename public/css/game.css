@@ -423,11 +423,11 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.tokenWage:hover{
+.tokenWage:hover {
     border: 2px solid white;
 }
 
-.tokenWageSelected{
+.tokenWageSelected {
     border: 2px solid white;
 }
 
@@ -753,8 +753,59 @@
     z-index: 3;
 }
 
-#clearMat{
+#clearMat {
     margin-bottom: 5px;
+}
+
+.roulette-win {
+    position: fixed;
+    background-color: rgb(14, 92, 11);
+    opacity: 0.3;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: block;
+    transition: all 0.3s ease-out !important;
+}
+
+.roulette-lose {
+    position: fixed;
+    background-color: rgb(104, 8, 8);
+    text-align: center;
+    opacity: 0.3;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: block;
+    transition: all 0.3s ease-out !important;
+}
+
+.loseAmount {
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #a80000;
+    font-size: 3em;
+    font-weight: bolder;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+}
+
+.winAmount {
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #008b00;
+    font-size: 3em;
+    font-weight: bolder;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
 }
 
 @keyframes wheelRotate {
