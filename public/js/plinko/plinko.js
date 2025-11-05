@@ -180,8 +180,224 @@ Plinko.prototype.show = function () {
         totalSpan.textContent = totalGain.toFixed(2);
     }
 
+    function createAudioToolkit() {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) {
+            return {
+                resume() { },
+            };
+        }
+
+        let context = null;
+
+        function ensureContext() {
+            if (!context) {
+                context = new AudioContextClass();
+            }
+            return context;
+        }
+
+        function resume() {
+            const ctx = ensureContext();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+        }
+
+        let ballCashBase = null;
+
+        function getBallCashSound() {
+            if (!ballCashBase) {
+                const soundUrl = window.soundAssets?.plinkoCash || '../../sounds/plinkoCash.mp3';
+                ballCashBase = new Audio(soundUrl);
+                ballCashBase.preload = 'auto';
+                ballCashBase.volume = 0.5;
+                ballCashBase.load();
+            }
+            return ballCashBase;
+        }
+
+        function playBallCashSound() {
+            const base = getBallCashSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let ballBadCashBase = null;
+
+        function getBallBadCashSound() {
+            if (!ballBadCashBase) {
+                const soundUrl = window.soundAssets?.plinkoBadCash || '../../sounds/plinkoBadCash.mp3';
+                ballBadCashBase = new Audio(soundUrl);
+                ballBadCashBase.preload = 'auto';
+                ballBadCashBase.volume = 0.5;
+                ballBadCashBase.load();
+            }
+            return ballBadCashBase;
+        }
+
+        function playBallBadCashSound() {
+            const base = getBallBadCashSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let ballGoodCashBase = null;
+
+        function getBallGoodCashSound() {
+            if (!ballGoodCashBase) {
+                const soundUrl = window.soundAssets?.plinkoGoodCash || '../../sounds/plinkoGoodCash.mp3';
+                ballGoodCashBase = new Audio(soundUrl);
+                ballGoodCashBase.preload = 'auto';
+                ballGoodCashBase.volume = 0.5;
+                ballGoodCashBase.load();
+            }
+            return ballGoodCashBase;
+        }
+
+        function playBallGoodCashSound() {
+            const base = getBallGoodCashSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let ballBestCashBase = null;
+
+        function getBallBestCashSound() {
+            if (!ballBestCashBase) {
+                const soundUrl = window.soundAssets?.plinkoBestCash || '../../sounds/plinkoBestCash.mp3';
+                ballBestCashBase = new Audio(soundUrl);
+                ballBestCashBase.preload = 'auto';
+                ballBestCashBase.volume = 0.5;
+                ballBestCashBase.load();
+            }
+            return ballBestCashBase;
+        }
+
+        function playBallBestCashSound() {
+            const base = getBallBestCashSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        return {
+            resume,
+            playBallCashSound,
+            playBallBadCashSound,
+            playBallGoodCashSound,
+            playBallBestCashSound,
+            preloadSounds() {
+                getBallCashSound();
+                getBallBadCashSound();
+                getBallGoodCashSound();
+                getBallBestCashSound();
+            }
+        };
+    }
+
+    const audio = createAudioToolkit();
+    audio.preloadSounds();
+
     // Exemple d’utilisation (à appeler à chaque fois qu’une boule termine)
     function onBouleTerminee(mise, multiplicateur) {
+        if (multiplicateur <= 1) {
+            audio.resume();
+            audio.playBallBadCashSound();
+        }
+
+        else if (multiplicateur > 1 && multiplicateur <= 12) {
+            audio.resume();
+            audio.playBallCashSound();
+        }
+
+        else if (multiplicateur > 5 && multiplicateur <= 90) {
+            audio.resume();
+            audio.playBallGoodCashSound();
+        }
+
+        else{
+            audio.resume();
+            audio.playBallBestCashSound();
+        }
+
+
         const gain = mise * multiplicateur;
         ajouterStat(mise, multiplicateur, gain);
     }

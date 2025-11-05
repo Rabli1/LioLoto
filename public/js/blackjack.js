@@ -15,10 +15,24 @@
     document.getElementById('split').disabled = true;
     document.getElementById('playerHand2').style.display = 'none';
     let betAmount = 0;
+    let betAmountHand1 = 0;
+    let betAmountHand2 = 0;
 
     let playerHand = [];
     let playerHandSplit = [];
     let dealerHand = [];
+
+    function playCardDeal() {
+        const audio1 = new Audio('/sounds/cards.mp3');
+        audio1.volume = 0.1;
+        audio1.play();
+    }
+
+    function playCardHit() {
+        const audio1 = new Audio('/sounds/cardHit.mp3');
+        audio1.volume = 0.1;
+        audio1.play();
+    }
 
     function dispatchGameEvent(name, detail = {}) {
         document.dispatchEvent(new CustomEvent(name, { detail }));
@@ -81,6 +95,7 @@
         const dealerContainer = document.getElementById('dealerContainer');
         const playerContainer = document.getElementById('playerContainer');
         const playerContainerSplit = document.getElementById('playerContainerSplit');
+
 
         if (dealerContainer) {
             dealerHand.forEach((card, index) => {
@@ -188,6 +203,7 @@
         playerSum = SommeMain(playerHand);
         dealerSum = SommeMain(dealerHand);
 
+        playCardDeal();
         afficheMains();
         updateScore();
         if ((getCardValue(playerHand[0]) === getCardValue(playerHand[1])) && (window.Balance.get() >= betAmount * 2)) {
@@ -233,6 +249,8 @@
         hisSplit = false;
         canHitSplit = true;
         firstSplit = true;
+        betAmountHand1 = 0;
+        betAmountHand2 = 0;
 
         hiddenCard = null;
         canHit = true;
@@ -285,7 +303,12 @@
     }
 
     function settleAndRestartSplit(outcome1, outcome2) {
-        dispatchGameEvent('blackjack:resultSplit', { outcome1, outcome2 });
+        dispatchGameEvent('blackjack:resultSplit', { 
+            outcome1, 
+            outcome2, 
+            betAmountHand1, 
+            betAmountHand2 
+        });
         setTimeout(() => {
             restartGame();
         }, 4000);
@@ -294,6 +317,7 @@
     function dealerDraw() {
         document.getElementById('playerHand1').style.opacity = '1';
         document.getElementById('playerHand2').style.opacity = '1';
+        playCardHit();
         if (dealerSum < 17) {
             const card = deck.pop();
             dealerHand.push(card);
@@ -391,6 +415,7 @@
             playerSum = SommeMain(playerHand);
             document.getElementById('double').disabled = true;
 
+            playCardHit();
             afficheMains();
             updateScore();
 
@@ -400,6 +425,16 @@
                 setTimeout(() => {
                     settleAndRestart('lose');
                 }, 500);
+            }
+
+            else if (playerSum === 21) {
+                canHit = false;
+                document.getElementById('stayButton').disabled = true;
+                document.getElementById('hitButton').disabled = true;
+                document.getElementById('double').disabled = true;
+                document.getElementById('split').disabled = true;
+                revealDealerHand();
+                dealerDraw();
             }
         }
         else {
@@ -473,6 +508,8 @@
         document.getElementById('playerHand2').style.opacity = '0.5';
         window.Balance.miser(betAmount)
         window.currentBlackjackBet = betAmount * 2;
+        betAmountHand1 = betAmount;
+        betAmountHand2 = betAmount;
         document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${betAmount * 2}</h2>`;
 
         if (window.Balance.get() < betAmount * 2)
@@ -519,6 +556,7 @@
             if (canHitSplit) {
                 playerHand.push(deck.pop());
                 playerSum = SommeMain(playerHand);
+                betAmountHand1 += betAmount;
                 window.currentBlackjackBet += betAmount;
                 window.Balance.miser(betAmount)
                 document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${window.currentBlackjackBet}</h2>`;
@@ -535,6 +573,7 @@
             else {
                 playerHandSplit.push(deck.pop());
                 playerSumSplit = SommeMain(playerHandSplit);
+                betAmountHand2 += betAmount;
                 window.currentBlackjackBet += betAmount;
                 window.Balance.miser(betAmount)
                 document.getElementById('betAmount').innerHTML = `<h2>Votre mise : ${window.currentBlackjackBet}</h2>`;

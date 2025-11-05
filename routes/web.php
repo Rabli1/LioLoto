@@ -33,6 +33,9 @@ Route::get('game/slot-machine', [GameController::class, 'slotMachine']);
 Route::get('game/crash', [GameController::class, 'crash']);
 Route::get('game/coinflip',[GameController::class, 'coinflip']);
 Route::get('game/poker', [GameController::class, 'poker']);
+Route::get('game/wordle', [GameController::class, 'wordle']);
+Route::get('/game/wordle/word', [GameController::class, 'wordleWord']);
+Route::get('/game/wordle/check', [GameController::class, 'checkWord']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
@@ -43,8 +46,6 @@ Route::post('/game/getPokerState', [GameController::class, 'getPokerState']);
 Route::post('/game/joinPoker', [GameController::class, 'joinPoker']);
 Route::post('/game/initRound', [GameController::class, 'initRound']);
 Route::post('/game/placeBet', [GameController::class, 'placeBet']);
-Route::post('/game/nextRound', [GameController::class, 'nextRound']);
-Route::post('/game/settleRound', [GameController::class, 'settleRound']);
 Route::post('/game/quitPoker', [GameController::class, 'quitPoker']);
 
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);

@@ -35,6 +35,13 @@
   border-radius: 10px;
 }
 
+.playerSeat.winner {
+  box-shadow: 0 0 15px 3px gold;
+  opacity: 1;
+  filter: none;
+  border-radius: 10px;
+}
+
 @media (max-width: 992px) {
   #gameMat img.img-fluid {
     width: 50px;

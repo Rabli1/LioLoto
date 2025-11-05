@@ -15,6 +15,6 @@ export default defineConfig({
         host: 'localhost',
         port: 5173,
         cors: true,
-        allowedHosts: ['localhost']
+        allowedHosts: ['localhost', 'lioto'],
     },
 });

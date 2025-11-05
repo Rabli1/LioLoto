@@ -82,7 +82,7 @@ class UserServices
         }
     }
     public function redirectIfNotAdmin(){
-        if(!session("user")->admin){
+        if(session()->has('user') && !session("user")->admin){
             abort(redirect('/'));
         }
     } 

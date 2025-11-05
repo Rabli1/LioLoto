@@ -4,6 +4,7 @@
     let tokenPlaced = false;
     let resultSpin;
 
+
     function initBettingMat() {
         const bettingMat = document.getElementById('bettingMat');
         const item0 = document.createElement('div');
@@ -13,6 +14,7 @@
         item0.textContent = 0;
         item0.id = 'item0';
         item0.classList.add('clickRoulette');
+        item0.dataset.cases = 0;
 
         bettingMat.appendChild(item0);
 
@@ -22,6 +24,7 @@
             item.textContent = i;
             item.id = `item${i}`;
             item.classList.add('clickRoulette');
+            item.dataset.cases = i;
 
             if (rowCnt < 2) {
                 rowCnt = 6;
@@ -88,6 +91,7 @@
             rightSideItem.textContent = '2:1';
             rightSideItem.classList.add('rightSideItem', 'clickRoulette');
             rightSideItem.style.gridRow = i;
+            rightSideItem.dataset.cases = `col${i / 2}`;
             bettingMat.appendChild(rightSideItem);
         }
 
@@ -96,12 +100,15 @@
             const topItem = document.createElement('div');
             if (i == 2) {
                 topItem.textContent = '1 à 12';
+                topItem.dataset.cases = '1-12';
             }
             else if (i == 10) {
                 topItem.textContent = '13 à 24';
+                topItem.dataset.cases = '13-24';
             }
             else if (i == 18) {
                 topItem.textContent = '25 à 36';
+                topItem.dataset.cases = '25-36';
             }
             topItem.classList.add('topItem', 'clickRoulette');
             topItem.style.gridColumn = `${i}/${i + 7}`;
@@ -113,23 +120,30 @@
             const bottomItem = document.createElement('div');
             if (i == 2) {
                 bottomItem.textContent = '1 à 18';
+                bottomItem.dataset.cases = '1-18';
             }
             else if (i == 6) {
                 bottomItem.textContent = 'Pair';
+                bottomItem.dataset.cases = 'p';
             }
             else if (i == 10) {
                 bottomItem.textContent = 'Rouge';
                 bottomItem.style.backgroundColor = 'rgba(211, 47, 47, 0.5)';
+                bottomItem.dataset.cases = 'r';
             }
             else if (i == 14) {
                 bottomItem.textContent = 'Noir';
                 bottomItem.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
+                bottomItem.dataset.cases = 'n';
             }
             else if (i == 18) {
                 bottomItem.textContent = 'Impair';
+                bottomItem.dataset.cases = 'i';
             }
             else {
                 bottomItem.textContent = '19 à 36';
+                bottomItem.dataset.cases = '19-36';
+
             }
             bottomItem.classList.add('bottomItem', 'clickRoulette');
             bottomItem.style.gridColumn = `${i}/${i + 3}`;
@@ -199,6 +213,13 @@
     function spinRoulette(winningNumber) {
         const roulette = document.querySelector('.roulette');
         const ballContainer = document.querySelector('.ballContainer');
+        const buttonSpin = document.getElementById('buttonSpin');
+
+        if (buttonSpin) {
+            buttonSpin.disabled = true;
+        }
+
+        playRoulette();
 
         for (let i = 0; i < rouletteNumbers.length; i++) {
             if (rouletteNumbers[i] == winningNumber) {
@@ -224,19 +245,154 @@
         setTimeout(function () {
             roulette.style.cssText = '';
             style.remove();
+
+            try {
+                settleRouletteBets(winningNumber);
+            } catch (e) {
+                console.error('Erreur de règlement des mises roulette:', e);
+            }
+
+            if (buttonSpin) {
+                buttonSpin.disabled = false;
+            }
         }, 10000);
 
     }
 
+    function isRed(num) {
+        const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        return redNumbers.includes(num);
+    }
+
+    function payoutMultiplier(betCase, winningNumber, parentElement) {
+        const s = String(betCase).trim();
+        const isColumnCell = !!(parentElement && parentElement.classList.contains('rightSideItem'));
+
+        // 2:1 bet
+        if (isColumnCell) {
+            let col = 0;
+            if (s.startsWith('col')) {
+                col = parseInt(s.slice(3), 10);
+            } else {
+                col = parseInt(s, 10);
+            }
+            if ([1, 2, 3].includes(col)) {
+                const inColumn = winningNumber !== 0 && ((winningNumber - col) % 3 === 0);
+                return inColumn ? 3 : 0;
+            }
+            return 0;
+        }
+
+        // Num bet
+        if (s !== '') {
+            const n = Number(s);
+            if (Number.isInteger(n) && String(n) === s && n >= 0 && n <= 36) {
+                return n === winningNumber ? 36 : 0;
+            }
+        }
+
+        // Gap bet
+        if (s.includes(' et ')) {
+            const [aStr, bStr] = s.split(' et ').map((v) => parseInt(v, 10));
+            if ([aStr, bStr].includes(winningNumber)) {
+                return 18; // 17:1 profit, 18 with stake
+            }
+            return 0;
+        }
+
+        // 1 a 18 bet
+        if (s === '1-18') {
+            return (winningNumber >= 1 && winningNumber <= 18) ? 2 : 0;
+        }
+        // 19 a 36 bet
+        if (s === '19-36') {
+            return (winningNumber >= 19 && winningNumber <= 36) ? 2 : 0;
+        }
+
+        // Douzaine bet
+        if (s === '1-12' || s === '13-24' || s === '25-36') {
+            const [minStr, maxStr] = s.split('-');
+            const min = parseInt(minStr, 10);
+            const max = parseInt(maxStr, 10);
+            return (winningNumber >= min && winningNumber <= max) ? 3 : 0;
+        }
+
+        // Rouge, Noir, Pair Impair bet
+        switch (s) {
+            case 'p':
+                return (winningNumber !== 0 && winningNumber % 2 === 0) ? 2 : 0;
+            case 'i':
+                return (winningNumber % 2 === 1) ? 2 : 0;
+            case 'r':
+                return (winningNumber !== 0 && isRed(winningNumber)) ? 2 : 0;
+            case 'n':
+                return (winningNumber !== 0 && !isRed(winningNumber)) ? 2 : 0;
+        }
+
+        return 0;
+    }
+
+    function settleRouletteBets(winningNumber) {
+        const tokens = document.querySelectorAll('.rouletteToken');
+        if (!tokens.length) {
+            if (window.Balance && typeof window.Balance.ajouterMontantJSON === 'function') {
+                window.Balance.ajouterMontantJSON();
+            }
+            return;
+        }
+
+        let totalPayout = 0;
+
+        tokens.forEach(token => {
+            const stake = parseInt(token.textContent, 10) || 0;
+            const parent = token.parentElement;
+            if (!stake || !parent) return;
+            const betDescriptor = String(parent.dataset.cases || '').trim();
+            const multiplier = payoutMultiplier(betDescriptor, winningNumber, parent);
+            if (multiplier > 0) {
+                totalPayout += stake * multiplier;
+                // Optional: visual cue for win
+                parent.classList.add('roulette-win');
+                setTimeout(() => parent.classList.remove('roulette-win'), 1500);
+            }
+        });
+
+        if (window.Balance && totalPayout > 0) {
+            window.Balance.gain(totalPayout, { persist: false });
+        }
+
+        document.querySelectorAll('.rouletteToken').forEach(t => t.remove());
+
+        tokenPlaced = false;
+        const buttonSpin = document.getElementById('buttonSpin');
+        if (buttonSpin) buttonSpin.hidden = true;
+
+        if (window.Balance && typeof window.Balance.ajouterMontantJSON === 'function') {
+            window.Balance.ajouterMontantJSON();
+        }
+    }
+
     initBettingMat();
     initRoulette();
-
-    const clickRoulette = document.querySelectorAll('.clickRoulette');
     const buttonSpin = document.getElementById('buttonSpin');
+    const clickRoulette = document.querySelectorAll('.clickRoulette');
     const wageButton = document.querySelectorAll('.tokenWage');
     wageButton[0].classList.add('tokenWageSelected');
     const clearMat = document.getElementById('clearMat');
+    function playToken() {
+        new Audio('/sounds/token.wav').play();
+    }
+    function playRoulette() {
+        new Audio('/sounds/roulette.wav').play();
+    }
     let tokenValue = 10;
+
+    if (window.Balance) {
+        window.Balance.init({
+            session: window.plinkoSession || window.gameSession || {},
+            displaySelectors: ['#roulette-balance'],
+        });
+    }
 
     buttonSpin.addEventListener('click', () => {
         resultSpin = Math.floor(Math.random() * 37);
@@ -247,12 +403,17 @@
         betClick.addEventListener('click', e => {
             const existingToken = betClick.querySelector('.rouletteToken');
 
+            if (!window.Balance.miser(tokenValue, { persist: false })) {
+                alert('Solde insuffisant.');
+                return;
+            }
+
             if (existingToken) {
                 const currentValue = parseInt(existingToken.textContent);
                 const newValue = currentValue + tokenValue;
+                playToken();
                 existingToken.textContent = newValue;
             } else {
-
                 const token = document.createElement('div');
                 token.classList.add('rouletteToken');
                 token.textContent = tokenValue;
@@ -263,7 +424,13 @@
 
                     if (currentValue > tokenValue) {
                         token.textContent = currentValue - tokenValue;
+                        if (window.Balance) {
+                            window.Balance.gain(tokenValue, { persist: false });
+                        }
                     } else {
+                        if (window.Balance) {
+                            window.Balance.gain(currentValue, { persist: false });
+                        }
                         token.remove();
                     }
 
@@ -273,6 +440,7 @@
                     }
                 });
 
+                playToken();
                 betClick.appendChild(token);
             }
 
@@ -293,9 +461,17 @@
 
     clearMat.addEventListener('click', () => {
         const tokens = document.querySelectorAll('.rouletteToken');
+        let totalRefund = 0;
+
         tokens.forEach(token => {
+            totalRefund += parseInt(token.textContent);
             token.remove();
         });
+
+        if (window.Balance && totalRefund > 0) {
+            window.Balance.gain(totalRefund, { persist: false });
+        }
+
         tokenPlaced = false;
         buttonSpin.hidden = true;
     });

@@ -244,6 +244,72 @@
   border-color: #ddd !important;
 }
 
+@media (max-width: 5000px) {
+  #react-navbar {
+    margin-right: 40% !important;
+    padding-left: 65% !important;
+  }
+
+  .pill-nav {
+    --nav-h: 50px;
+  }
+
+  .pill-list>li a,
+  .pill {
+    font-size: 1.30rem !important;
+    padding: 5px 10px !important;
+  }
+
+  .pill-logo {
+    width: 50px !important;
+    height: 50px !important;
+    padding: 6px !important;
+  }
+
+  .btn-search-toggle svg {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .pill-nav input.form-control {
+    font-size: 1rem !important;
+    padding: 4px 8px !important;
+  }
+}
+
+@media (max-width: 2560px) {
+  #react-navbar {
+    margin-right: 40% !important;
+    padding-left: 40% !important;
+  }
+
+  .pill-nav {
+    --nav-h: 50px;
+  }
+
+  .pill-list>li a,
+  .pill {
+    font-size: 1.25rem !important;
+    padding: 5px 10px !important;
+  }
+
+  .pill-logo {
+    width: 50px !important;
+    height: 50px !important;
+    padding: 6px !important;
+  }
+
+  .btn-search-toggle svg {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .pill-nav input.form-control {
+    font-size: 1rem !important;
+    padding: 4px 8px !important;
+  }
+}
+
 @media (max-width: 2000px) {
   #react-navbar {
     margin-right: 40% !important;
@@ -637,7 +703,7 @@
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
   #react-navbar {
     margin-left: 2% !important;
     margin-bottom: 10% !important;
@@ -646,6 +712,44 @@
     right: 0px !important;
     width: 0% !important;
     transform: scale(0.85);
+    transform-origin: center;
+  }
+
+  .pill-nav {
+    --nav-h: 35px;
+  }
+
+  .pill-list>li a,
+  .pill {
+    font-size: 0.65rem !important;
+    padding: 2px 4px !important;
+  }
+
+  .pill-logo {
+    width: 45px !important;
+    height: 45px !important;
+    padding: 3px !important;
+  }
+
+  .btn-search-toggle svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  .pill-nav input.form-control {
+    font-size: 0.70rem !important;
+    padding: 1px 4px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  #react-navbar {
+    margin-left: 2% !important;
+    margin-bottom: 10% !important;
+    position: relative;
+    bottom: 5px !important;
+    right: 0px !important;
+    width: 0% !important;
     transform-origin: center;
   }
 
