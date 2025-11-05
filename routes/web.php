@@ -29,6 +29,7 @@ Route::get('game/plinko', [GameController::class, 'plinko']);
 Route::get('game/mines', [GameController::class, 'mines']);
 Route::get('game/chicken-road', [GameController::class, 'chickenRoad']);
 Route::get('game/roulette', [GameController::class, 'roulette']);
+Route::get('game/slot-machine', [GameController::class, 'slotMachine']);
 Route::get('game/crash', [GameController::class, 'crash']);
 Route::get('game/coinflip',[GameController::class, 'coinflip']);
 Route::get('game/poker', [GameController::class, 'poker']);
@@ -51,4 +52,3 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 Route::post('admin/fixPoints', [AdminController::class, 'fixPoints']);
 Route::post('admin/toggleBan', [AdminController::class, 'toggleBan']);
 Route::post('admin/toggleAdmin', [AdminController::class, 'toggleAdmin']);
-

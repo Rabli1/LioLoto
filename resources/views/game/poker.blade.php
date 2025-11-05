@@ -17,6 +17,8 @@
             <section id="gameMat" class="p-3 rounded bg-dark text-center">
                 @if(session()->has('user'))
                     <button class="btn btn-danger" id="join-button">Rejoindre</button>
+                    <button class="btn btn-danger" id="quit-button">Quitter</button>
+
                 @else
                     <a href="{{ url('/user/connection') }}" class="btn btn-danger">Connectez-vous pour rejoindre</a>
                 @endif
@@ -35,6 +37,7 @@
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                 </div>
+                                <div class="hand-name fw-bold"></div>
                             </div>
                         </th>
                         <th class="playerSeat">
@@ -48,6 +51,7 @@
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                 </div>
+                                <div class="hand-name fw-bold"></div>
                             </div>
                         </th>
                         <th></th>
@@ -64,6 +68,7 @@
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                 </div>
+                                <div class="hand-name fw-bold"></div>
                             </div>
                         </th>
                         <th id="poker-center" colspan="2">
@@ -76,6 +81,7 @@
                                     <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
                                 </div>
+                                <div class="hand-name"></div>
                             </div>
 
                         </th>
@@ -90,6 +96,7 @@
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                 </div>
+                                <div class="hand-name fw-bold"></div>
                             </div>
                         </th>
                     </tr>
@@ -106,6 +113,7 @@
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                 </div>
+                                <div class="hand-name fw-bold"></div>
                             </div>
                         </th>
                         <th class="playerSeat">
@@ -119,6 +127,7 @@
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                     <img src="{{ asset('img/cards/BACK.png') }}" class="img-fluid" alt="Card">
                                 </div>
+                                <div class="hand-name fw-bold"></div>
                             </div>
                         </th>
                         <th></th>
@@ -128,6 +137,11 @@
             <div id="bet-section" class="text-white p-4 rounded shadow-sm">
                 <h4 class="text-center mb-1">Placez votre mise</h4>
                 <div id="required-call">(200 pour call)</div>
+                <div class="progress">
+                    <div class="progress-bar bg-danger" role="progressbar"
+                        style="width: 0%;">
+                    </div>
+                </div>
                 <div id="poker-error" class="text-danger mb-2"></div>
                 <div class="row align-items-center mb-4">
                     <div class="col-md-4 mb-3 mb-md-0">
