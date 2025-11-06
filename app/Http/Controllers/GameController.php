@@ -148,6 +148,19 @@ class GameController extends Controller
     public function getPokerState(): JsonResponse
     {
         $state = json_decode(@file_get_contents(base_path(self::POKER_STATE_PATH)), true) ?? [];
+        $userId = session('user')->id;
+
+        if (!empty($userId)) {
+            foreach ($state['players'] as &$player) {
+                if ($player['id'] === $userId || $state['roundStep'] === 'showdown') {
+                    $player['cards'] = array_map(function ($card) {
+                        return $this->gameServices->Decrypt($card);
+                    }, $player['cards']);
+                }
+            }
+            unset($player);
+        }
+
         return response()->json([
             'gameState' => $state
         ]);
@@ -168,22 +181,44 @@ class GameController extends Controller
         if (!empty($playerInQueue) || !empty($playersInGame)) {
             return;
         }
-        $players[] = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'balance' => $user->points,
-            'profileImage' => $user->profileImage,
-            'profileColor' => $user->profileColor,
-            'currentBet' => 0,
-            'isAllIn' => false,
-            'hasFolded' => false,
-            'hasPlayed' => false,
-            "hasWon" => false,
-            'toKick' => false,
-            'hand' => "",
-            'cards' => [],
-        ];
-        $state['queue'] = $players;
+        if ($state['roundStep'] === 'waiting') {
+            $state['players'][] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'balance' => $user->points,
+                'profileImage' => $user->profileImage,
+                'profileColor' => $user->profileColor,
+                'currentBet' => 0,
+                'isAllIn' => false,
+                'hasFolded' => false,
+                'hasPlayed' => false,
+                "hasWon" => false,
+                'toKick' => false,
+                'hand' => "",
+                'cards' => [],
+            ];
+        } else {
+            $players[] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'balance' => $user->points,
+                'profileImage' => $user->profileImage,
+                'profileColor' => $user->profileColor,
+                'currentBet' => 0,
+                'isAllIn' => false,
+                'hasFolded' => false,
+                'hasPlayed' => false,
+                "hasWon" => false,
+                'toKick' => false,
+                'hand' => "",
+                'cards' => [],
+            ];
+            $state['queue'] = $players;
+        }
+        if ($state['roundStep'] === 'waiting' && count($state['players']) > 1) {
+            file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $this->initRound();
+        }
 
         file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
@@ -247,7 +282,7 @@ class GameController extends Controller
             'game' => $validated['game'] ?? null,
         ]);
     }
-    public function initRound(Request $request): JsonResponse
+    public function initRound(): JsonResponse
     {
         $pokerPath = base_path(self::POKER_STATE_PATH);
         $state = json_decode(@file_get_contents($pokerPath), true) ?? [];
@@ -270,6 +305,10 @@ class GameController extends Controller
             }
         }
         $playerCount = count($state['players']);
+        if ($playerCount < 2) {
+            $state['roundStep'] = 'waiting';
+            return response()->json(['success' => false, 'message' => 'Not enough players to start the round.']);
+        }
 
         //build deck
         $values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -278,7 +317,7 @@ class GameController extends Controller
 
         foreach ($suits as $suit) {
             foreach ($values as $value) {
-                $deck[] = "{$value}-{$suit}";
+                $deck[] = $this->gameServices->Encrypt("{$value}-{$suit}");
             }
         }
         // Shuffle
@@ -434,15 +473,18 @@ class GameController extends Controller
             $state['requiredBet'] = 0;
             switch ($state['roundStep']) {
                 case 'flop':
-                    $state['communityCards'] = array_slice($state['deck'], 0, 3);
+                    $state['communityCards'] = array_map(
+                        fn($card) => $this->gameServices->Decrypt($card),
+                        array_slice($state['deck'], 0, 3)
+                    );
                     $state['deck'] = array_slice($state['deck'], 3);
                     break;
                 case 'turn':
-                    $state['communityCards'][] = $state['deck'][0];
+                    $state['communityCards'][] = $this->gameServices->Decrypt($state['deck'][0]);
                     $state['deck'] = array_slice($state['deck'], 1);
                     break;
                 case 'river':
-                    $state['communityCards'][] = $state['deck'][0];
+                    $state['communityCards'][] = $this->gameServices->Decrypt($state['deck'][0]);
                     $state['deck'] = array_slice($state['deck'], 1);
                     break;
                 case 'showdown':
@@ -454,7 +496,6 @@ class GameController extends Controller
                 $player['currentBet'] = 0;
                 $player['hasPlayed'] = false;
             }
-
         }
         file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
@@ -640,7 +681,7 @@ class GameController extends Controller
                 $highStraight = $getStraightHigh($flushUnique);
                 if ($highStraight == 14 && min($flushUnique) == 10)
                     return "Quinte Flush Royale";
-                return "Quinte Flush";
+                return "Quinte Flush, " . $highStraight;
             }
         }
         $group4val = null;
@@ -668,11 +709,11 @@ class GameController extends Controller
             array_shift($group2val);
         }
         if ($group4val)
-            return "Carrée";
+            return "Carrée," . $group4val;
         if ($group3val && $group2val)
             return "Full House," . $group3val . ',' . $group2val[count($group2val) - 1];
         if ($flushSuit)
-            return "Flush";
+            return "Flush," . $flushVals[4] . ',' . $flushVals[3] . ',' . $flushVals[2] . ',' . $flushVals[1] . ',' . $flushVals[0];
         if ($isStraight)
             return 'Quinte,' . $straightHigh;
         if ($group3val)

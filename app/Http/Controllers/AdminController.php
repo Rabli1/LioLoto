@@ -28,6 +28,7 @@ class AdminController extends Controller
     }
     public function fixPoints(Request $request):RedirectResponse
     {
+        $this->userService->redirectIfNotAdmin();
         $userId = (int) $request->input('userId');
         $newPoints = (int) $request->input('points');
         $path = base_path(self::USERS_PATH);
@@ -42,6 +43,7 @@ class AdminController extends Controller
     }
     public function toggleBan(Request $request): RedirectResponse
     {
+        $this->userService->redirectIfNotAdmin();
         $userId = (int) $request->input('userId');
         $action = $request->input('action');
         $path = base_path(self::USERS_PATH);
@@ -61,6 +63,7 @@ class AdminController extends Controller
     }
     public function toggleAdmin(Request $request): RedirectResponse
     {
+        $this->userService->redirectIfNotAdmin();
         $userId = (int) $request->input('userId');
         $action = $request->input('action');
         $path = base_path(self::USERS_PATH);
