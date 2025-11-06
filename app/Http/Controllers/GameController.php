@@ -123,6 +123,16 @@ class GameController extends Controller
             'playerBalance' => $balance,
         ]);
     }
+
+    public function slotMachine(): View
+    {
+        $player = $this->resolvePlayer();
+        $balance = $player?->points ?? 0;
+
+        return view('game.slot-machine', [
+            'playerBalance' => $balance,
+        ]);
+    }
     public function crash(): View
     {
         $balance = 0;

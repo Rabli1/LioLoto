@@ -67,6 +67,16 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/slot/card.svg") }}'
+                            alt="Slot Machine"></div>
+                    <div class="row">
+                        <h3>Slot Machine</h3>
+                    </div>
+                    <div class="row"><a href="/game/slot-machine" class="btn btn-danger btn-md">Jouer</a></div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
                     <div class="row"><img style="height: 210px;" src='{{ asset("img/crash.png") }}' alt="Crash"></div>
                     <div class="row">
                         <h3>Crash</h3>

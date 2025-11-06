@@ -79,6 +79,12 @@
         endpoints: { saveBalance: '{{ url('game/balance') }}' },
         csrfToken: '{{ csrf_token() }}'
     };
+    window.soundAssets = {
+        bjWin: '{{ asset('sounds/bjWin.wav') }}',
+        normalWin: '{{ asset('sounds/normalWin.wav') }}',
+        tieGame: '{{ asset('sounds/tieGame.mp3') }}',
+        bjLose: '{{ asset('sounds/rouletteLose.mp3') }}',
+    };
 </script>
 <script defer src="{{ asset('js/blackjack_balance.js') }}"></script>
 <script defer src="{{ asset('js/blackjack.js') }}"></script>

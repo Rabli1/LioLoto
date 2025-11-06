@@ -4,6 +4,203 @@
     let tokenPlaced = false;
     let resultSpin;
 
+    function createAudioToolkit() {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) {
+            return {
+                resume() { },
+            };
+        }
+
+        let context = null;
+
+        function ensureContext() {
+            if (!context) {
+                context = new AudioContextClass();
+            }
+            return context;
+        }
+
+        function resume() {
+            const ctx = ensureContext();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+        }
+
+        let rouletteSoundBase = null;
+
+        function getRouletteSound() {
+            if (!rouletteSoundBase) {
+                const soundUrl = window.soundAssets?.roulette || '../sounds/roulette.wav';
+                rouletteSoundBase = new Audio(soundUrl);
+                rouletteSoundBase.preload = 'auto';
+                rouletteSoundBase.volume = 0.5;
+                rouletteSoundBase.load();
+            }
+            return rouletteSoundBase;
+        }
+
+        function playRouletteSound() {
+            const base = getRouletteSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let rouletteWinSoundBase = null;
+
+        function getRouletteWinSound() {
+            if (!rouletteWinSoundBase) {
+                const soundUrl = window.soundAssets?.rouletteWin || '../sounds/rouletteWin.wav';
+                rouletteWinSoundBase = new Audio(soundUrl);
+                rouletteWinSoundBase.preload = 'auto';
+                rouletteWinSoundBase.volume = 0.5;
+                rouletteWinSoundBase.load();
+            }
+            return rouletteWinSoundBase;
+        }
+
+        function playRouletteWinSound() {
+            const base = getRouletteWinSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let rouletteLoseSoundBase = null;
+
+        function getRouletteLoseSound() {
+            if (!rouletteLoseSoundBase) {
+                const soundUrl = window.soundAssets?.rouletteLose || '../sounds/rouletteLose.mp3';
+                rouletteLoseSoundBase = new Audio(soundUrl);
+                rouletteLoseSoundBase.preload = 'auto';
+                rouletteLoseSoundBase.volume = 0.5;
+                rouletteLoseSoundBase.load();
+            }
+            return rouletteLoseSoundBase;
+        }
+
+        function playRouletteLoseSound() {
+            const base = getRouletteLoseSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+
+        let tokenSoundBase = null;
+
+        function getTokenSound() {
+            if (!tokenSoundBase) {
+                const soundUrl = window.soundAssets?.token || '../sounds/token.mp3';
+                tokenSoundBase = new Audio(soundUrl);
+                tokenSoundBase.preload = 'auto';
+                tokenSoundBase.volume = 0.5;
+                tokenSoundBase.load();
+            }
+            return tokenSoundBase;
+        }
+
+        function playTokenSound() {
+            const base = getTokenSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        return {
+            resume,
+            playRouletteSound,
+            playTokenSound,
+            playRouletteWinSound,
+            playRouletteLoseSound,
+            preloadSounds() {
+                getRouletteSound();
+                getTokenSound();
+                getRouletteWinSound();
+                getRouletteLoseSound();
+            }
+        };
+    }
+
+    const audio = createAudioToolkit();
+
+    audio.preloadSounds();
+
 
     function initBettingMat() {
         const bettingMat = document.getElementById('bettingMat');
@@ -219,7 +416,8 @@
             buttonSpin.disabled = true;
         }
 
-        playRoulette();
+        audio.resume();
+        audio.playRouletteSound();
 
         for (let i = 0; i < rouletteNumbers.length; i++) {
             if (rouletteNumbers[i] == winningNumber) {
@@ -342,20 +540,50 @@
         }
 
         let totalPayout = 0;
+        let totalBet = 0;
+        let hasWin = false;
 
         tokens.forEach(token => {
             const stake = parseInt(token.textContent, 10) || 0;
+            totalBet += stake;
             const parent = token.parentElement;
             if (!stake || !parent) return;
             const betDescriptor = String(parent.dataset.cases || '').trim();
             const multiplier = payoutMultiplier(betDescriptor, winningNumber, parent);
             if (multiplier > 0) {
                 totalPayout += stake * multiplier;
-                // Optional: visual cue for win
-                parent.classList.add('roulette-win');
-                setTimeout(() => parent.classList.remove('roulette-win'), 1500);
+                hasWin = true;
+                parent.classList.add('winnerBet');
             }
         });
+
+        const container = document.getElementById('endContainer');
+        const endAmount = document.getElementById('endAmount');
+        const winnerBet = document.querySelectorAll('.winnerBet');
+
+        if (container && endAmount) {
+            if (hasWin) {
+                audio.resume();
+                audio.playRouletteWinSound();
+                container.classList.add('roulette-win');
+                endAmount.classList.add('winAmount');
+                winnerBet.forEach(winner => {winner.classList.add('winnerBox');});
+                endAmount.textContent = `+${totalPayout}$`;
+            } else {
+                audio.resume();
+                audio.playRouletteLoseSound();
+                container.classList.add('roulette-lose');
+                endAmount.classList.add('loseAmount');
+                endAmount.textContent = `-${totalBet}$`;
+            }
+
+            setTimeout(() => {
+                container.classList.remove('roulette-win', 'roulette-lose');
+                endAmount.classList.remove('winAmount', 'loseAmount');
+                winnerBet.forEach(winner => {winner.classList.remove('winnerBox','winnerBet');});
+                endAmount.textContent = '';
+            }, 2500);
+        }
 
         if (window.Balance && totalPayout > 0) {
             window.Balance.gain(totalPayout, { persist: false });
@@ -379,17 +607,11 @@
     const wageButton = document.querySelectorAll('.tokenWage');
     wageButton[0].classList.add('tokenWageSelected');
     const clearMat = document.getElementById('clearMat');
-    function playToken() {
-        new Audio('/sounds/token.wav').play();
-    }
-    function playRoulette() {
-        new Audio('/sounds/roulette.wav').play();
-    }
     let tokenValue = 10;
 
     if (window.Balance) {
         window.Balance.init({
-            session: window.plinkoSession || window.gameSession || {},
+            session: window.rouletteSession || window.gameSession || {},
             displaySelectors: ['#roulette-balance'],
         });
     }
@@ -411,7 +633,8 @@
             if (existingToken) {
                 const currentValue = parseInt(existingToken.textContent);
                 const newValue = currentValue + tokenValue;
-                playToken();
+                audio.resume();
+                audio.playTokenSound();
                 existingToken.textContent = newValue;
             } else {
                 const token = document.createElement('div');
@@ -440,7 +663,8 @@
                     }
                 });
 
-                playToken();
+                audio.resume();
+                audio.playTokenSound();
                 betClick.appendChild(token);
             }
 
