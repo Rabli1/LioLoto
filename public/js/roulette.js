@@ -553,11 +553,13 @@
             if (multiplier > 0) {
                 totalPayout += stake * multiplier;
                 hasWin = true;
+                parent.classList.add('winnerBet');
             }
         });
 
         const container = document.getElementById('endContainer');
         const endAmount = document.getElementById('endAmount');
+        const winnerBet = document.querySelectorAll('.winnerBet');
 
         if (container && endAmount) {
             if (hasWin) {
@@ -565,6 +567,7 @@
                 audio.playRouletteWinSound();
                 container.classList.add('roulette-win');
                 endAmount.classList.add('winAmount');
+                winnerBet.forEach(winner => {winner.classList.add('winnerBox');});
                 endAmount.textContent = `+${totalPayout}$`;
             } else {
                 audio.resume();
@@ -577,6 +580,7 @@
             setTimeout(() => {
                 container.classList.remove('roulette-win', 'roulette-lose');
                 endAmount.classList.remove('winAmount', 'loseAmount');
+                winnerBet.forEach(winner => {winner.classList.remove('winnerBox','winnerBet');});
                 endAmount.textContent = '';
             }, 2500);
         }
@@ -607,7 +611,7 @@
 
     if (window.Balance) {
         window.Balance.init({
-            session: window.plinkoSession || window.gameSession || {},
+            session: window.rouletteSession || window.gameSession || {},
             displaySelectors: ['#roulette-balance'],
         });
     }

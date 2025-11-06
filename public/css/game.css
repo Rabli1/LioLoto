@@ -359,7 +359,6 @@
     grid-row: 2 / 7;
     grid-column: 1;
     background-color: rgb(46, 111, 64, 0.8);
-    /* background-color: rgb(255, 255, 255, 0.20); */
 }
 
 .topItem {
@@ -376,7 +375,6 @@
 
 .gap {
     position: relative;
-    /*opacity: 0;*/
     border: 2px solid white;
 }
 
@@ -806,6 +804,10 @@
     font-weight: bolder;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     z-index: 1001;
+}
+
+#bettingMat > div.winnerBox{
+    border: 2px solid rgb(0, 223, 0, 1) !important;
 }
 
 @keyframes wheelRotate {
