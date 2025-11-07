@@ -20,6 +20,7 @@ const timeProgressBar = $(".progress-bar")
 const intervalTime = 2 * 1000;
 const turnTime = 15 * 1000;
 let turnStart = Date.now();
+let betNotPlaced = true;
 let gameState = {};
 let currentEtag = "";
 const csrfToken = window.gameSession.csrfToken;
@@ -265,6 +266,7 @@ function initRound() {
 
 function placeBet(bet) {
     pokerError.text("");
+    betNotPlaced = false;
     $.ajax({
         url: '/game/placeBet',
         method: 'POST',
@@ -286,21 +288,20 @@ function placeBet(bet) {
 async function startCountDown() {
     const duration = turnTime;
     const start = Date.now();
-    
-    while (true) {
+    betNotPlaced = true;
+    while (betNotPlaced) {
         const elapsed = Date.now() - start;
         if (elapsed > duration) break;
-        
+
         const progress = (elapsed / duration) * 100;
         timeProgressBar.css("width", `${progress}%`);
         await sleep(50);
     }
-
-    const currentPlayer = gameState?.players?.[gameState.playersTurn];
-    if (currentPlayer?.id) {
-        quitGame(currentPlayer.id, true);
-    } else {
-        console.warn('startCountDown: no current player to kick (playerId missing)');
+    if (betNotPlaced) {
+        const currentPlayer = gameState?.players?.[gameState.playersTurn];
+        if (currentPlayer?.id) {
+            //quitGame(currentPlayer.id, true);
+        }
     }
 }
 startRefreshInterval();
