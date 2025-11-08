@@ -36,6 +36,7 @@ Route::get('game/poker', [GameController::class, 'poker']);
 Route::get('game/wordle', [GameController::class, 'wordle']);
 Route::get('/game/wordle/word', [GameController::class, 'wordleWord']);
 Route::get('/game/wordle/check', [GameController::class, 'checkWord']);
+Route::get('/game/wordle/list', [GameController::class, 'getWordListForClient']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);

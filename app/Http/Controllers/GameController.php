@@ -775,21 +775,23 @@ class GameController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function wordleWord(): JsonResponse
+    public function getWordListForClient(): JsonResponse
     {
-        // Générer un mot secret stocké en session (invisible au client)
-        $wordsFile = storage_path('app/json/wordle.json');
-        $words = json_decode(file_get_contents($wordsFile), true);
+        $words = $this->getWordList();
 
-        $randomWord = strtoupper($words[array_rand($words)]);
-
-        // Stocker le mot en SESSION (pas renvoyé au client)
-        session(['wordle_secret' => $randomWord]);
-
-        // Renvoyer seulement une confirmation
-        return response()->json(['ready' => true]);
+            // Affiche que la cache est valide pendant 1000 sec. Jai tu vraiment de faire ca? idk mais je le garde la parce que je pense quon le faisait avec chourot
+        return response()->json($words)
+            ->header('Cache-Control', 'public, max-age=1000')
+            ->header('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 1000));
     }
 
+    private function getWordList(): array
+    {
+        return Cache::remember('wordle_words', 1000, function () { //temps de vie  de la cache 1000 sec
+            $wordsFile = storage_path('app/json/wordle.json');
+            return array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
+        });
+    }
     public function checkWord(Request $request): JsonResponse
     {
         $request->validate([
@@ -803,15 +805,6 @@ class GameController extends Controller
             return response()->json(['error' => 'No game in progress'], 400);
         }
 
-        // Vérifier si le mot existe dans le dictionnaire
-        $wordsFile = storage_path('app/json/wordle.json');
-        $words = array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
-
-        if (!in_array($inputWord, $words)) {
-            return response()->json(['valid' => false]);
-        }
-
-        // Calculer les couleurs des lettres
         $result = [];
         $secretLetters = str_split($secretWord);
         $inputLetters = str_split($inputWord);
@@ -833,12 +826,13 @@ class GameController extends Controller
         ]);
     }
 
-
-    private function getWordList(): array
+        public function wordleWord(): JsonResponse
     {
-        return Cache::remember('wordle_words', 3600, function () {
-            $wordsFile = storage_path('app/json/wordle.json');
-            return array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
-        });
+        $words = $this->getWordList();
+        $randomWord = $words[array_rand($words)];
+
+        session(['wordle_secret' => $randomWord]);
+
+        return response()->json(['ready' => true]);
     }
 }

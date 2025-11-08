@@ -101,3 +101,40 @@ header {
 .spacer-half {
   flex-grow: 0.5;
 }
+
+.keyboard-row button.key-correct {
+    background-color: rgb(83, 141, 78) !important;
+    border-color: rgb(83, 141, 78) !important;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.keyboard-row button.key-present {
+    background-color: rgb(181, 159, 59) !important;
+    border-color: rgb(181, 159, 59) !important;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.keyboard-row button.key-absent {
+    background-color: rgb(58, 58, 60) !important;
+    border-color: rgb(58, 58, 60) !important;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.keyboard-row button {
+    transition: all 0.3s ease;
+}
+
+.keyboard-row button.key-correct:hover {
+    background-color: rgb(93, 151, 88) !important;
+}
+
+.keyboard-row button.key-present:hover {
+    background-color: rgb(191, 169, 69) !important;
+}
+
+.keyboard-row button.key-absent:hover {
+    background-color: rgb(68, 68, 70) !important;
+}
