@@ -19,17 +19,108 @@ let xValues = [];
 
 cachOutBtn.prop("disabled", true);
 
-function playCashout() {
-  const audio = new Audio('/sounds/cashout.mp3');
-  audio.load();
-  audio.play();
+function createAudioToolkit() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    return {
+      resume() { },
+    };
+  }
+
+  let context = null;
+
+  function ensureContext() {
+    if (!context) {
+      context = new AudioContextClass();
+    }
+    return context;
+  }
+
+  function resume() {
+    const ctx = ensureContext();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+  }
+
+  let cashoutSoundBase = null;
+
+  function getCashoutSound() {
+    if (!cashoutSoundBase) {
+      cashoutSoundBase = new Audio('/sounds/cashout.mp3');
+      cashoutSoundBase.preload = 'auto';
+      cashoutSoundBase.volume = 0.5;
+    }
+    return cashoutSoundBase;
+  }
+
+  function playCashoutSound() {
+    const base = getCashoutSound();
+    if (!base) return;
+
+    const play = (audioNode) => {
+      audioNode.currentTime = 0;
+      const promise = audioNode.play();
+      if (promise && typeof promise.catch === 'function') {
+        promise.catch(() => { });
+      }
+    };
+
+    if (base.paused) {
+      play(base);
+    } else {
+      const clone = base.cloneNode(true);
+      clone.volume = base.volume;
+      play(clone);
+    }
+  }
+
+  let crashSoundBase = null;
+
+  function getCrashSound() {
+    if (!crashSoundBase) {
+      crashSoundBase = new Audio('/sounds/explosion.mp3');
+      crashSoundBase.preload = 'auto';
+      crashSoundBase.volume = 0.5;
+    }
+    return crashSoundBase;
+  }
+
+  function playCrashSound() {
+    const base = getCrashSound();
+    if (!base) return;
+
+    const play = (audioNode) => {
+      audioNode.currentTime = 0;
+      const promise = audioNode.play();
+      if (promise && typeof promise.catch === 'function') {
+        promise.catch(() => { });
+      }
+    };
+
+    if (base.paused) {
+      play(base);
+    } else {
+      const clone = base.cloneNode(true);
+      clone.volume = base.volume;
+      play(clone);
+    }
+  }
+
+  return {
+    resume,
+    playCashoutSound,
+    playCrashSound,
+    preloadSounds() {
+      getCashoutSound();
+      getCrashSound();
+    }
+  };
 }
 
-function playCrash() {
-  const audio = new Audio('/sounds/explosion.mp3');
-  audio.volume = 0.5;
-  audio.play();
-}
+const audio = createAudioToolkit();
+audio.preloadSounds();
 
 for (let x = 0; x < 10; x += 0.1) {
   xValues.push(x);
@@ -105,7 +196,7 @@ async function animateGame() {
 
     if (autoCashout) {
       if (cashOut < value) {
-        playCashout();
+        audio.playCashoutSound();
         console.log(value + " " + cashOut);
         const win = parseInt(cashOut * betAmount);
         winMessage.text(`${cashOut}x -> ${win} gagné`)
@@ -147,7 +238,7 @@ async function animateGame() {
     await sleep(sleepTime);
   }
 
-  playCrash();
+  audio.playCrashSound();
   multiplier.addClass("text-danger");
   let list = lastCrash.find('div');
   if (list.length > 10) {
@@ -174,7 +265,7 @@ playBtn.on("click", async function () {
 });
 
 cachOutBtn.on("click", function () {
-  playCashout();
+  audio.playCashoutSound();
   window.gameSession.balance = Number(window.gameSession.balance);
   cachOutBtn.prop('disabled', true);
   const balance = parseInt(value * betAmount);

@@ -180,6 +180,27 @@ Plinko.prototype.show = function () {
     }
 
     function onBouleTerminee(mise, multiplicateur) {
+        if (multiplicateur <= 1) {
+            audio.resume();
+            audio.playBallBadCashSound();
+        }
+
+        else if (multiplicateur > 1 && multiplicateur <= 12) {
+            audio.resume();
+            audio.playBallCashSound();
+        }
+
+        else if (multiplicateur > 5 && multiplicateur <= 90) {
+            audio.resume();
+            audio.playBallGoodCashSound();
+        }
+
+        else{
+            audio.resume();
+            audio.playBallBestCashSound();
+        }
+
+
         const gain = mise * multiplicateur;
         ajouterStat(mise, multiplicateur, gain);
     }

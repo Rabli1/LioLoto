@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="diamondGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f9f2d6"/>
+      <stop offset="45%" stop-color="#f2d47a"/>
+      <stop offset="100%" stop-color="#d78b2a"/>
+    </linearGradient>
+    <linearGradient id="diamondStroke" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fdeac2"/>
+      <stop offset="100%" stop-color="#c3731d"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="100" height="100" rx="18" fill="rgba(0,0,0,0.18)" />
+  <polygon points="60 20 90 50 60 100 30 50" fill="url(#diamondGradient)" stroke="url(#diamondStroke)" stroke-width="4" stroke-linejoin="round"/>
+  <polyline points="60 20 50 50 60 100 70 50 60 20" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+</svg>

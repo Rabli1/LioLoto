@@ -16,6 +16,10 @@
 <main class="py-4">
     <div class="container">
         <section class="game-outline text-center">
+
+            <div id="endContainer"></div>
+            <div id="endAmount"></div>
+            
             <header class="mb-4">
                 <h1 class="mb-2">Roulette</h1>
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
@@ -53,6 +57,12 @@
         balance: {{ (int) $playerBalance }},
         endpoints: { saveBalance: '{{ url('game/balance') }}' },
         csrfToken: '{{ csrf_token() }}'
+    };
+    window.soundAssets = {
+        token: '{{ asset('sounds/token.mp3') }}',
+        roulette: '{{ asset('sounds/roulette.wav') }}',
+        rouletteWin: '{{ asset('sounds/rouletteWin.wav') }}',
+        rouletteLose: '{{ asset('sounds/rouletteLose.mp3') }}',
     };
 </script>
 <script defer src="{{ asset('js/roulette.js') }}"></script>

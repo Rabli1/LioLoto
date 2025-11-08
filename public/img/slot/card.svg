@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 240">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#221f3b"/>
+      <stop offset="100%" stop-color="#161616"/>
+    </linearGradient>
+    <linearGradient id="cardLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="360" height="240" rx="26" fill="url(#cardBg)"/>
+  <rect x="18" y="18" width="324" height="204" rx="22" fill="url(#cardLight)" stroke="rgba(255,255,255,0.04)" stroke-width="3"/>
+  <g transform="translate(75 40)">
+    <rect x="0" y="0" width="210" height="160" rx="24" fill="rgba(0,0,0,0.28)" stroke="rgba(255,255,255,0.08)" stroke-width="3"/>
+    <g transform="translate(36 26)">
+      <rect x="0" y="0" width="60" height="108" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+      <rect x="72" y="0" width="60" height="108" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+      <rect x="144" y="0" width="60" height="108" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+      <circle cx="30" cy="54" r="24" fill="#f25b71" stroke="#ff9aa7" stroke-width="4"/>
+      <path d="M72 12h48l-32 84h-16l28-58h-28z" fill="#f8d46a" stroke="#ffe09c" stroke-width="4" stroke-linejoin="round"/>
+      <rect x="156" y="44" width="36" height="28" rx="8" fill="#1f1f1f" stroke="#f5d36f" stroke-width="3"/>
+      <text x="174" y="60" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#f5d36f">BAR</text>
+    </g>
+  </g>
+  <text x="40" y="208" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#ffffff">Slot Machine</text>
+</svg>
