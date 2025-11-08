@@ -76,19 +76,11 @@ audio.preloadSounds();
 
 function Particle(x, y, r) {
     var options = {
-<<<<<<< HEAD
         restitution: 0.5, 
         friction: -0.0001, 
         label: "particle",
         collisionFilter: {
             group: -1 
-=======
-        restitution: 0.5,
-        friction: -0.0001,
-        label: "particle",
-        collisionFilter: {
-            group: -1
->>>>>>> 3c2514f55b98ba367079857abe65897cbd6dd402
         }
     };
 
