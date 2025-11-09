@@ -162,7 +162,7 @@ class GameController extends Controller
 
         if (!empty($userId)) {
             foreach ($state['players'] as &$player) {
-                if ($player['id'] === $userId || $state['roundStep'] === 'showdown') {
+                if ($player['id'] === $userId && $state['roundStep'] !== 'showdown') {
                     $player['cards'] = array_map(function ($card) {
                         return $this->gameServices->Decrypt($card);
                     }, $player['cards']);
@@ -228,6 +228,7 @@ class GameController extends Controller
         if ($state['roundStep'] === 'waiting' && count($state['players']) > 1) {
             file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             $this->initRound();
+            return;
         }
 
         file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -317,6 +318,7 @@ class GameController extends Controller
         $playerCount = count($state['players']);
         if ($playerCount < 2) {
             $state['roundStep'] = 'waiting';
+            file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             return response()->json(['success' => false, 'message' => 'Not enough players to start the round.']);
         }
 
@@ -327,7 +329,8 @@ class GameController extends Controller
 
         foreach ($suits as $suit) {
             foreach ($values as $value) {
-                $deck[] = $this->gameServices->Encrypt("{$value}-{$suit}");
+                $encyptedCard = $this->gameServices->Encrypt("{$value}-{$suit}");
+                $deck[] = $encyptedCard;
             }
         }
         // Shuffle
@@ -498,6 +501,11 @@ class GameController extends Controller
                     $state['deck'] = array_slice($state['deck'], 1);
                     break;
                 case 'showdown':
+                    foreach ($state['players'] as &$player) {
+                        $player['cards'] = array_map(function ($card) {
+                            return $this->gameServices->Decrypt($card);
+                        }, $player['cards']);
+                    }
                     $this->settleRound($state);
                     break;
             }
@@ -607,7 +615,6 @@ class GameController extends Controller
             'K' => 13,
             'A' => 14
         ];
-        // Flatten the nested array of cards
         $flatCards = [];
         foreach ($cards as $cardSet) {
             if (is_array($cardSet)) {
@@ -616,7 +623,7 @@ class GameController extends Controller
                 $flatCards[] = $cardSet;
             }
         }
-        // Parse ranks and suits
+
         $values = [];
         $suits = [];
         foreach ($flatCards as $card) {
@@ -632,7 +639,6 @@ class GameController extends Controller
         arsort($counts);
         $groups = array_values($counts);
 
-        // Detect flush
         $flushSuit = null;
         foreach ($suits as $suit => $vals) {
             if (count($vals) >= 5) {
@@ -643,11 +649,11 @@ class GameController extends Controller
             }
         }
 
-        // Helper inline functions
+
         $hasStraight = function (array $vals): bool {
             $vals = array_values(array_unique($vals));
             if (in_array(14, $vals))
-                $vals[] = 1; // Ace low
+                $vals[] = 1;
             sort($vals);
             $consec = 1;
             for ($i = 1; $i < count($vals); $i++) {
@@ -664,7 +670,7 @@ class GameController extends Controller
         $getStraightHigh = function (array $vals): ?int {
             $vals = array_values(array_unique($vals));
             if (in_array(14, $vals))
-                $vals[] = 1; // Ace low
+                $vals[] = 1; 
             sort($vals);
             $consec = 1;
             for ($i = 1; $i < count($vals); $i++) {
@@ -679,11 +685,9 @@ class GameController extends Controller
             return null;
         };
 
-        // Check for straight
         $isStraight = $hasStraight($values);
         $straightHigh = $isStraight ? $getStraightHigh($values) : null;
 
-        // Check for straight flush
         if ($flushSuit) {
             $flushUnique = array_values(array_unique($flushVals));
             sort($flushUnique);
@@ -737,17 +741,35 @@ class GameController extends Controller
 
     public function quitPoker(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'playerId' => 'required|integer',
-            'force' => 'nullable|boolean'
-        ]);
+        $data = [];
+        if ($request->isJson()) {
+            $data = $request->json()->all();
+        }
+        if (empty($data)) {
+            $raw = $request->getContent();
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                $data = $decoded;
+            }
+        }
+        if (empty($data)) {
+            $data = $request->all();
+        }
+
+        $playerId = isset($data['playerId']) ? (int) $data['playerId'] : null;
+        $force = !empty($data['force']);
+
+        if (!$playerId) {
+            return response()->json(['success' => false, 'message' => 'playerId missing'], 200);
+        }
+
         $path = base_path(self::POKER_STATE_PATH);
         $state = json_decode(@file_get_contents($path), true) ?? [];
 
         foreach ($state['players'] as &$player) {
-            if ($player['id'] === $validated['playerId']) {
+            if ($player['id'] === $playerId) {
                 $player['toKick'] = true;
-                if ($validated['force']) {
+                if ($force) {
                     $player['hasFolded'] = true;
                     $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
 
@@ -764,15 +786,16 @@ class GameController extends Controller
                             }
                         }
                     }
-                    break;
                 }
+                break;
             }
         }
+        unset($player);
 
         file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
         file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true], 200);
     }
 
     public function wordleWord(): JsonResponse

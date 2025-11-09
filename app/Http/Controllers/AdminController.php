@@ -11,13 +11,13 @@ use App\Models\User;
 class AdminController extends Controller
 {
     private const USERS_PATH = 'database/json/users.json';
-        private UserServices $userService;
+    private UserServices $userService;
 
     public function __construct(UserServices $userService)
     {
         $this->userService = $userService;
     }
-    public function dashboard(): View | RedirectResponse
+    public function dashboard(): View|RedirectResponse
     {
         $this->userService->redirectIfNotConnected();
         $this->userService->redirectIfNotAdmin();
@@ -26,7 +26,7 @@ class AdminController extends Controller
             'users' => $users,
         ]);
     }
-    public function fixPoints(Request $request):RedirectResponse
+    public function fixPoints(Request $request): RedirectResponse
     {
         $this->userService->redirectIfNotAdmin();
         $userId = (int) $request->input('userId');
@@ -79,6 +79,24 @@ class AdminController extends Controller
                 break;
             }
         }
+        return redirect('/admin/dashboard');
+    }
+    public function killPoker(Request $request): RedirectResponse
+    {
+        $this->userService->redirectIfNotAdmin();
+        $path = database_path('json/pokerState.json');
+        $initialState = [
+            "playersTurn" => 1,
+            "roundStep" => "waiting",
+            "communityCards" => [],
+            "pot" => 75,
+            "requiredBet" => 50,
+            "smallBlind" => 1,
+            "queue" => [],
+            "players" => [],
+            "deck" => []
+        ];
+        file_put_contents($path, json_encode($initialState));
         return redirect('/admin/dashboard');
     }
 }

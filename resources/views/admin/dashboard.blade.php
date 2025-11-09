@@ -9,6 +9,12 @@
 <div class="d-flex justify-content-center mt-3 mb-4">
     <input type="text" id="dashboardSearch" class="form-control w-25" placeholder="Rechercher par nom">
 </div>
+<div class="d-flex justify-content-center mb-4">
+    <form action="/admin/killPoker" method="post">
+        @csrf
+        <button type="submit" class="btn btn-danger">Réinitialiser poker</button>
+    </form>
+</div>
 
 <table class="table table-dark table-striped mt-3" id="usersTable">
     <thead>

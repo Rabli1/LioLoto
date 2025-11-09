@@ -75,11 +75,11 @@
                             <div class="d-flex flex-column align-items-center">
                                 <div id="pot" class="mb-2">pot : 2000</div>
                                 <div id="community-cards">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/A-H.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/K-H.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/Q-H.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/J-H.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/10-H.png') }}" class="img-fluid" alt="Card">
                                 </div>
                                 <div class="hand-name"></div>
                             </div>
