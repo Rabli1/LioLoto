@@ -38,6 +38,16 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/liotodle.png") }}' alt="Liotodle">
+                    </div>
+                    <div class="row">
+                        <h3>Liotodle</h3>
+                    </div>
+                    <div class="row"><a href="/game/wordle" class="btn btn-danger btn-md">Jouer</a></div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
                     <div class="row"><img style="height: 210px;" src='{{ asset("img/plinko.webp") }}' alt="Plinko">
                     </div>
                     <div class="row">
