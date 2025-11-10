@@ -19,6 +19,7 @@ const timeProgressBar = $(".progress-bar")
 
 const intervalTime = 2 * 1000;
 const turnTime = 15 * 1000;
+const RESTART_DELAY = 10000; // 10 seconds in milliseconds
 let turnStart = Date.now();
 let betNotPlaced = true;
 let gameState = {};
@@ -28,6 +29,7 @@ let deck = [];
 const roundSteps = ['pre-flop', 'flop', 'turn', 'river', 'showdown'];
 let currentRound = 0;
 let gameTerminated = false;
+let restartTimeout = null;
 
 
 joinButton.on('click', () => {
@@ -111,15 +113,38 @@ function updateUI() {
     let playersList = gameState.players;
     const potValue = Number(gameState.pot) || 0;
     pot.text(`Pot : ${potValue.toLocaleString('en-US').replace(/,/g, ' ')}`);
+    gameMessage.text("");
     if (gameState.players.length < 2) {
         gameMessage.text("En attente de joueurs pour démarrer la partie...");
         return;
     }
+    if (!gameTerminated && restartTimeout) {
+        clearTimeout(restartTimeout);
+        restartTimeout = null;
+    }
+
     let maxBet = Infinity;
     gameTerminated = false;
     if (gameState.roundStep === 'showdown') {
         gameTerminated = true;
+        
+        if (gameTerminated && !restartTimeout) {
+            let secondsLeft = RESTART_DELAY / 1000;
+            gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
+            
+            const countdownInterval = setInterval(() => {
+                secondsLeft--;
+                gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
+            }, 1000);
+
+            restartTimeout = setTimeout(() => {
+                clearInterval(countdownInterval);
+                gameMessage.text("Démarrage d'une nouvelle partie...");
+                initRound();
+            }, RESTART_DELAY);
+        }
     }
+
     playerSeats.each(function (index) {
         const seat = $(this);
         const playerData = playersList[index];
@@ -192,8 +217,8 @@ function updateUI() {
         betAmount.attr('max', maxBet);
         betRange.attr('min', callAmount);
         betAmount.attr('min', callAmount);
-        betRange.val(callAmount);
-        betAmount.val(callAmount);
+        betRange.val(Math.max(callAmount, 50));
+        betAmount.val(Math.max(callAmount, 50));
         timeProgressBar.css("width", "0%")
         startCountDown();
         betSection.show();
@@ -239,27 +264,33 @@ function quitGame(id, force) {
             if (!force) {
                 gameMessage.text("Vous allez quitter la table à la fin de cette manche");
             }
+            else{
+                joinButton.show();
+            }
         },
         error: function (xhr, status, error) {
-            if (xhr.status === 422 && xhr.responseJSON) {
-                console.error('Validation error quitting game:', xhr.responseJSON);
-            } else {
                 console.error('Error quitting game:', status, error, xhr.responseText);
-            }
         }
     });
 }
 
 function initRound() {
     gameTerminated = false;
+    if (restartTimeout) {
+        clearTimeout(restartTimeout);
+        restartTimeout = null;
+    }
+    
     $.ajax({
         url: '/game/initRound',
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrfToken },
         success: function (response) {
+            gameMessage.text("");
         },
         error: function (xhr, status, error) {
             console.error('Error initializing round:', error);
+            gameMessage.text("Erreur lors du démarrage de la partie");
         }
     });
 }
@@ -300,9 +331,27 @@ async function startCountDown() {
     if (betNotPlaced) {
         const currentPlayer = gameState?.players?.[gameState.playersTurn];
         if (currentPlayer?.id) {
-            //quitGame(currentPlayer.id, true);
+            quitGame(currentPlayer.id, true);
         }
     }
 }
+function handlePlayerExit() {
+    if (window.gameSession && window.gameSession.userId) {
+        navigator.sendBeacon(
+            "/game/quitPoker",
+            JSON.stringify({
+                playerId: Number(window.gameSession.userId),
+                force: true
+            })
+        );
+    }
+}
+window.addEventListener("beforeunload", handlePlayerExit);
+
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+        handlePlayerExit();
+    }
+});
+
 startRefreshInterval();
-initRound();

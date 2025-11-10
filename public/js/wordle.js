@@ -1,22 +1,36 @@
 document.addEventListener("DOMContentLoaded", () => {
     createSquares();
-    getNewWord();
 
     let guessedWords = [[]];
     let availableSpace = 1;
-
-    let word;
     let guessedWordCount = 0;
+    let isSubmitting = false;
+    let validWords = [];
+    let secretWord = '';
+    let keyboardState = {};
 
     const keys = document.querySelectorAll(".keyboard-row button");
 
-    function getNewWord() {
-    fetch("/game/wordle/word")
-        .then(res => res.json())
-        .then(data => {
-            console.log("Nouvelle partie initialisée");
-        });
-}
+    // tester ctrl+shift+s 
+    window.revealSecret = () => {
+        console.log("🔍 Mot secret:", secretWord);
+        alert("Mot secret: " + secretWord);
+        return secretWord;
+    };
+
+    async function initGame() {
+        try {
+            const wordsResponse = await fetch("/game/wordle/list");
+            const words = await wordsResponse.json();
+            validWords = words.map(w => w.toUpperCase());
+            
+            secretWord = validWords[Math.floor(Math.random() * validWords.length)];
+        } catch (error) {
+            console.error("Erreur lors de l'initialisation:", error);
+        }
+    }
+
+    initGame();
 
     function getCurrentWordArr() {
         const numberOfGuessedWords = guessedWords.length;
@@ -30,76 +44,135 @@ document.addEventListener("DOMContentLoaded", () => {
             currentWordArr.push(letter);
 
             const availableSpaceEl = document.getElementById(String(availableSpace));
-            availableSpace = availableSpace + 1;
-            availableSpaceEl.textContent = letter;
+            if (availableSpaceEl) {
+                availableSpace = availableSpace + 1;
+                availableSpaceEl.textContent = letter;
+            }
         }
     }
 
-    function getTileColor(letter, index) {
-        const isCorrectLetter = word.includes(letter);
-
-        if (!isCorrectLetter) {
-            return "rgb(58, 58, 60)";
+    function checkWordColors(guessWord, secretWord) {
+        const result = [];
+        const secretLetters = secretWord.split('');
+        const guessLetters = guessWord.split('');
+        
+        const secretUsed = new Array(5).fill(false);
+        const guessResult = new Array(5).fill('absent');
+        
+        //lettre verte (correcte)
+        for (let i = 0; i < 5; i++) {
+            if (guessLetters[i] === secretLetters[i]) {
+                guessResult[i] = 'correct';
+                secretUsed[i] = true;
+            }
         }
-
-        const letterInThatPosition = word.charAt(index);
-        const isCorrectPosition = letter === letterInThatPosition;
-
-        if (isCorrectPosition) {
-            return "rgb(83, 141, 78)";
+        
+        //lettre jaune (presente)
+        for (let i = 0; i < 5; i++) {
+            if (guessResult[i] === 'correct') continue;
+            
+            for (let j = 0; j < 5; j++) {
+                if (!secretUsed[j] && guessLetters[i] === secretLetters[j]) {
+                    guessResult[i] = 'present';
+                    secretUsed[j] = true;
+                    break;
+                }
+            }
         }
+        
+        return guessResult;
+    }
 
-        return "rgb(181, 159, 59)";
+    function updateKeyboardColors(word, results) {
+        const letters = word.split('');
+        
+        letters.forEach((letter, index) => {
+            const currentStatus = results[index];
+            const previousStatus = keyboardState[letter];
+            
+            if (previousStatus === 'correct') return;
+            if (previousStatus === 'present' && currentStatus === 'absent') return;
+            
+            keyboardState[letter] = currentStatus;
+            
+            const keyButton = document.querySelector(`button[data-key="${letter.toLowerCase()}"]`);
+            if (keyButton) {
+                keyButton.classList.remove('key-correct', 'key-present', 'key-absent');
+                
+                if (currentStatus === 'correct') {
+                    keyButton.classList.add('key-correct');
+                } else if (currentStatus === 'present') {
+                    keyButton.classList.add('key-present');
+                } else if (currentStatus === 'absent') {
+                    keyButton.classList.add('key-absent');
+                }
+            }
+        });
     }
 
     function handleSubmitWord() {
-    const currentWordArr = getCurrentWordArr();
-    if (currentWordArr.length !== 5) {
-        window.alert("Word must be 5 letters");
-        return;
-    }
+        if (isSubmitting) {
+            return;
+        }
 
-    const currentWord = currentWordArr.join("").toUpperCase();
+        const currentWordArr = getCurrentWordArr();
+        if (currentWordArr.length !== 5) {
+            window.alert("Le mot doit contenir 5 lettres");
+            return;
+        }
 
-    fetch("/game/wordle/check?word=" + currentWord)
-        .then(res => res.json())
-        .then(data => {
-            if (!data.valid) {
-                alert("Word is not recognised!");
+        isSubmitting = true;
+        const currentWord = currentWordArr.join("").toUpperCase();
+
+        if (!validWords.includes(currentWord)) {
+            alert(currentWord + " est invalide !");
+            isSubmitting = false;
+            return;
+        }
+
+        const result = checkWordColors(currentWord, secretWord);
+        const won = currentWord === secretWord;
+
+        const firstLetterId = guessedWordCount * 5 + 1;
+        const interval = 200;
+        
+        currentWordArr.forEach((letter, index) => {
+            setTimeout(() => {
+                const colorMap = {
+                    'correct': 'rgb(83, 141, 78)',
+                    'present': 'rgb(181, 159, 59)',
+                    'absent': 'rgb(58, 58, 60)'
+                };
+                
+                const tileColor = colorMap[result[index]];
+                const letterId = firstLetterId + index;
+                const letterEl = document.getElementById(letterId);
+                if (letterEl) {
+                    letterEl.classList.add("animate__flipInX");
+                    letterEl.style = `background-color:${tileColor};border-color:${tileColor}`;
+                }
+            }, interval * index);
+        });
+
+        setTimeout(() => {
+            updateKeyboardColors(currentWord, result);
+            
+            guessedWordCount += 1;
+            if (won) {
+                window.alert("Félicitations !");
+                isSubmitting = true; 
                 return;
             }
 
-            const firstLetterId = guessedWordCount * 5 + 1;
-            const interval = 200;
-            
-            currentWordArr.forEach((letter, index) => {
-                setTimeout(() => {
-                    const colorMap = {
-                        'correct': 'rgb(83, 141, 78)',
-                        'present': 'rgb(181, 159, 59)',
-                        'absent': 'rgb(58, 58, 60)'
-                    };
-                    
-                    const tileColor = colorMap[data.result[index]];
-                    const letterId = firstLetterId + index;
-                    const letterEl = document.getElementById(letterId);
-                    letterEl.classList.add("animate__flipInX");
-                    letterEl.style = `background-color:${tileColor};border-color:${tileColor}`;
-                }, interval * index);
-            });
-
-            guessedWordCount += 1;
-
-            if (data.won) {
-                window.alert("Congratulations!");
-            }
-
-            if (guessedWordCount === 6 && !data.won) {
-                window.alert("Sorry, you have no more guesses!");
+            if (guessedWordCount === 6 && !won) {
+                window.alert("Vous avez perdu. Le mot était : " + secretWord);
+                isSubmitting = true; 
+                return;
             }
 
             guessedWords.push([]);
-        });
+            isSubmitting = false; 
+        }, interval * 5 + 100);
     }
 
     function createSquares() {
@@ -116,18 +189,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function handleDeleteLetter() {
         const currentWordArr = getCurrentWordArr();
-        const removedLetter = currentWordArr.pop();
+        
+        if (currentWordArr.length === 0) {
+            return;
+        }
 
+        const removedLetter = currentWordArr.pop();
         guessedWords[guessedWords.length - 1] = currentWordArr;
 
-        const lastLetterEl = document.getElementById(String(availableSpace - 1));
+        const currentRowStart = guessedWordCount * 5 + 1;
+        const lastLetterPosition = currentRowStart + currentWordArr.length;
+        const lastLetterEl = document.getElementById(String(lastLetterPosition));
 
-        lastLetterEl.textContent = "";
-        availableSpace = availableSpace - 1;
+        if (lastLetterEl) {
+            lastLetterEl.textContent = "";
+        }
+        
+        availableSpace = lastLetterPosition;
     }
 
     for (let i = 0; i < keys.length; i++) {
         keys[i].onclick = ({ target }) => {
+            if (isSubmitting) {
+                return;
+            }
+
             const letter = target.getAttribute("data-key");
 
             if (letter === "enter") {
@@ -143,4 +229,28 @@ document.addEventListener("DOMContentLoaded", () => {
             updateGuessedWords(letter);
         };
     }
+
+    document.addEventListener("keydown", (event) => {
+        if (isSubmitting) {
+            return;
+        }
+
+        const key = event.key.toLowerCase();
+
+        // Ctrl + Shift + S pour tester
+        if (event.ctrlKey && event.shiftKey && key === 's') {
+            event.preventDefault();
+            alert("🔍 Mot secret: " + secretWord);
+            console.log("Mot secret:", secretWord);
+            return;
+        }
+
+        if (key === "enter") {
+            handleSubmitWord();
+        } else if (key === "backspace") {
+            handleDeleteLetter();
+        } else if (/^[a-z]$/.test(key)) {
+            updateGuessedWords(key);
+        }
+    });
 });
