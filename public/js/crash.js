@@ -234,9 +234,6 @@ async function animateGame() {
   });
 
   while (value < gameEnd) {
-
-    audio.resume();
-    audio.playCrashMusicSound();
     value += increment;
     multiplier.text(value.toFixed(2) + "x");
 
@@ -306,6 +303,8 @@ playBtn.on("click", async function () {
     return;
   }
   playBtn.prop('disabled', true);
+  audio.resume();
+  audio.playCrashMusicSound();
   await animateGame();
   cachOutBtn.prop('disabled', true);
   playBtn.prop('disabled', false);
