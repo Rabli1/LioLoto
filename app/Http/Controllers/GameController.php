@@ -177,6 +177,16 @@ class GameController extends Controller
     public function joinPoker(): void
     {
         $user = session('user');
+        if (!$user)
+            return;
+
+        // Prevent players with insufficient points from joining
+        $userPoints = is_object($user) ? ($user->points ?? 0) : ($user['points'] ?? 0);
+        if ((int) $userPoints < 250) {
+            // do not add to queue / table if below minimum
+            return;
+        }
+
         $path = base_path(self::POKER_STATE_PATH);
         $state = json_decode(@file_get_contents($path), true) ?? [];
 
@@ -596,6 +606,14 @@ class GameController extends Controller
 
             file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         }
+
+        foreach ($players as &$player) {
+            $playerBalance = (int) ($player['balance'] ?? 0);
+            if ($playerBalance < 250) {
+                $player['toKick'] = true;
+            }
+        }
+        unset($player);
     }
     private function getPokerHand($cards)
     {
@@ -764,16 +782,15 @@ class GameController extends Controller
 
         $path = base_path(self::POKER_STATE_PATH);
         $state = json_decode(@file_get_contents($path), true) ?? [];
-
-        foreach ($state['players'] as &$player) {
-            if ($player['id'] === $playerId) {
-                $player['toKick'] = true;
-                if ($force) {
-                    if ($state['roundStep'] === 'waiting') {
-                        $state['players'] = array_filter($state['players'], function ($p) use ($playerId) {
-                            return $p['id'] !== $playerId;
-                        });
-                    } else {
+        if ($state['roundStep'] === 'waiting') {
+            $state['players'] = array_filter($state['players'], function ($p) use ($playerId) {
+                return $p['id'] !== $playerId;
+            });
+        } else {
+            foreach ($state['players'] as &$player) {
+                if ($player['id'] === $playerId) {
+                    $player['toKick'] = true;
+                    if ($force) {
                         $player['hasFolded'] = true;
                         $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
 
@@ -791,8 +808,8 @@ class GameController extends Controller
                             }
                         }
                     }
+                    break;
                 }
-                break;
             }
         }
         unset($player);

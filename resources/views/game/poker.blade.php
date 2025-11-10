@@ -8,7 +8,7 @@
             <header class="mb-4">
                 <h1 class="mb-2">Poker</h1>
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
-                    Volez aux autres en gros
+                    Doit avoir au moins 250 points pour jouer
                 </p>
                 <span class="balance" id="balanceUI">
                     Solde : <span data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span>
