@@ -172,11 +172,7 @@
                     <div class="row">
                         <h3>Poker</h3>
                     </div>
-                    @if(session()->has('user') && session('user')->admin)
-                        <div class="row"><a href="/game/poker" class="btn btn-danger btn-md">Jouer</a></div>
-                    @else
-                        <div class="row"><button class="btn btn-danger btn-md" disabled>En dévelopement</button></div>
-                    @endif
+                    <div class="row"><a href="/game/poker" class="btn btn-danger btn-md">Jouer (beta)</a></div>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">

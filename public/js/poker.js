@@ -17,16 +17,14 @@ const raiseButton = $("#raise-button");
 const timeProgressBar = $(".progress-bar")
 
 
-const intervalTime = 2 * 1000;
-const turnTime = 15 * 1000;
-const RESTART_DELAY = 10000; // 10 seconds in milliseconds
+const intervalTime = 3 * 1000;
+const turnTime = 20 * 1000;
+const RESTART_DELAY = 10 * 1000;
 let turnStart = Date.now();
 let betNotPlaced = true;
 let gameState = {};
 let currentEtag = "";
 const csrfToken = window.gameSession.csrfToken;
-let deck = [];
-const roundSteps = ['pre-flop', 'flop', 'turn', 'river', 'showdown'];
 let currentRound = 0;
 let gameTerminated = false;
 let restartTimeout = null;
