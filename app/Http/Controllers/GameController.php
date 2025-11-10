@@ -145,7 +145,6 @@ class GameController extends Controller
     }
     public function poker(): View
     {
-        $this->userServices->redirectIfNotAdmin();
         $balance = 0;
         if (session()->has('user')) {
             $balance = session('user')->points;
