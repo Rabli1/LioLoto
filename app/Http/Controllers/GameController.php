@@ -669,7 +669,7 @@ class GameController extends Controller
         $getStraightHigh = function (array $vals): ?int {
             $vals = array_values(array_unique($vals));
             if (in_array(14, $vals))
-                $vals[] = 1; 
+                $vals[] = 1;
             sort($vals);
             $consec = 1;
             for ($i = 1; $i < count($vals); $i++) {
@@ -769,19 +769,25 @@ class GameController extends Controller
             if ($player['id'] === $playerId) {
                 $player['toKick'] = true;
                 if ($force) {
-                    $player['hasFolded'] = true;
-                    $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
+                    if ($state['roundStep'] === 'waiting') {
+                        $state['players'] = array_filter($state['players'], function ($p) use ($playerId) {
+                            return $p['id'] !== $playerId;
+                        });
+                    } else {
+                        $player['hasFolded'] = true;
+                        $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
 
-                    if (count($activePlayers) === 1) {
-                        $state['roundStep'] = 'winByFold';
-                        $winner = reset($activePlayers);
-                        $winnerId = $winner['id'];
+                        if (count($activePlayers) === 1) {
+                            $state['roundStep'] = 'winByFold';
+                            $winner = reset($activePlayers);
+                            $winnerId = $winner['id'];
 
-                        foreach ($state['players'] as &$p) {
-                            if ($p['id'] === $winnerId) {
-                                $p['hasWon'] = true;
-                                $p['balance'] += ($state['pot'] ?? 0);
-                                break;
+                            foreach ($state['players'] as &$p) {
+                                if ($p['id'] === $winnerId) {
+                                    $p['hasWon'] = true;
+                                    $p['balance'] += ($state['pot'] ?? 0);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -801,7 +807,7 @@ class GameController extends Controller
     {
         $words = $this->getWordList();
 
-            // Affiche que la cache est valide pendant 1000 sec. Jai tu vraiment de faire ca? idk mais je le garde la parce que je pense quon le faisait avec chourot
+        // Affiche que la cache est valide pendant 1000 sec. Jai tu vraiment de faire ca? idk mais je le garde la parce que je pense quon le faisait avec chourot
         return response()->json($words)
             ->header('Cache-Control', 'public, max-age=1000')
             ->header('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 1000));
@@ -848,7 +854,7 @@ class GameController extends Controller
         ]);
     }
 
-        public function wordleWord(): JsonResponse
+    public function wordleWord(): JsonResponse
     {
         $words = $this->getWordList();
         $randomWord = $words[array_rand($words)];

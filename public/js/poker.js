@@ -25,7 +25,8 @@ let betNotPlaced = true;
 let gameState = {};
 let currentEtag = "";
 const csrfToken = window.gameSession.csrfToken;
-let currentRound = 0;
+let currentRound = "";
+let lastPotValue = 75;
 let gameTerminated = false;
 let restartTimeout = null;
 
@@ -92,24 +93,20 @@ async function getEtag() {
     return data.Etag;
 }
 
-function updateEtag() {
-    $.ajax({
-        url: '/game/updateEtag',
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': csrfToken },
-        success: function () {
-
-        },
-        error: function (xhr, status, error) {
-            console.error('Error updating Etag', error);
-        }
-    });
-}
-
 function updateUI() {
     if (!gameState) return;
     let playersList = gameState.players;
     const potValue = Number(gameState.pot) || 0;
+    const newRoundStep = gameState.roundStep
+    if (currentRound !== newRoundStep) {
+        playCommunityCard(newRoundStep);
+    }
+    currentRound = newRoundStep;
+    const newPotValue = gameState.pot;
+    if (newPotValue !== lastPotValue) {
+        playChip();
+    }
+    lastPotValue = newPotValue;
     pot.text(`Pot : ${potValue.toLocaleString('en-US').replace(/,/g, ' ')}`);
     gameMessage.text("");
     if (gameState.players.length < 2) {
@@ -125,11 +122,11 @@ function updateUI() {
     gameTerminated = false;
     if (gameState.roundStep === 'showdown') {
         gameTerminated = true;
-        
+
         if (gameTerminated && !restartTimeout) {
             let secondsLeft = RESTART_DELAY / 1000;
             gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
-            
+
             const countdownInterval = setInterval(() => {
                 secondsLeft--;
                 gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
@@ -139,6 +136,7 @@ function updateUI() {
                 clearInterval(countdownInterval);
                 gameMessage.text("Démarrage d'une nouvelle partie...");
                 initRound();
+                playGameStart();
             }, RESTART_DELAY);
         }
     }
@@ -262,12 +260,12 @@ function quitGame(id, force) {
             if (!force) {
                 gameMessage.text("Vous allez quitter la table à la fin de cette manche");
             }
-            else{
+            else {
                 joinButton.show();
             }
         },
         error: function (xhr, status, error) {
-                console.error('Error quitting game:', status, error, xhr.responseText);
+            console.error('Error quitting game:', status, error, xhr.responseText);
         }
     });
 }
@@ -278,7 +276,7 @@ function initRound() {
         clearTimeout(restartTimeout);
         restartTimeout = null;
     }
-    
+
     $.ajax({
         url: '/game/initRound',
         method: 'POST',
@@ -352,4 +350,35 @@ document.addEventListener("visibilitychange", () => {
     }
 });
 
+function playChip() {
+    const audio = new Audio('/sounds/chips.mp3');
+    audio.load();
+    audio.play();
+}
+function playGameStart() {
+    const len = gameState.players.length;
+    for (let count = 0; count < len; count++) {
+        setTimeout(() => {
+            const audio = new Audio('/sounds/dealPair.mp3');
+            audio.play();
+        }, count * 500);
+    }
+}
+function playCommunityCard(round) {
+    const hit = new Audio('/sounds/cardHit.mp3')
+    hit.load();
+    switch (round) {
+        case "flop":
+            const flop = new Audio('/sounds/flop.mp3')
+            flop.load();
+            flop.play();
+            break;
+        case "turn":
+            hit.play();
+            break;
+        case "river":
+            hit.play();
+            break;
+    }
+}
 startRefreshInterval();
