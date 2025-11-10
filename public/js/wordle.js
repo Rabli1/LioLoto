@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const wordsResponse = await fetch("/game/wordle/list");
             const words = await wordsResponse.json();
             validWords = words.map(w => w.toUpperCase());
-            
+
             secretWord = validWords[Math.floor(Math.random() * validWords.length)];
         } catch (error) {
             console.error("Erreur lors de l'initialisation:", error);
@@ -55,10 +55,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const result = [];
         const secretLetters = secretWord.split('');
         const guessLetters = guessWord.split('');
-        
+
         const secretUsed = new Array(5).fill(false);
         const guessResult = new Array(5).fill('absent');
-        
+
         //lettre verte (correcte)
         for (let i = 0; i < 5; i++) {
             if (guessLetters[i] === secretLetters[i]) {
@@ -66,11 +66,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 secretUsed[i] = true;
             }
         }
-        
+
         //lettre jaune (presente)
         for (let i = 0; i < 5; i++) {
             if (guessResult[i] === 'correct') continue;
-            
+
             for (let j = 0; j < 5; j++) {
                 if (!secretUsed[j] && guessLetters[i] === secretLetters[j]) {
                     guessResult[i] = 'present';
@@ -79,26 +79,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         }
-        
+
         return guessResult;
     }
 
     function updateKeyboardColors(word, results) {
         const letters = word.split('');
-        
+
         letters.forEach((letter, index) => {
             const currentStatus = results[index];
             const previousStatus = keyboardState[letter];
-            
+
             if (previousStatus === 'correct') return;
             if (previousStatus === 'present' && currentStatus === 'absent') return;
-            
+
             keyboardState[letter] = currentStatus;
-            
+
             const keyButton = document.querySelector(`button[data-key="${letter.toLowerCase()}"]`);
             if (keyButton) {
                 keyButton.classList.remove('key-correct', 'key-present', 'key-absent');
-                
+
                 if (currentStatus === 'correct') {
                     keyButton.classList.add('key-correct');
                 } else if (currentStatus === 'present') {
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const firstLetterId = guessedWordCount * 5 + 1;
         const interval = 200;
-        
+
         currentWordArr.forEach((letter, index) => {
             setTimeout(() => {
                 const colorMap = {
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     'present': 'rgb(181, 159, 59)',
                     'absent': 'rgb(58, 58, 60)'
                 };
-                
+
                 const tileColor = colorMap[result[index]];
                 const letterId = firstLetterId + index;
                 const letterEl = document.getElementById(letterId);
@@ -156,22 +156,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
             updateKeyboardColors(currentWord, result);
-            
+
             guessedWordCount += 1;
             if (won) {
-                window.alert("Félicitations !");
-                isSubmitting = true; 
+                let points = 0;
+                switch (guessedWordCount) {
+                    case 1: points = 1000; break;
+                    case 2: points = 800; break;
+                    case 3: points = 600; break;
+                    case 4: points = 500; break;
+                    case 5: points = 400; break;
+                    case 6: points = 300; break;
+                    default: points = 0;
+                }
+                Balance.init({ session: window.gameSession });
+                if (window.Balance) {
+                    Balance.gain(points, { persist: true });
+                    alert(`Félicitations ! Vous avez gagné ${points} points 🎉`);
+                } else {
+                    alert("Félicitations !");
+                    console.warn("Balance non trouvée : impossible d'ajouter les points");
+                }
+
+                isSubmitting = true;
                 return;
             }
 
             if (guessedWordCount === 6 && !won) {
                 window.alert("Vous avez perdu. Le mot était : " + secretWord);
-                isSubmitting = true; 
+                isSubmitting = true;
                 return;
             }
 
             guessedWords.push([]);
-            isSubmitting = false; 
+            isSubmitting = false;
         }, interval * 5 + 100);
     }
 
@@ -189,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function handleDeleteLetter() {
         const currentWordArr = getCurrentWordArr();
-        
+
         if (currentWordArr.length === 0) {
             return;
         }
@@ -204,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (lastLetterEl) {
             lastLetterEl.textContent = "";
         }
-        
+
         availableSpace = lastLetterPosition;
     }
 
