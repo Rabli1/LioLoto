@@ -108,13 +108,57 @@ function createAudioToolkit() {
     }
   }
 
+  let crashMusicSoundBase = null;
+
+  function getCrashMusicSound() {
+    if (!crashMusicSoundBase) {
+      crashMusicSoundBase = new Audio('/sounds/crashMusic.mp3');
+      crashMusicSoundBase.preload = 'auto';
+      crashMusicSoundBase.volume = 0.5;
+    }
+    return crashMusicSoundBase;
+  }
+
+  function playCrashMusicSound() {
+    const base = getCrashMusicSound();
+    if (!base) return;
+
+    const play = (audioNode) => {
+      audioNode.currentTime = 0;
+      const promise = audioNode.play();
+      if (promise && typeof promise.catch === 'function') {
+        promise.catch(() => { });
+      }
+    };
+
+    if (base.paused) {
+      play(base);
+    } else {
+      const clone = base.cloneNode(true);
+      clone.volume = base.volume;
+      play(clone);
+    }
+  }
+
+  function pauseCrashMusicSound() {
+    const base = getCrashMusicSound();
+    if (!base) return;
+
+    if (!base.paused) {
+      base.pause();
+    }
+  }
+
   return {
     resume,
     playCashoutSound,
     playCrashSound,
+    playCrashMusicSound,
+    pauseCrashMusicSound,
     preloadSounds() {
       getCashoutSound();
       getCrashSound();
+      getCrashMusicSound();
     }
   };
 }
@@ -191,6 +235,8 @@ async function animateGame() {
 
   while (value < gameEnd) {
 
+    audio.resume();
+    audio.playCrashMusicSound();
     value += increment;
     multiplier.text(value.toFixed(2) + "x");
 
@@ -238,6 +284,7 @@ async function animateGame() {
     await sleep(sleepTime);
   }
 
+  audio.pauseCrashMusicSound();
   audio.playCrashSound();
   multiplier.addClass("text-danger");
   let list = lastCrash.find('div');
