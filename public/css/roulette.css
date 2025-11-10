@@ -1,0 +1,722 @@
+#bettingMat {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: 80px 80px 5px 80px 5px 80px 5px 80px 5px 80px 5px 80px 5px 80px 5px 80px 5px 80px 5px 80px 5px 80px 5px 80px 80px;
+    grid-template-rows: 80px 80px 5px 80px 5px 80px 80px;
+    gap: 2px;
+
+}
+
+#bettingMat>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    color: white;
+    font-weight: bold;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    position: relative;
+}
+
+#item0 {
+    grid-row: 2 / 7;
+    grid-column: 1;
+    background-color: rgb(46, 111, 64, 0.8);
+}
+
+.topItem {
+    grid-row: 1;
+}
+
+.rightSideItem {
+    grid-column-start: 25;
+}
+
+.bottomItem {
+    grid-row: 7;
+}
+
+.gap {
+    position: relative;
+    border: 2px solid white;
+}
+
+.clickRoulette {
+    cursor: pointer;
+    position: relative;
+}
+
+.rouletteToken {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(45deg, #5e0000, #5e2d2d);
+    border: 2px solid rgb(255, 255, 255, 0.20);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+    color: white;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tokenWage {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(45deg, #5e0000, #5e2d2d);
+    border: 2px solid rgb(255, 255, 255, 0.20);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 17px;
+    color: white;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tokenWage:hover {
+    border: 2px solid white;
+}
+
+.tokenWageSelected {
+    border: 2px solid white;
+}
+
+.roulette {
+    height: 312px;
+    width: 312px;
+    position: relative;
+    margin: 20px auto;
+}
+
+.outerRim {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 310px;
+    height: 310px;
+    border-radius: 100%;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
+    border: 10px solid rgba(255, 255, 255, 0.08);
+}
+
+.rouletteSect {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 290px;
+    height: 290px;
+    border-radius: 100%;
+    clip: rect(0px, 290px, 290px, 145px);
+}
+
+.singleNum {
+    left: 152px;
+    margin-top: 4.5px;
+}
+
+.doubleNum {
+    left: 148px;
+    margin-top: 4.5px;
+}
+
+.singleNum,
+.doubleNum {
+    position: absolute;
+    z-index: 1;
+    color: white;
+    font-size: 14px;
+    transform: rotate(3deg);
+}
+
+.block {
+    transition: all 1s;
+    position: absolute;
+    width: 290px;
+    height: 290px;
+    border-radius: 100%;
+    clip: rect(0px, 145px, 290px, 0px);
+}
+
+#sect0 .block {
+    /* background-color: rgb(255, 255, 255, 0.20); */
+    background-color: rgb(46, 111, 64, 0.8);
+    transform: rotate(9.73deg);
+}
+
+#sect1 .block,
+#sect3 .block,
+#sect5 .block,
+#sect7 .block,
+#sect9 .block,
+#sect11 .block,
+#sect13 .block,
+#sect15 .block,
+#sect17 .block,
+#sect19 .block,
+#sect21 .block,
+#sect23 .block,
+#sect25 .block,
+#sect27 .block,
+#sect29 .block,
+#sect31 .block,
+#sect33 .block,
+#sect35 .block {
+    background-color: rgba(211, 47, 47, 0.5);
+    transform: rotate(9.73deg);
+}
+
+#sect2 .block,
+#sect4 .block,
+#sect6 .block,
+#sect8 .block,
+#sect10 .block,
+#sect12 .block,
+#sect14 .block,
+#sect16 .block,
+#sect18 .block,
+#sect20 .block,
+#sect22 .block,
+#sect24 .block,
+#sect26 .block,
+#sect28 .block,
+#sect30 .block,
+#sect32 .block,
+#sect34 .block,
+#sect36 .block {
+    background-color: rgba(255, 255, 255, 0.06);
+    transform: rotate(9.73deg);
+}
+
+#sect1 {
+    transform: rotate(9.73deg);
+}
+
+#sect2 {
+    transform: rotate(19.46deg);
+}
+
+#sect3 {
+    transform: rotate(29.19deg);
+}
+
+#sect4 {
+    transform: rotate(38.92deg);
+}
+
+#sect5 {
+    transform: rotate(48.65deg);
+}
+
+#sect6 {
+    transform: rotate(58.38deg);
+}
+
+#sect7 {
+    transform: rotate(68.11deg);
+}
+
+#sect8 {
+    transform: rotate(77.84deg);
+}
+
+#sect9 {
+    transform: rotate(87.57deg);
+}
+
+#sect10 {
+    transform: rotate(97.3deg);
+}
+
+#sect11 {
+    transform: rotate(107.03deg);
+}
+
+#sect12 {
+    transform: rotate(116.76deg);
+}
+
+#sect13 {
+    transform: rotate(126.49deg);
+}
+
+#sect14 {
+    transform: rotate(136.22deg);
+}
+
+#sect15 {
+    transform: rotate(145.95deg);
+}
+
+#sect16 {
+    transform: rotate(155.68deg);
+}
+
+#sect17 {
+    transform: rotate(165.41deg);
+}
+
+#sect18 {
+    transform: rotate(175.14deg);
+}
+
+#sect19 {
+    transform: rotate(184.87deg);
+}
+
+#sect20 {
+    transform: rotate(194.6deg);
+}
+
+#sect21 {
+    transform: rotate(204.33deg);
+}
+
+#sect22 {
+    transform: rotate(214.06deg);
+}
+
+#sect23 {
+    transform: rotate(223.79deg);
+}
+
+#sect24 {
+    transform: rotate(233.52deg);
+}
+
+#sect25 {
+    transform: rotate(243.25deg);
+}
+
+#sect26 {
+    transform: rotate(252.98deg);
+}
+
+#sect27 {
+    transform: rotate(262.71deg);
+}
+
+#sect28 {
+    transform: rotate(272.44deg);
+}
+
+#sect29 {
+    transform: rotate(282.17deg);
+}
+
+#sect30 {
+    transform: rotate(291.9deg);
+}
+
+#sect31 {
+    transform: rotate(301.63deg);
+}
+
+#sect32 {
+    transform: rotate(311.36deg);
+}
+
+#sect33 {
+    transform: rotate(321.09deg);
+}
+
+#sect34 {
+    transform: rotate(330.82deg);
+}
+
+#sect35 {
+    transform: rotate(340.55deg);
+}
+
+#sect36 {
+    transform: rotate(350.28deg);
+}
+
+.pocketSect {
+    position: absolute;
+    top: 37px;
+    left: 37px;
+    width: 235px;
+    height: 235px;
+    background-color: #000;
+    border-radius: 100%;
+    opacity: .5;
+}
+
+.rimPockets {
+    position: absolute;
+    top: 34px;
+    left: 34px;
+    width: 241px;
+    height: 241px;
+    border-radius: 100%;
+    border: 3px solid silver;
+}
+
+.middleRoulette {
+    position: absolute;
+    top: 62px;
+    left: 61px;
+    height: 186px;
+    width: 186px;
+    border: 3px solid #9f9a9a;
+    border-radius: 100%;
+    background: radial-gradient(circle at 100px 100px, rgb(99, 14, 14), #000);
+}
+
+.ballContainer {
+    width: 212px;
+    height: 207px;
+    position: absolute;
+    left: 47.5px;
+    top: 50px;
+    border-radius: 100%;
+    z-index: 2;
+}
+
+.ball {
+    background-color: #fff;
+    width: 16px;
+    height: 16px;
+    border-radius: 100%;
+    position: relative;
+    left: 109px;
+    top: -8px;
+}
+
+.spinButton {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 80px;
+    width: 80px;
+    border-radius: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: rgba(56, 7, 7, 0.5);
+    border: 2px solid #9f9a9a;
+    font-size: large;
+    font-weight: bold;
+    z-index: 3;
+}
+
+#clearMat {
+    margin-bottom: 5px;
+}
+
+.roulette-win {
+    position: fixed;
+    background-color: rgb(14, 92, 11);
+    opacity: 0.3;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: block;
+    transition: all 0.3s ease-out !important;
+}
+
+.roulette-lose {
+    position: fixed;
+    background-color: rgb(104, 8, 8);
+    text-align: center;
+    opacity: 0.3;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: block;
+    transition: all 0.3s ease-out !important;
+}
+
+.loseAmount {
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #a80000;
+    font-size: 3em;
+    font-weight: bolder;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+}
+
+.winAmount {
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #008b00;
+    font-size: 3em;
+    font-weight: bolder;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+}
+
+#bettingMat > div.winnerBox{
+    border: 2px solid rgb(0, 223, 0, 1) !important;
+}
+
+@keyframes wheelRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+@keyframes ballRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(-359deg);
+    }
+}
+
+/* Slot Machine */
+.slot-machine-board {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 1.75rem 1.5rem;
+}
+
+.slot-machine-reels {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(1.5rem, 6vw, 2.6rem);
+}
+
+.slot-reel {
+    width: 108px;
+    height: 108px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease, filter 0.25s ease;
+}
+
+.slot-symbol,
+.slot-symbol img {
+    width: 68px;
+    height: 68px;
+}
+
+.slot-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slot-symbol-placeholder {
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.slot-reel.is-spinning {
+    animation: slot-reel-spin 0.3s linear infinite;
+    filter: brightness(1.1);
+}
+
+.slot-reel.is-win {
+    border-color: rgba(248, 212, 106, 0.7);
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+}
+
+.slot-reel.is-win .slot-symbol img {
+    filter: drop-shadow(0 0 8px rgba(248, 212, 106, 0.45));
+}
+
+.slot-hud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem;
+}
+
+.slot-stat {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.slot-status {
+    min-height: 1.4rem;
+    letter-spacing: 0.06em;
+}
+
+.slot-bet-token {
+    min-width: 86px;
+    padding: 0.7rem 1.05rem;
+    border-radius: 999px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.slot-bet-token:hover,
+.slot-bet-token:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.slot-hint {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.slot-paytable {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 1.5rem 1.25rem;
+}
+
+.slot-paytable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.75rem;
+}
+
+.slot-paytable-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.slot-paytable-info {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.slot-paytable-info img {
+    width: 34px;
+    height: 34px;
+}
+
+.slot-paytable-multiplier {
+    color: #f8d46a;
+}
+
+.slot-layout {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 0 auto;
+    max-width: 640px;
+}
+
+.slot-layout-main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.slot-layout-main > .slot-machine-board,
+.slot-layout-main > #slot-controls,
+.slot-layout-main > .slot-paytable {
+    width: 100%;
+}
+
+.slot-layout-stats {
+    width: clamp(240px, 85vw, 300px);
+    margin: 0 auto;
+}
+
+.slot-stats-wrapper {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 0.75rem;
+}
+
+.slot-stats-table {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.slot-stats-table th,
+.slot-stats-table td {
+    border-color: rgba(255, 255, 255, 0.04) !important;
+    font-size: 0.85rem;
+    vertical-align: middle;
+}
+
+.slot-history-row.is-win td {
+    color: #f8d46a;
+    font-weight: 600;
+}
+
+.slot-history-empty td {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+@media (min-width: 992px) {
+    .slot-layout {
+        max-width: 640px;
+    }
+
+    .slot-layout-stats {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translateX(calc(-100% - 2rem));
+        width: 280px;
+    }
+}
+
+@keyframes slot-reel-spin {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(6px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
