@@ -59,6 +59,13 @@
                         @endif
                     </form>
                 </td>
+                <td>
+                    <form action="/admin/deleteUser" method="post">
+                        @csrf
+                        <input type="hidden" name="userId" value="{{ $user['id'] }}">
+                        <button type="submit" class="btn btn-danger" {{ $user['id'] == $connectedUserId ? "disabled" : "" }}>Supprimer utilisateur</button>
+                    </form>
+                </td>
             </tr>
         @endforeach
     </tbody>

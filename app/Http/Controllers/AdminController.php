@@ -78,4 +78,15 @@ class AdminController extends Controller
         }
         return redirect('/admin/dashboard');
     }
+    public function deleteUser(Request $request): RedirectResponse
+    {
+        $userId = (int) $request->input('userId');
+        $path = base_path(self::USERS_PATH);
+        $users = json_decode(@file_get_contents($path), true);
+        $users = array_filter($users, function ($user) use ($userId) {
+            return $user['id'] !== $userId;
+        });
+        file_put_contents($path, json_encode(array_values($users)));
+        return redirect('/admin/dashboard');
+    }
 }
