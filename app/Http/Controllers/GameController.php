@@ -430,19 +430,46 @@ class GameController extends Controller
             $valToReturn = $player['balance'];
             $player['hasFolded'] = true;
 
-            $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
+            $activePlayers = array_filter($state['players'], fn($p) => !($p['hasFolded'] ?? false));
 
             if (count($activePlayers) === 1) {
+                // finalize win-by-fold immediately to prevent other logic from advancing the round
                 $state['roundStep'] = 'winByFold';
-                $winnerKey = $activePlayers[0]['id'];
-                $state['players'][$winnerKey]['hasWon'] = true;
-                $winnerId = $state['players'][$winnerKey]['id'];
-                foreach ($users as &$user) {
-                    if ($winnerId === $user['id']) {
-                        $user['points'] += $state['pot'];
+                $winner = reset($activePlayers);
+                $winnerId = $winner['id'];
+
+                // mark winner in state and give pot
+                foreach ($state['players'] as &$p) {
+                    if (($p['id'] ?? null) === $winnerId) {
+                        $p['hasWon'] = true;
+                        $p['balance'] = ($p['balance'] ?? 0) + ($state['pot'] ?? 0);
+                        break;
                     }
                 }
-                unset($user);
+                unset($p);
+
+                // update users.json for the winner
+                foreach ($users as &$u) {
+                    if (($u['id'] ?? null) === $winnerId) {
+                        $u['points'] = (int)(($u['points'] ?? 0) + ($state['pot'] ?? 0));
+                        break;
+                    }
+                }
+                unset($u);
+
+                // mark players with low balance to be kicked next initRound
+                foreach ($state['players'] as &$p) {
+                    $p['toKick'] = ((int)($p['balance'] ?? 0) < 250);
+                }
+                unset($p);
+
+                // persist immediately and update etag, then return to stop further processing
+                file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                $Etag = ['Etag' => (string) Str::uuid()];
+                file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+                return response()->json(['newBalance' => $valToReturn, 'winner' => $winnerId]);
             }
         } else {
             $state['requiredBet'] = max((int) $state['requiredBet'], (int) $validatedAmount);
@@ -453,7 +480,6 @@ class GameController extends Controller
 
             $state['pot'] += $validatedAmount;
 
-            // change in users.json
             $user = clone session('user');
             foreach ($users as &$entry) {
                 if (($entry['id'] ?? null) === $user->id) {

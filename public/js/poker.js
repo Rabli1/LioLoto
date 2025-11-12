@@ -120,10 +120,11 @@ function updateUI() {
 
     let maxBet = Infinity;
     gameTerminated = false;
-    if (gameState.roundStep === 'showdown') {
+    if('showdown' == gameState.roundStep){
         gameTerminated = true;
-
-        if (gameTerminated && !restartTimeout) {
+    }
+    if ('winByFold' == gameState.roundStep || 'showdown' == gameState.roundStep) {
+        if (!restartTimeout) {
             let secondsLeft = RESTART_DELAY / 1000;
             gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
 
@@ -137,6 +138,7 @@ function updateUI() {
                 gameMessage.text("Démarrage d'une nouvelle partie...");
                 initRound();
                 playGameStart();
+                restartTimeout = null;
             }, RESTART_DELAY);
         }
     }
