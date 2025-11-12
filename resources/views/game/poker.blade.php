@@ -10,9 +10,6 @@
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Doit avoir au moins 250 points pour jouer
                 </p>
-                <span class="balance" id="balanceUI">
-                    Solde : <span data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span>
-                </span>
             </header>
             <section id="gameMat" class="p-3 rounded bg-dark text-center">
                 @if(session()->has('user'))
