@@ -46,7 +46,8 @@ function setup() {
 
         for (var i = 0; i < numPlinkos; i++) {
             var x = centerX - totalWidth / 2 + i * spacing;
-            var p = new Plinko(x, y, 5.78);
+            var p = new Plinko(x, y, 5.82
+            );
             plinkos.push(p);
         }
     }
