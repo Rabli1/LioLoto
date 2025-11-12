@@ -159,9 +159,6 @@
                 $('#submit').prop('disabled', true);
             }
         });
-        $('#submit').on('click', function () {
-            $(this).prop('disabled', true);
-        });
     });
 </script>
 @include('shared.footer')
