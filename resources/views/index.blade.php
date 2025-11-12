@@ -96,6 +96,23 @@
         </div>
     </div>
     <div class="container mt-5">
+        <h4 class="text-center mt-4">Jeux Quotidien</h4>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
+                    <div class="row">
+                        <img style="height: 210px;" src='{{ asset("img/liotodle.png") }}' alt="Liotodle">
+                    </div>
+                    <div class="row">
+                        <h3>Liotodle</h3>
+                    </div>
+                    <div class="row">
+                        <a href="/game/wordle" class="btn btn-danger btn-md">Jouer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <h1 style="text-align: center; margin-top: 20px;">Jeux disponibles</h1>
         <div class="row">
             <div class="col-lg-4 mb-4">
@@ -139,6 +156,16 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/slot/card.svg") }}'
+                            alt="Machine à sous"></div>
+                    <div class="row">
+                        <h3>Machine à sous</h3>
+                    </div>
+                    <div class="row"><a href="/game/slot-machine" class="btn btn-danger btn-md">Jouer</a></div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="leaderboard-card text-center">
                     <div class="row"><img style="height: 210px;" src='{{ asset("img/crash.png") }}' alt="Crash"></div>
                     <div class="row">
                         <h3>Crash</h3>
@@ -162,11 +189,7 @@
                     <div class="row">
                         <h3>Poker</h3>
                     </div>
-                    @if(session()->has('user') && session('user')->admin)
-                        <div class="row"><a href="/game/poker" class="btn btn-danger btn-md">Jouer</a></div>
-                    @else
-                        <div class="row"><button class="btn btn-danger btn-md" disabled>En dévelopement</button></div>
-                    @endif
+                    <div class="row"><a href="/game/poker" class="btn btn-danger btn-md">Jouer (beta)</a></div>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">

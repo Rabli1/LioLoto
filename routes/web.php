@@ -36,6 +36,7 @@ Route::get('game/poker', [GameController::class, 'poker']);
 Route::get('game/wordle', [GameController::class, 'wordle']);
 Route::get('/game/wordle/word', [GameController::class, 'wordleWord']);
 Route::get('/game/wordle/check', [GameController::class, 'checkWord']);
+Route::get('/game/wordle/list', [GameController::class, 'getWordListForClient']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
@@ -52,3 +53,4 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 Route::post('admin/fixPoints', [AdminController::class, 'fixPoints']);
 Route::post('admin/toggleBan', [AdminController::class, 'toggleBan']);
 Route::post('admin/toggleAdmin', [AdminController::class, 'toggleAdmin']);
+Route::post('admin/killPoker', [AdminController::class, 'killPoker']);

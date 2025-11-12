@@ -8,11 +8,8 @@
             <header class="mb-4">
                 <h1 class="mb-2">Poker</h1>
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
-                    Volez aux autres en gros
+                    Doit avoir au moins 250 points pour jouer
                 </p>
-                <span class="balance" id="balanceUI">
-                    Solde : <span data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span>
-                </span>
             </header>
             <section id="gameMat" class="p-3 rounded bg-dark text-center">
                 @if(session()->has('user'))
@@ -75,11 +72,11 @@
                             <div class="d-flex flex-column align-items-center">
                                 <div id="pot" class="mb-2">pot : 2000</div>
                                 <div id="community-cards">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
-                                    <img src="{{ asset('img/cards/2-C.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/A-H.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/K-H.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/Q-H.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/J-H.png') }}" class="img-fluid" alt="Card">
+                                    <img src="{{ asset('img/cards/10-H.png') }}" class="img-fluid" alt="Card">
                                 </div>
                                 <div class="hand-name"></div>
                             </div>

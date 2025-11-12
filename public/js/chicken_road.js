@@ -146,6 +146,7 @@
         }
 
         let cashoutSoundBase = null;
+        
         function getCashoutSound() {
             if (!cashoutSoundBase) {
                 cashoutSoundBase = new Audio('/sounds/cashout.mp3');

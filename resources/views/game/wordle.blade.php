@@ -68,6 +68,14 @@
         </div>
     </div>
 </body>
+<script>
+    window.gameSession = {
+        userId: {{ session('user')->id ?? 'null' }},
+        balance: {{ (int) $playerBalance }},
+        endpoints: { saveBalance: '{{ url('game/balance') }}' },
+        csrfToken: '{{ csrf_token() }}'
+    };
+</script>
 @include('shared.footer')
 
 </html>

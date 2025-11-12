@@ -145,7 +145,6 @@ class GameController extends Controller
     }
     public function poker(): View
     {
-        $this->userServices->redirectIfNotAdmin();
         $balance = 0;
         if (session()->has('user')) {
             $balance = session('user')->points;
@@ -158,6 +157,19 @@ class GameController extends Controller
     public function getPokerState(): JsonResponse
     {
         $state = json_decode(@file_get_contents(base_path(self::POKER_STATE_PATH)), true) ?? [];
+        $userId = session('user')->id;
+
+        if (!empty($userId)) {
+            foreach ($state['players'] as &$player) {
+                if ($player['id'] === $userId && $state['roundStep'] !== 'showdown') {
+                    $player['cards'] = array_map(function ($card) {
+                        return $this->gameServices->Decrypt($card);
+                    }, $player['cards']);
+                }
+            }
+            unset($player);
+        }
+
         return response()->json([
             'gameState' => $state
         ]);
@@ -165,6 +177,16 @@ class GameController extends Controller
     public function joinPoker(): void
     {
         $user = session('user');
+        if (!$user)
+            return;
+
+        // Prevent players with insufficient points from joining
+        $userPoints = is_object($user) ? ($user->points ?? 0) : ($user['points'] ?? 0);
+        if ((int) $userPoints < 250) {
+            // do not add to queue / table if below minimum
+            return;
+        }
+
         $path = base_path(self::POKER_STATE_PATH);
         $state = json_decode(@file_get_contents($path), true) ?? [];
 
@@ -178,22 +200,45 @@ class GameController extends Controller
         if (!empty($playerInQueue) || !empty($playersInGame)) {
             return;
         }
-        $players[] = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'balance' => $user->points,
-            'profileImage' => $user->profileImage,
-            'profileColor' => $user->profileColor,
-            'currentBet' => 0,
-            'isAllIn' => false,
-            'hasFolded' => false,
-            'hasPlayed' => false,
-            "hasWon" => false,
-            'toKick' => false,
-            'hand' => "",
-            'cards' => [],
-        ];
-        $state['queue'] = $players;
+        if ($state['roundStep'] === 'waiting') {
+            $state['players'][] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'balance' => $user->points,
+                'profileImage' => $user->profileImage,
+                'profileColor' => $user->profileColor,
+                'currentBet' => 0,
+                'isAllIn' => false,
+                'hasFolded' => false,
+                'hasPlayed' => false,
+                "hasWon" => false,
+                'toKick' => false,
+                'hand' => "",
+                'cards' => [],
+            ];
+        } else {
+            $players[] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'balance' => $user->points,
+                'profileImage' => $user->profileImage,
+                'profileColor' => $user->profileColor,
+                'currentBet' => 0,
+                'isAllIn' => false,
+                'hasFolded' => false,
+                'hasPlayed' => false,
+                "hasWon" => false,
+                'toKick' => false,
+                'hand' => "",
+                'cards' => [],
+            ];
+            $state['queue'] = $players;
+        }
+        if ($state['roundStep'] === 'waiting' && count($state['players']) > 1) {
+            file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $this->initRound();
+            return;
+        }
 
         file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
@@ -257,7 +302,7 @@ class GameController extends Controller
             'game' => $validated['game'] ?? null,
         ]);
     }
-    public function initRound(Request $request): JsonResponse
+    public function initRound(): JsonResponse
     {
         $pokerPath = base_path(self::POKER_STATE_PATH);
         $state = json_decode(@file_get_contents($pokerPath), true) ?? [];
@@ -280,6 +325,11 @@ class GameController extends Controller
             }
         }
         $playerCount = count($state['players']);
+        if ($playerCount < 2) {
+            $state['roundStep'] = 'waiting';
+            file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            return response()->json(['success' => false, 'message' => 'Not enough players to start the round.']);
+        }
 
         //build deck
         $values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -288,7 +338,8 @@ class GameController extends Controller
 
         foreach ($suits as $suit) {
             foreach ($values as $value) {
-                $deck[] = "{$value}-{$suit}";
+                $encyptedCard = $this->gameServices->Encrypt("{$value}-{$suit}");
+                $deck[] = $encyptedCard;
             }
         }
         // Shuffle
@@ -379,19 +430,41 @@ class GameController extends Controller
             $valToReturn = $player['balance'];
             $player['hasFolded'] = true;
 
-            $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
+            $activePlayers = array_filter($state['players'], fn($p) => !($p['hasFolded'] ?? false));
 
             if (count($activePlayers) === 1) {
                 $state['roundStep'] = 'winByFold';
-                $winnerKey = $activePlayers[0]['id'];
-                $state['players'][$winnerKey]['hasWon'] = true;
-                $winnerId = $state['players'][$winnerKey]['id'];
-                foreach ($users as &$user) {
-                    if ($winnerId === $user['id']) {
-                        $user['points'] += $state['pot'];
+                $winner = reset($activePlayers);
+                $winnerId = $winner['id'];
+
+                foreach ($state['players'] as &$p) {
+                    if (($p['id'] ?? null) === $winnerId) {
+                        $p['hasWon'] = true;
+                        $p['balance'] = ($p['balance'] ?? 0) + ($state['pot'] ?? 0);
+                        break;
                     }
                 }
-                unset($user);
+                unset($p);
+
+                foreach ($users as &$u) {
+                    if (($u['id'] ?? null) === $winnerId) {
+                        $u['points'] = (int)(($u['points'] ?? 0) + ($state['pot'] ?? 0));
+                        break;
+                    }
+                }
+                unset($u);
+
+                foreach ($state['players'] as &$p) {
+                    $p['toKick'] = ((int)($p['balance'] ?? 0) < 250);
+                }
+                unset($p);
+
+                file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                $Etag = ['Etag' => (string) Str::uuid()];
+                file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+                return response()->json(['newBalance' => $valToReturn, 'winner' => $winnerId]);
             }
         } else {
             $state['requiredBet'] = max((int) $state['requiredBet'], (int) $validatedAmount);
@@ -402,7 +475,6 @@ class GameController extends Controller
 
             $state['pot'] += $validatedAmount;
 
-            // change in users.json
             $user = clone session('user');
             foreach ($users as &$entry) {
                 if (($entry['id'] ?? null) === $user->id) {
@@ -444,18 +516,26 @@ class GameController extends Controller
             $state['requiredBet'] = 0;
             switch ($state['roundStep']) {
                 case 'flop':
-                    $state['communityCards'] = array_slice($state['deck'], 0, 3);
+                    $state['communityCards'] = array_map(
+                        fn($card) => $this->gameServices->Decrypt($card),
+                        array_slice($state['deck'], 0, 3)
+                    );
                     $state['deck'] = array_slice($state['deck'], 3);
                     break;
                 case 'turn':
-                    $state['communityCards'][] = $state['deck'][0];
+                    $state['communityCards'][] = $this->gameServices->Decrypt($state['deck'][0]);
                     $state['deck'] = array_slice($state['deck'], 1);
                     break;
                 case 'river':
-                    $state['communityCards'][] = $state['deck'][0];
+                    $state['communityCards'][] = $this->gameServices->Decrypt($state['deck'][0]);
                     $state['deck'] = array_slice($state['deck'], 1);
                     break;
                 case 'showdown':
+                    foreach ($state['players'] as &$player) {
+                        $player['cards'] = array_map(function ($card) {
+                            return $this->gameServices->Decrypt($card);
+                        }, $player['cards']);
+                    }
                     $this->settleRound($state);
                     break;
             }
@@ -464,7 +544,6 @@ class GameController extends Controller
                 $player['currentBet'] = 0;
                 $player['hasPlayed'] = false;
             }
-
         }
         file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
@@ -548,6 +627,14 @@ class GameController extends Controller
 
             file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         }
+
+        foreach ($players as &$player) {
+            $playerBalance = (int) ($player['balance'] ?? 0);
+            if ($playerBalance < 250) {
+                $player['toKick'] = true;
+            }
+        }
+        unset($player);
     }
     private function getPokerHand($cards)
     {
@@ -566,7 +653,6 @@ class GameController extends Controller
             'K' => 13,
             'A' => 14
         ];
-        // Flatten the nested array of cards
         $flatCards = [];
         foreach ($cards as $cardSet) {
             if (is_array($cardSet)) {
@@ -575,7 +661,7 @@ class GameController extends Controller
                 $flatCards[] = $cardSet;
             }
         }
-        // Parse ranks and suits
+
         $values = [];
         $suits = [];
         foreach ($flatCards as $card) {
@@ -591,7 +677,6 @@ class GameController extends Controller
         arsort($counts);
         $groups = array_values($counts);
 
-        // Detect flush
         $flushSuit = null;
         foreach ($suits as $suit => $vals) {
             if (count($vals) >= 5) {
@@ -602,11 +687,11 @@ class GameController extends Controller
             }
         }
 
-        // Helper inline functions
+
         $hasStraight = function (array $vals): bool {
             $vals = array_values(array_unique($vals));
             if (in_array(14, $vals))
-                $vals[] = 1; // Ace low
+                $vals[] = 1;
             sort($vals);
             $consec = 1;
             for ($i = 1; $i < count($vals); $i++) {
@@ -623,7 +708,7 @@ class GameController extends Controller
         $getStraightHigh = function (array $vals): ?int {
             $vals = array_values(array_unique($vals));
             if (in_array(14, $vals))
-                $vals[] = 1; // Ace low
+                $vals[] = 1;
             sort($vals);
             $consec = 1;
             for ($i = 1; $i < count($vals); $i++) {
@@ -638,11 +723,9 @@ class GameController extends Controller
             return null;
         };
 
-        // Check for straight
         $isStraight = $hasStraight($values);
         $straightHigh = $isStraight ? $getStraightHigh($values) : null;
 
-        // Check for straight flush
         if ($flushSuit) {
             $flushUnique = array_values(array_unique($flushVals));
             sort($flushUnique);
@@ -650,7 +733,7 @@ class GameController extends Controller
                 $highStraight = $getStraightHigh($flushUnique);
                 if ($highStraight == 14 && min($flushUnique) == 10)
                     return "Quinte Flush Royale";
-                return "Quinte Flush";
+                return "Quinte Flush, " . $highStraight;
             }
         }
         $group4val = null;
@@ -678,11 +761,11 @@ class GameController extends Controller
             array_shift($group2val);
         }
         if ($group4val)
-            return "Carrée";
+            return "Carrée," . $group4val;
         if ($group3val && $group2val)
             return "Full House," . $group3val . ',' . $group2val[count($group2val) - 1];
         if ($flushSuit)
-            return "Flush";
+            return "Flush," . $flushVals[4] . ',' . $flushVals[3] . ',' . $flushVals[2] . ',' . $flushVals[1] . ',' . $flushVals[0];
         if ($isStraight)
             return 'Quinte,' . $straightHigh;
         if ($group3val)
@@ -696,30 +779,53 @@ class GameController extends Controller
 
     public function quitPoker(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'playerId' => 'required|integer',
-            'force' => 'nullable|boolean'
-        ]);
+        $data = [];
+        if ($request->isJson()) {
+            $data = $request->json()->all();
+        }
+        if (empty($data)) {
+            $raw = $request->getContent();
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                $data = $decoded;
+            }
+        }
+        if (empty($data)) {
+            $data = $request->all();
+        }
+
+        $playerId = isset($data['playerId']) ? (int) $data['playerId'] : null;
+        $force = !empty($data['force']);
+
+        if (!$playerId) {
+            return response()->json(['success' => false, 'message' => 'playerId missing'], 200);
+        }
+
         $path = base_path(self::POKER_STATE_PATH);
         $state = json_decode(@file_get_contents($path), true) ?? [];
+        if ($state['roundStep'] === 'waiting') {
+            $state['players'] = array_filter($state['players'], function ($p) use ($playerId) {
+                return $p['id'] !== $playerId;
+            });
+        } else {
+            foreach ($state['players'] as &$player) {
+                if ($player['id'] === $playerId) {
+                    $player['toKick'] = true;
+                    if ($force) {
+                        $player['hasFolded'] = true;
+                        $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
 
-        foreach ($state['players'] as &$player) {
-            if ($player['id'] === $validated['playerId']) {
-                $player['toKick'] = true;
-                if ($validated['force']) {
-                    $player['hasFolded'] = true;
-                    $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
+                        if (count($activePlayers) === 1) {
+                            $state['roundStep'] = 'winByFold';
+                            $winner = reset($activePlayers);
+                            $winnerId = $winner['id'];
 
-                    if (count($activePlayers) === 1) {
-                        $state['roundStep'] = 'winByFold';
-                        $winner = reset($activePlayers);
-                        $winnerId = $winner['id'];
-
-                        foreach ($state['players'] as &$p) {
-                            if ($p['id'] === $winnerId) {
-                                $p['hasWon'] = true;
-                                $p['balance'] += ($state['pot'] ?? 0);
-                                break;
+                            foreach ($state['players'] as &$p) {
+                                if ($p['id'] === $winnerId) {
+                                    $p['hasWon'] = true;
+                                    $p['balance'] += ($state['pot'] ?? 0);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -727,28 +833,31 @@ class GameController extends Controller
                 }
             }
         }
+        unset($player);
 
         file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
         file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true], 200);
     }
 
-    public function wordleWord(): JsonResponse
+    public function getWordListForClient(): JsonResponse
     {
-        // Générer un mot secret stocké en session (invisible au client)
-        $wordsFile = storage_path('app/json/wordle.json');
-        $words = json_decode(file_get_contents($wordsFile), true);
+        $words = $this->getWordList();
 
-        $randomWord = strtoupper($words[array_rand($words)]);
-
-        // Stocker le mot en SESSION (pas renvoyé au client)
-        session(['wordle_secret' => $randomWord]);
-
-        // Renvoyer seulement une confirmation
-        return response()->json(['ready' => true]);
+        // Affiche que la cache est valide pendant 1000 sec. Jai tu vraiment de faire ca? idk mais je le garde la parce que je pense quon le faisait avec chourot
+        return response()->json($words)
+            ->header('Cache-Control', 'public, max-age=1000')
+            ->header('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 1000));
     }
 
+    private function getWordList(): array
+    {
+        return Cache::remember('wordle_words', 1000, function () { //temps de vie  de la cache 1000 sec
+            $wordsFile = storage_path('app/json/wordle.json');
+            return array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
+        });
+    }
     public function checkWord(Request $request): JsonResponse
     {
         $request->validate([
@@ -762,15 +871,6 @@ class GameController extends Controller
             return response()->json(['error' => 'No game in progress'], 400);
         }
 
-        // Vérifier si le mot existe dans le dictionnaire
-        $wordsFile = storage_path('app/json/wordle.json');
-        $words = array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
-
-        if (!in_array($inputWord, $words)) {
-            return response()->json(['valid' => false]);
-        }
-
-        // Calculer les couleurs des lettres
         $result = [];
         $secretLetters = str_split($secretWord);
         $inputLetters = str_split($inputWord);
@@ -792,12 +892,13 @@ class GameController extends Controller
         ]);
     }
 
-
-    private function getWordList(): array
+    public function wordleWord(): JsonResponse
     {
-        return Cache::remember('wordle_words', 3600, function () {
-            $wordsFile = storage_path('app/json/wordle.json');
-            return array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
-        });
+        $words = $this->getWordList();
+        $randomWord = $words[array_rand($words)];
+
+        session(['wordle_secret' => $randomWord]);
+
+        return response()->json(['ready' => true]);
     }
 }
