@@ -11,7 +11,7 @@ use App\Models\User;
 class AdminController extends Controller
 {
     private const USERS_PATH = 'database/json/users.json';
-        private UserServices $userService;
+    private UserServices $userService;
 
     public function __construct(UserServices $userService)
     {
@@ -80,7 +80,13 @@ class AdminController extends Controller
     }
         public function deleteUser(Request $request): RedirectResponse
     {
+        $this->userService->redirectIfNotConnected();
+        $this->userService->redirectIfNotAdmin();
         $userId = (int) $request->input('userId');
+        $currentUser = session('user');
+        if ($currentUser && $currentUser->id === $userId) {
+            return redirect('/admin/dashboard');
+        }
         $path = base_path(self::USERS_PATH);
         $users = json_decode(@file_get_contents($path), true);
         $users = array_filter($users, function ($user) use ($userId) {

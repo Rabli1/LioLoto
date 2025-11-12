@@ -53,4 +53,5 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 Route::post('admin/fixPoints', [AdminController::class, 'fixPoints']);
 Route::post('admin/toggleBan', [AdminController::class, 'toggleBan']);
 Route::post('admin/toggleAdmin', [AdminController::class, 'toggleAdmin']);
+Route::post('admin/deleteUser', [AdminController::class, 'deleteUser']);
 Route::post('admin/killPoker', [AdminController::class, 'killPoker']);
