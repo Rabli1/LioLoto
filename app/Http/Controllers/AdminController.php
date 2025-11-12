@@ -78,7 +78,7 @@ class AdminController extends Controller
         }
         return redirect('/admin/dashboard');
     }
-    public function deleteUser(Request $request): RedirectResponse
+        public function deleteUser(Request $request): RedirectResponse
     {
         $userId = (int) $request->input('userId');
         $path = base_path(self::USERS_PATH);
@@ -87,6 +87,24 @@ class AdminController extends Controller
             return $user['id'] !== $userId;
         });
         file_put_contents($path, json_encode(array_values($users)));
+        return redirect('/admin/dashboard');
+    }
+    public function killPoker(Request $request): RedirectResponse
+    {
+        $this->userService->redirectIfNotAdmin();
+        $path = database_path('json/pokerState.json');
+        $initialState = [
+            "playersTurn" => 1,
+            "roundStep" => "waiting",
+            "communityCards" => [],
+            "pot" => 75,
+            "requiredBet" => 50,
+            "smallBlind" => 1,
+            "queue" => [],
+            "players" => [],
+            "deck" => []
+        ];
+        file_put_contents($path, json_encode($initialState));
         return redirect('/admin/dashboard');
     }
 }
