@@ -27,34 +27,57 @@ usort($sortedUsers, static function ($a, $b) {
     return ($a['id'] ?? 0) <=> ($b['id'] ?? 0);
 });
 
-$medalFields = ['gold', 'silver', 'bronze'];
+$rankMedals = [
+    1 => 'gold',
+    2 => 'silver',
+    3 => 'bronze',
+];
 $awarded = [];
 
-foreach ($medalFields as $rank => $field) {
-    if (!isset($sortedUsers[$rank])) {
+$userIndex = [];
+foreach ($users as $idx => $entry) {
+    if (isset($entry['id'])) {
+        $userIndex[$entry['id']] = $idx;
+    }
+}
+unset($entry);
+
+$previousPoints = null;
+$currentRank = 0;
+
+foreach ($sortedUsers as $entry) {
+    $points = isset($entry['points']) ? (int) $entry['points'] : 0;
+
+    if ($previousPoints === null) {
+        $currentRank = 1;
+    } elseif ($points !== $previousPoints) {
+        $currentRank += 1;
+    }
+
+    if (!isset($rankMedals[$currentRank])) {
         break;
     }
 
-    $winnerId = $sortedUsers[$rank]['id'] ?? null;
-
-    if ($winnerId === null) {
+    $winnerId = $entry['id'] ?? null;
+    if ($winnerId === null || !isset($userIndex[$winnerId])) {
+        $previousPoints = $points;
         continue;
     }
 
-    foreach ($users as &$entry) {
-        if (($entry['id'] ?? null) === $winnerId) {
-            $entry[$field] = ($entry[$field] ?? 0) + 1;
-            $awarded[] = sprintf(
-                '%d. %s (ID %s) -> %s',
-                $rank + 1,
-                $entry['name'] ?? 'Unknown',
-                $winnerId,
-                strtoupper($field)
-            );
-            break;
-        }
-    }
-    unset($entry);
+    $medalField = $rankMedals[$currentRank];
+    $userIdx = $userIndex[$winnerId];
+    $users[$userIdx][$medalField] = ($users[$userIdx][$medalField] ?? 0) + 1;
+
+    $awarded[] = sprintf(
+        '%d. %s (ID %s, %d pts) -> %s',
+        $currentRank,
+        $users[$userIdx]['name'] ?? 'Unknown',
+        $winnerId,
+        $points,
+        strtoupper($medalField)
+    );
+
+    $previousPoints = $points;
 }
 
 foreach ($users as &$entry) {

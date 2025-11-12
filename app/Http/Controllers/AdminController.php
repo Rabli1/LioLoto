@@ -17,7 +17,7 @@ class AdminController extends Controller
     {
         $this->userService = $userService;
     }
-    public function dashboard(): View|RedirectResponse
+    public function dashboard(): View | RedirectResponse
     {
         $this->userService->redirectIfNotConnected();
         $this->userService->redirectIfNotAdmin();
@@ -26,9 +26,8 @@ class AdminController extends Controller
             'users' => $users,
         ]);
     }
-    public function fixPoints(Request $request): RedirectResponse
+    public function fixPoints(Request $request):RedirectResponse
     {
-        $this->userService->redirectIfNotAdmin();
         $userId = (int) $request->input('userId');
         $newPoints = (int) $request->input('points');
         $path = base_path(self::USERS_PATH);
@@ -43,7 +42,6 @@ class AdminController extends Controller
     }
     public function toggleBan(Request $request): RedirectResponse
     {
-        $this->userService->redirectIfNotAdmin();
         $userId = (int) $request->input('userId');
         $action = $request->input('action');
         $path = base_path(self::USERS_PATH);
@@ -63,7 +61,6 @@ class AdminController extends Controller
     }
     public function toggleAdmin(Request $request): RedirectResponse
     {
-        $this->userService->redirectIfNotAdmin();
         $userId = (int) $request->input('userId');
         $action = $request->input('action');
         $path = base_path(self::USERS_PATH);
@@ -79,6 +76,23 @@ class AdminController extends Controller
                 break;
             }
         }
+        return redirect('/admin/dashboard');
+    }
+        public function deleteUser(Request $request): RedirectResponse
+    {
+        $this->userService->redirectIfNotConnected();
+        $this->userService->redirectIfNotAdmin();
+        $userId = (int) $request->input('userId');
+        $currentUser = session('user');
+        if ($currentUser && $currentUser->id === $userId) {
+            return redirect('/admin/dashboard');
+        }
+        $path = base_path(self::USERS_PATH);
+        $users = json_decode(@file_get_contents($path), true);
+        $users = array_filter($users, function ($user) use ($userId) {
+            return $user['id'] !== $userId;
+        });
+        file_put_contents($path, json_encode(array_values($users)));
         return redirect('/admin/dashboard');
     }
     public function killPoker(Request $request): RedirectResponse
