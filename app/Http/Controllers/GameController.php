@@ -180,10 +180,8 @@ class GameController extends Controller
         if (!$user)
             return;
 
-        // Prevent players with insufficient points from joining
         $userPoints = is_object($user) ? ($user->points ?? 0) : ($user['points'] ?? 0);
         if ((int) $userPoints < 250) {
-            // do not add to queue / table if below minimum
             return;
         }
 
@@ -191,6 +189,10 @@ class GameController extends Controller
         $state = json_decode(@file_get_contents($path), true) ?? [];
 
         $players = $state['queue'] ?? [];
+        $state = json_decode(@file_get_contents($path), true) ?? [];
+        $state['players'] = $state['players'] ?? [];
+        $state['queue'] = $state['queue'] ?? [];
+        $state['roundStep'] = $state['roundStep'] ?? 'waiting';
         $playerInQueue = array_filter($players, function ($player) use ($user) {
             return $player['id'] == $user->id;
         });
@@ -211,13 +213,19 @@ class GameController extends Controller
                 'isAllIn' => false,
                 'hasFolded' => false,
                 'hasPlayed' => false,
-                "hasWon" => false,
+                'hasWon' => false,
                 'toKick' => false,
                 'hand' => "",
                 'cards' => [],
             ];
+
+            if (count($state['players']) >= 2) {
+                file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                $this->initRound();
+                return;
+            }
         } else {
-            $players[] = [
+            $state['queue'][] = [
                 'id' => $user->id,
                 'name' => $user->name,
                 'balance' => $user->points,
@@ -227,17 +235,11 @@ class GameController extends Controller
                 'isAllIn' => false,
                 'hasFolded' => false,
                 'hasPlayed' => false,
-                "hasWon" => false,
+                'hasWon' => false,
                 'toKick' => false,
                 'hand' => "",
                 'cards' => [],
             ];
-            $state['queue'] = $players;
-        }
-        if ($state['roundStep'] === 'waiting' && count($state['players']) > 1) {
-            file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-            $this->initRound();
-            return;
         }
 
         file_put_contents($path, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -424,10 +426,8 @@ class GameController extends Controller
         $actingIndex = array_search($userId, array_column($state['players'], 'id'));
 
         $player = &$state['players'][$actingIndex];
-        $valToReturn = 0;
 
         if ($validatedAmount === -1) {
-            $valToReturn = $player['balance'];
             $player['hasFolded'] = true;
 
             $activePlayers = array_filter($state['players'], fn($p) => !($p['hasFolded'] ?? false));
@@ -448,14 +448,14 @@ class GameController extends Controller
 
                 foreach ($users as &$u) {
                     if (($u['id'] ?? null) === $winnerId) {
-                        $u['points'] = (int)(($u['points'] ?? 0) + ($state['pot'] ?? 0));
+                        $u['points'] = (int) (($u['points'] ?? 0) + ($state['pot'] ?? 0));
                         break;
                     }
                 }
                 unset($u);
 
                 foreach ($state['players'] as &$p) {
-                    $p['toKick'] = ((int)($p['balance'] ?? 0) < 250);
+                    $p['toKick'] = ((int) ($p['balance'] ?? 0) < 250);
                 }
                 unset($p);
 
@@ -464,15 +464,13 @@ class GameController extends Controller
                 $Etag = ['Etag' => (string) Str::uuid()];
                 file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-                return response()->json(['newBalance' => $valToReturn, 'winner' => $winnerId]);
+                return response()->json(['winner' => $winnerId]);
             }
         } else {
-            $state['requiredBet'] = max((int) $state['requiredBet'], (int) $validatedAmount);
-            $valToReturn = $player['balance'] - $validatedAmount;
             $player['currentBet'] += $validatedAmount;
             $player['hasPlayed'] = true;
             $player['balance'] -= $validatedAmount;
-
+            $state['requiredBet'] = max((int) $state['requiredBet'], (int) $player['currentBet']);
             $state['pot'] += $validatedAmount;
 
             $user = clone session('user');
@@ -483,7 +481,6 @@ class GameController extends Controller
                     }
                     $entry['points'] -= $validatedAmount;
                     $entry['points'] = (int) $entry['points'];
-                    $valToReturn = $entry['points'];
                     $user->points = (int) $entry['points'];
                     break;
                 }
@@ -548,7 +545,7 @@ class GameController extends Controller
         file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $Etag = ['Etag' => (string) Str::uuid()];
         file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        return response()->json(['newBalance' => $valToReturn]);
+        return response()->json();
     }
     private function settleRound(&$state): void
     {

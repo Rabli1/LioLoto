@@ -304,8 +304,6 @@ function placeBet(bet) {
             amount: bet
         },
         success: function (response) {
-            balanceUI.text(`Solde : ${response.newBalance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/,/g, ' ')}`);
-            console.log("new balance: " + response.newBalance);
         },
         error: function (xhr, status, error) {
             console.error('Error placing bet:', error);

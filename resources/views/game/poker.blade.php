@@ -13,9 +13,10 @@
             </header>
             <section id="gameMat" class="p-3 rounded bg-dark text-center">
                 @if(session()->has('user'))
-                    <button class="btn btn-danger" id="join-button">Rejoindre</button>
-                    <button class="btn btn-danger" id="quit-button">Quitter</button>
-
+                    @if(session('user')->points > 250)
+                        <button class="btn btn-danger" id="join-button">Rejoindre</button>
+                        <button class="btn btn-danger" id="quit-button">Quitter</button>
+                    @endif
                 @else
                     <a href="{{ url('/user/connection') }}" class="btn btn-danger">Connectez-vous pour rejoindre</a>
                 @endif
@@ -135,8 +136,7 @@
                 <h4 class="text-center mb-1">Placez votre mise</h4>
                 <div id="required-call">(200 pour call)</div>
                 <div class="progress">
-                    <div class="progress-bar bg-danger" role="progressbar"
-                        style="width: 0%;">
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: 0%;">
                     </div>
                 </div>
                 <div id="poker-error" class="text-danger mb-2"></div>
