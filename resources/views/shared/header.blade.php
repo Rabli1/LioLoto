@@ -17,6 +17,10 @@
     body {
       background-color: rgba(26, 26, 26, 1);
       color: #FCF0F0;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     .leaderboard-card {
