@@ -20,9 +20,32 @@
 
             <div id="endContainer"></div>
             <div id="endAmount"></div>
-            
+
             <header class="mb-4">
-                <h1 class="mb-2">Roulette</h1>
+                <div class="d-flex justify-content-center align-items-end gap-2">
+                    <h1 class="mb-2">Roulette</h1>
+                    <div class="info-container">
+                        <button id="infoBtn" class="btn btn-secondary p-2">
+                            <i class="fa-solid fa-info"></i>
+                        </button>
+
+                        <div class="info-popup" id="infoBox">
+                            <p class="mb-0">
+                                Dans la roulette, misez sur un numéro, une couleur ou une zone. Le résultat dépend du
+                                lancer de la bille.
+                                plus d'information <a href="/user/support?game=roulette">ici</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    const btn = document.getElementById("infoBtn");
+                    const box = document.getElementById("infoBox");
+
+                    btn.addEventListener("click", () => {
+                        box.style.display = (box.style.display === "block") ? "none" : "block";
+                    });
+                </script>
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Placer des mises et tenter votre chance !
                 </p>

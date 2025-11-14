@@ -20,7 +20,31 @@
     <div id="container">
         <div id="game">
             <header>
-                <h1 class="title">LIOTODLE</h1>
+                <div class="d-flex justify-content-center align-items-end gap-2">
+                    <h1 class="mb-2">Liotodle</h1>
+                    <div class="info-container">
+                        <button id="infoBtn" class="btn btn-secondary p-2">
+                            <i class="fa-solid fa-info"></i>
+                        </button>
+
+                        <div class="info-popup" id="infoBox">
+                            <p class="mb-0">
+                                Devinez le mot en un nombre limité d’essais. Les couleurs indiquent la justesse des
+                                lettres.
+                                plus d'information <a href="/user/support?game=liotodle">ici</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    const btn = document.getElementById("infoBtn");
+                    const box = document.getElementById("infoBox");
+
+                    btn.addEventListener("click", () => {
+                        box.style.display = (box.style.display === "block") ? "none" : "block";
+                    });
+                </script>
+
             </header>
 
             <div id="board-container">

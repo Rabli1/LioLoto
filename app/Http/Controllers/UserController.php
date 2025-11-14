@@ -360,8 +360,9 @@ class UserController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
     }
-    public function support()
+    public function support(Request $request)
     {
-        return view('user.support');
+        $game = $request->input('game') ?? "";
+        return view('user.support', ['game' => $game]);
     }
 }
