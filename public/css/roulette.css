@@ -494,3 +494,275 @@
     }
 }
 
+/* Responsive Mobile Styles */
+@media (max-width: 768px) {
+    /* Reduce roulette wheel size */
+    .roulette {
+        height: 250px;
+        width: 250px;
+        margin: 10px auto;
+    }
+
+    .outerRim {
+        width: 248px;
+        height: 248px;
+        border: 8px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .rouletteSect {
+        top: 8px;
+        left: 8px;
+        width: 232px;
+        height: 232px;
+        clip: rect(0px, 232px, 232px, 116px);
+    }
+
+    .singleNum {
+        left: 122px;
+        margin-top: 3px;
+        font-size: 11px;
+    }
+
+    .doubleNum {
+        left: 118px;
+        margin-top: 3px;
+        font-size: 11px;
+    }
+
+    .block {
+        width: 232px;
+        height: 232px;
+        clip: rect(0px, 116px, 232px, 0px);
+    }
+
+    .pocketSect {
+        top: 30px;
+        left: 30px;
+        width: 188px;
+        height: 188px;
+    }
+
+    .rimPockets {
+        top: 27px;
+        left: 27px;
+        width: 193px;
+        height: 193px;
+        border: 2px solid silver;
+    }
+
+    .middleRoulette {
+        top: 50px;
+        left: 49px;
+        height: 149px;
+        width: 149px;
+        border: 2px solid #9f9a9a;
+    }
+
+    .ballContainer {
+        width: 170px;
+        height: 166px;
+        left: 38px;
+        top: 40px;
+    }
+
+    .ball {
+        width: 12px;
+        height: 12px;
+        left: 87px;
+        top: -6px;
+    }
+
+    .spinButton {
+        height: 60px;
+        width: 60px;
+        font-size: 14px;
+    }
+
+    /* Adjust betting mat */
+    #bettingMat {
+        grid-template-columns: 45px 45px 2px 45px 2px 45px 2px 45px 2px 45px 2px 45px 2px 45px 2px 45px 2px 45px 2px 45px 2px 45px 2px 45px 45px;
+        grid-template-rows: 45px 45px 2px 45px 2px 45px 45px;
+        gap: 1px;
+        transform: scale(0.85);
+        transform-origin: center;
+        margin: 20px auto;
+        padding: 10px 0;
+    }
+
+    #bettingMat > div {
+        font-size: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 2px;
+    }
+
+    #betMat {
+        overflow: visible;
+        padding: 20px 5px;
+    }
+
+    .rouletteToken {
+        width: 22px;
+        height: 22px;
+        font-size: 9px;
+        border: 1px solid rgb(255, 255, 255, 0.20);
+    }
+
+    .tokenWage {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+        border: 1px solid rgb(255, 255, 255, 0.20);
+        margin: 3px;
+    }
+
+    .tokenWage:hover {
+        border: 1px solid white;
+    }
+
+    .tokenWageSelected {
+        border: 1px solid white;
+    }
+
+    #clearMat {
+        margin-top: 10px;
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    /* Adjust win/lose overlays */
+    .loseAmount,
+    .winAmount {
+        font-size: 2em;
+        top: 60%;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Even smaller for very small screens */
+    .roulette {
+        height: 200px;
+        width: 200px;
+        margin: 5px auto;
+    }
+
+    .outerRim {
+        width: 198px;
+        height: 198px;
+        border: 6px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .rouletteSect {
+        top: 6px;
+        left: 6px;
+        width: 186px;
+        height: 186px;
+        clip: rect(0px, 186px, 186px, 93px);
+    }
+
+    .singleNum {
+        left: 98px;
+        margin-top: 2px;
+        font-size: 9px;
+    }
+
+    .doubleNum {
+        left: 94px;
+        margin-top: 2px;
+        font-size: 9px;
+    }
+
+    .block {
+        width: 186px;
+        height: 186px;
+        clip: rect(0px, 93px, 186px, 0px);
+    }
+
+    .pocketSect {
+        top: 24px;
+        left: 24px;
+        width: 150px;
+        height: 150px;
+    }
+
+    .rimPockets {
+        top: 22px;
+        left: 22px;
+        width: 155px;
+        height: 155px;
+        border: 2px solid silver;
+    }
+
+    .middleRoulette {
+        top: 40px;
+        left: 39px;
+        height: 119px;
+        width: 119px;
+        border: 2px solid #9f9a9a;
+    }
+
+    .ballContainer {
+        width: 136px;
+        height: 133px;
+        left: 30px;
+        top: 32px;
+    }
+
+    .ball {
+        width: 10px;
+        height: 10px;
+        left: 70px;
+        top: -5px;
+    }
+
+    .spinButton {
+        height: 50px;
+        width: 50px;
+        font-size: 12px;
+    }
+
+    /* Ultra compact betting mat */
+    #bettingMat {
+        grid-template-columns: 36px 36px 2px 36px 2px 36px 2px 36px 2px 36px 2px 36px 2px 36px 2px 36px 2px 36px 2px 36px 2px 36px 2px 36px 36px;
+        grid-template-rows: 36px 36px 2px 36px 2px 36px 36px;
+        gap: 1px;
+        transform: scale(0.75);
+        transform-origin: center;
+        margin: 15px auto;
+        max-width: 100%;
+        padding: 10px 0;
+    }
+
+    #bettingMat > div {
+        font-size: 13px;
+    }
+    
+    /* Container adjustments for better fit */
+    #betMat {
+        padding: 15px 10px;
+        overflow: visible;
+    }
+
+    .rouletteToken {
+        width: 18px;
+        height: 18px;
+        font-size: 8px;
+    }
+
+    .tokenWage {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+        margin: 2px;
+    }
+
+    #clearMat {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+
+    .loseAmount,
+    .winAmount {
+        font-size: 1.5em;
+    }
+}
+
