@@ -110,7 +110,7 @@
                     <div class="row">
                         <h3>Poker</h3>
                     </div>
-                    <div class="row"><a href="/game/poker" class="btn btn-danger btn-md">Jouer (beta)</a></div>
+                    <div class="row"><a href="/game/poker" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">
