@@ -37,6 +37,7 @@ Route::get('game/liotodle', [GameController::class, 'liotodle']);
 Route::get('/game/liotodle/word', [GameController::class, 'liotodleWord']);
 Route::get('/game/liotodle/check', [GameController::class, 'checkWord']);
 Route::get('/game/liotodle/list', [GameController::class, 'getWordListForClient']);
+Route::post('/game/liotodle/finish', [GameController::class, 'finishDaily']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);

@@ -178,12 +178,31 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.warn("Balance non trouvée : impossible d'ajouter les points");
                 }
 
+                fetch('/game/liotodle/finish', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ finished: true })
+                });
+
                 isSubmitting = true;
                 return;
             }
 
             if (guessedWordCount === 6 && !won) {
                 window.alert("Vous avez perdu. Le mot était : " + secretWord);
+
+                fetch('/game/liotodle/finish', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ finished: true })
+                });
+                
                 isSubmitting = true;
                 return;
             }

@@ -937,4 +937,31 @@ class GameController extends Controller
 
         return response()->json(['ready' => true]);
     }
+
+    public function finishDaily(Request $request)
+    {
+        if (!session()->has('user')) {
+            return response()->json(['error' => 'No user'], 401);
+        }
+
+        $user = session()->get('user');
+        $user->daily = false;
+
+        session()->put('user', $user);
+
+        $path = base_path(self::USERS_PATH);
+
+        $users = json_decode(file_get_contents($path));
+
+        foreach ($users as $u) {
+            if ($u->id == $user->id) {
+                $u->daily = false;
+                break;
+            }
+        }
+
+        file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT));
+
+        return response()->json(['status' => 'daily_disabled']);
+    }
 }
