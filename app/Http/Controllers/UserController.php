@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\File;
+
 use Illuminate\Http\Request;
 use App\Services\UserServices;
-use App\Models\User;
-use ValueError;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordChangedMail;
 use App\Mail\AccountConfirmationMail;
@@ -56,7 +52,8 @@ class UserController extends Controller
             "lvl" => 1,
             "exp" => 0,
             "last_update" => date("Y-m-d"),
-            "confirmation_token" => $confirmationToken
+            "confirmation_token" => $confirmationToken,
+            "daily" => true
         ];
         $users[] = $newUser;
         file_put_contents('../database/json/users.json', json_encode($users));

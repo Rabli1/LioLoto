@@ -36,6 +36,7 @@
                     <div class="row"><a href="/game/blackjack" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
             </div>
+            @if (session()->has('user') && session()->get('user')->daily)
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
                     <div class="row"><img style="height: 210px;" src='{{ asset("img/liotodle.png") }}' alt="Liotodle">
@@ -46,7 +47,8 @@
                     <div class="row"><a href="/game/wordle" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
             </div>
-            <div class="col-lg-4 mb-4">
+            @endif
+            <div class="col-lg-4 mb-4 plinko-container">
                 <div class="leaderboard-card text-center">
                     <div class="row"><img style="height: 210px;" src='{{ asset("img/plinko.webp") }}' alt="Plinko">
                     </div>

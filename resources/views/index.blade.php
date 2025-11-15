@@ -96,6 +96,7 @@
         </div>
     </div>
     <div class="container mt-5">
+        @if (session()->has('user') && session()->get('user')->daily)
         <h4 class="text-center mt-4">Jeux Quotidien</h4>
 
         <div class="row justify-content-center">
@@ -113,6 +114,8 @@
                 </div>
             </div>
         </div>
+        @endif
+        
         <h1 style="text-align: center; margin-top: 20px;">Jeux disponibles</h1>
         <div class="row">
             <div class="col-lg-4 mb-4">
@@ -124,8 +127,8 @@
                     </div>
                     <div class="row"><a href="/game/blackjack" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
-            </div>
-            <div class="col-lg-4 mb-4">
+            </div>            
+            <div class="col-lg-4 mb-4 plinko-container">
                 <div class="leaderboard-card text-center">
                     <div class="row"><img style="height: 210px;" src='{{ asset("img/plinko.webp") }}' alt="Plinko">
                     </div>
