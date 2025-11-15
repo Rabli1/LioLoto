@@ -29,7 +29,7 @@
 
                         <div class="info-popup" id="infoBox">
                             <p class="mb-0">
-                                Devinez le mot en un nombre limité d’essais. Les couleurs indiquent la justesse des
+                                Devinez le mot en un nombre limité d'essais. Les couleurs indiquent la justesse des
                                 lettres.
                                 plus d'information <a href="/user/support?game=liotodle">ici</a>
                             </p>
@@ -89,6 +89,11 @@
                     <button data-key="del" class="wide-button">Del</button>
                 </div>
             </div>
+        </div>
+
+        <!-- ✅ Modal de résultat -->
+        <div id="resultModal" class="result-modal">
+                <div id="resultPoints" class="result-points"></div>
         </div>
     </div>
 </body>

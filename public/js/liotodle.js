@@ -11,12 +11,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const keys = document.querySelectorAll(".keyboard-row button");
 
-    // tester ctrl+shift+s 
-    window.revealSecret = () => {
-        console.log("🔍 Mot secret:", secretWord);
-        alert("Mot secret: " + secretWord);
-        return secretWord;
-    };
+    function showResultModal(won, attempts, points) {
+        const modal = document.getElementById('resultModal');
+
+        const pointsDiv = document.getElementById('resultPoints');
+
+        if (won) {
+            pointsDiv.textContent = `+${points} points`;
+            pointsDiv.classList.remove('lost');
+        } else {
+            pointsDiv.textContent = 'Aucun point';
+            pointsDiv.classList.add('lost');
+        }
+
+        modal.classList.add('show');
+        setTimeout(() => {
+            modal.classList.remove('show');
+        }, 2000);
+    }
+
+    function shakeRow(rowIndex) {
+        const start = rowIndex * 5 + 1;
+
+        for (let i = 0; i < 5; i++) {
+            const tile = document.getElementById(start + i);
+
+            tile.classList.add("animate__shakeX");
+
+            tile.addEventListener("animationend", () => {
+                tile.classList.remove("animate__shakeX");
+            });
+        }
+    }
 
     async function initGame() {
         try {
@@ -26,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             secretWord = validWords[Math.floor(Math.random() * validWords.length)];
         } catch (error) {
-            console.error("Erreur lors de l'initialisation:", error);
+            console.error("Erreur", error);
         }
     }
 
@@ -59,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const secretUsed = new Array(5).fill(false);
         const guessResult = new Array(5).fill('absent');
 
-        //lettre verte (correcte)
         for (let i = 0; i < 5; i++) {
             if (guessLetters[i] === secretLetters[i]) {
                 guessResult[i] = 'correct';
@@ -67,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        //lettre jaune (presente)
         for (let i = 0; i < 5; i++) {
             if (guessResult[i] === 'correct') continue;
 
@@ -117,7 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const currentWordArr = getCurrentWordArr();
         if (currentWordArr.length !== 5) {
-            window.alert("Le mot doit contenir 5 lettres");
             return;
         }
 
@@ -125,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const currentWord = currentWordArr.join("").toUpperCase();
 
         if (!validWords.includes(currentWord)) {
-            alert(currentWord + " est invalide !");
+            shakeRow(guessedWordCount);
             isSubmitting = false;
             return;
         }
@@ -158,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateKeyboardColors(currentWord, result);
 
             guessedWordCount += 1;
+
             if (won) {
                 let points = 0;
                 switch (guessedWordCount) {
@@ -169,14 +193,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     case 6: points = 300; break;
                     default: points = 0;
                 }
+
                 Balance.init({ session: window.gameSession });
                 if (window.Balance) {
                     Balance.gain(points, { persist: true });
-                    alert(`Félicitations ! Vous avez gagné ${points} points 🎉`);
-                } else {
-                    alert("Félicitations !");
-                    console.warn("Balance non trouvée : impossible d'ajouter les points");
                 }
+
+                showResultModal(true, guessedWordCount, points);
 
                 fetch('/game/liotodle/finish', {
                     method: 'POST',
@@ -186,13 +209,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     },
                     body: JSON.stringify({ finished: true })
                 });
+
+                 const soundUrl = window.soundAssets?.rouletteWin || '../sounds/rouletteWin.wav';
+                wordleWinSoundBase = new Audio(soundUrl);
+                wordleWinSoundBase.preload = 'auto';
+                wordleWinSoundBase.volume = 0.5;
+                wordleWinSoundBase.load();
+                wordleWinSoundBase.play();
 
                 isSubmitting = true;
                 return;
             }
 
             if (guessedWordCount === 6 && !won) {
-                window.alert("Vous avez perdu. Le mot était : " + secretWord);
+                showResultModal(false, guessedWordCount, 0);
 
                 fetch('/game/liotodle/finish', {
                     method: 'POST',
@@ -202,7 +232,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     },
                     body: JSON.stringify({ finished: true })
                 });
-                
+
+                const soundUrl = window.soundAssets?.rouletteWin || '../sounds/sadTrombone.mp3';
+                wordleLoseSoundBase = new Audio(soundUrl);
+                wordleLoseSoundBase.preload = 'auto';
+                wordleLoseSoundBase.volume = 0.5;
+                wordleLoseSoundBase.load();
+                wordleLoseSoundBase.play();
+
                 isSubmitting = true;
                 return;
             }
@@ -274,11 +311,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const key = event.key.toLowerCase();
 
-        // Ctrl + Shift + S pour tester
         if (event.ctrlKey && event.shiftKey && key === 's') {
             event.preventDefault();
-            alert("🔍 Mot secret: " + secretWord);
-            console.log("Mot secret:", secretWord);
+            alert("Mot secret: " + secretWord);
             return;
         }
 
