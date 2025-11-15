@@ -109,7 +109,7 @@
                         <h3>Liotodle</h3>
                     </div>
                     <div class="row">
-                        <a href="/game/wordle" class="btn btn-danger btn-md">Jouer</a>
+                        <a href="/game/liotodle" class="btn btn-danger btn-md">Jouer</a>
                     </div>
                 </div>
             </div>

@@ -362,4 +362,6 @@ class UserController extends Controller
         $game = $request->input('game') ?? "";
         return view('user.support', ['game' => $game]);
     }
+
+    
 }

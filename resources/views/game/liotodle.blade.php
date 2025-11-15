@@ -11,15 +11,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script src="{{ asset('js/wordle.js') }}"></script>
-    <link rel="stylesheet" href="{{ asset('css/wordle.css') }}">
+    <script src="{{ asset('js/liotodle.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('css/liotodle.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 </head>
 
 <body>
     <div id="container">
         <div id="game">
-            <header>
+            <header style="margin-top: 7%;">
                 <div class="d-flex justify-content-center align-items-end gap-2">
                     <h1 class="mb-2">Liotodle</h1>
                     <div class="info-container">

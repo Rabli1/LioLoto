@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function initGame() {
         try {
-            const wordsResponse = await fetch("/game/wordle/list");
+            const wordsResponse = await fetch("/game/liotodle/list");
             const words = await wordsResponse.json();
             validWords = words.map(w => w.toUpperCase());
 

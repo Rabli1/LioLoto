@@ -138,3 +138,7 @@ header {
 .keyboard-row button.key-absent:hover {
     background-color: rgb(68, 68, 70) !important;
 }
+
+body {
+background-color: black;
+}
