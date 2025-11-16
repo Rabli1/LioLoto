@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\File;
+
 use Illuminate\Http\Request;
 use App\Services\UserServices;
-use App\Models\User;
-use ValueError;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordChangedMail;
 use App\Mail\AccountConfirmationMail;
@@ -56,7 +52,8 @@ class UserController extends Controller
             "lvl" => 1,
             "exp" => 0,
             "last_update" => date("Y-m-d"),
-            "confirmation_token" => $confirmationToken
+            "confirmation_token" => $confirmationToken,
+            "daily" => true
         ];
         $users[] = $newUser;
         file_put_contents('../database/json/users.json', json_encode($users));
@@ -160,21 +157,6 @@ class UserController extends Controller
 
     public function authenticate(Request $request)
     {
-        if (!session()->has('user') && $request->hasCookie('remember_user')) {
-            $cookieUser = json_decode($request->cookie('remember_user'), true);
-            if ($cookieUser) {
-                $userArray = $this->userService->findByUsername($cookieUser['username']);
-
-                if ($userArray && isset($cookieUser['password']) && password_verify($cookieUser['password'], $userArray['password'])) {
-                    $user = (object) $userArray;
-                    session(['user' => $user]);
-                    return redirect('/');
-                } else {
-                    return redirect('user/connection')
-                        ->withCookie(cookie()->forget('remember_user'));
-                }
-            }
-        }
 
         $userArray = $this->userService->verifyCredentials($request->username, $request->password);
         if (!$userArray) {
@@ -365,4 +347,6 @@ class UserController extends Controller
         $game = $request->input('game') ?? "";
         return view('user.support', ['game' => $game]);
     }
+
+    
 }

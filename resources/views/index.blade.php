@@ -108,11 +108,12 @@
                         <h3>Liotodle</h3>
                     </div>
                     <div class="row">
-                        <a href="/game/wordle" class="btn btn-danger btn-md">Jouer</a>
+                        <a href="/game/liotodle" class="btn btn-danger btn-md">Jouer</a>
                     </div>
                 </div>
             </div>
         </div>
+        
         <h1 style="text-align: center; margin-top: 20px;">Jeux disponibles</h1>
         <div class="row">
             <div class="col-lg-4 mb-4">
@@ -124,8 +125,8 @@
                     </div>
                     <div class="row"><a href="/game/blackjack" class="btn btn-danger btn-md">Jouer</a></div>
                 </div>
-            </div>
-            <div class="col-lg-4 mb-4">
+            </div>            
+            <div class="col-lg-4 mb-4 plinko-container">
                 <div class="leaderboard-card text-center">
                     <div class="row"><img style="height: 210px;" src='{{ asset("img/plinko.webp") }}' alt="Plinko">
                     </div>

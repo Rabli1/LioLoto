@@ -83,13 +83,13 @@ class GameController extends Controller
         ]);
     }
 
-    public function wordle(): View
+    public function liotodle(): View
     {
 
         $player = $this->resolvePlayer();
         $balance = $player?->points ?? 0;
 
-        return view('game.wordle', [
+        return view('game.liotodle', [
             'playerBalance' => $balance,
         ]);
     }
@@ -889,8 +889,8 @@ class GameController extends Controller
 
     private function getWordList(): array
     {
-        return Cache::remember('wordle_words', 1000, function () { //temps de vie  de la cache 1000 sec
-            $wordsFile = storage_path('app/json/wordle.json');
+        return Cache::remember('liotodle_words', 1000, function () { //temps de vie  de la cache 1000 sec
+            $wordsFile = storage_path('app/json/liotodle.json');
             return array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
         });
     }
@@ -901,7 +901,7 @@ class GameController extends Controller
         ]);
 
         $inputWord = strtoupper($request->query('word'));
-        $secretWord = session('wordle_secret');
+        $secretWord = session('liotodle_secret');
 
         if (!$secretWord) {
             return response()->json(['error' => 'No game in progress'], 400);
@@ -928,13 +928,40 @@ class GameController extends Controller
         ]);
     }
 
-    public function wordleWord(): JsonResponse
+    public function liotodleWord(): JsonResponse
     {
         $words = $this->getWordList();
         $randomWord = $words[array_rand($words)];
 
-        session(['wordle_secret' => $randomWord]);
+        session(['liotodle_secret' => $randomWord]);
 
         return response()->json(['ready' => true]);
+    }
+
+    public function finishDaily(Request $request)
+    {
+        if (!session()->has('user')) {
+            return response()->json(['error' => 'No user'], 401);
+        }
+
+        $user = session()->get('user');
+        $user->daily = false;
+
+        session()->put('user', $user);
+
+        $path = base_path(self::USERS_PATH);
+
+        $users = json_decode(file_get_contents($path));
+
+        foreach ($users as $u) {
+            if ($u->id == $user->id) {
+                $u->daily = false;
+                break;
+            }
+        }
+
+        file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT));
+
+        return response()->json(['status' => 'daily_disabled']);
     }
 }

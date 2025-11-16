@@ -31,7 +31,7 @@
         
         <p>Merci de vous être inscrit sur notre plateforme.</p>
         
-        <p>Pour activer votre compte, veuillez cliquer sur le lien suivant: </p>
+        <p>Pour activer votre compte, veuillez aller sur le lien suivant: </p>
 
         <p>{{ $confirmationUrl }}</p>
 

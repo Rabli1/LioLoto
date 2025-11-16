@@ -36,10 +36,11 @@ Route::get('game/slot-machine', [GameController::class, 'slotMachine']);
 Route::get('game/crash', [GameController::class, 'crash']);
 Route::get('game/coinflip',[GameController::class, 'coinflip']);
 Route::get('game/poker', [GameController::class, 'poker']);
-Route::get('game/wordle', [GameController::class, 'wordle']);
-Route::get('/game/wordle/word', [GameController::class, 'wordleWord']);
-Route::get('/game/wordle/check', [GameController::class, 'checkWord']);
-Route::get('/game/wordle/list', [GameController::class, 'getWordListForClient']);
+Route::get('game/liotodle', [GameController::class, 'liotodle']);
+Route::get('/game/liotodle/word', [GameController::class, 'liotodleWord']);
+Route::get('/game/liotodle/check', [GameController::class, 'checkWord']);
+Route::get('/game/liotodle/list', [GameController::class, 'getWordListForClient']);
+Route::post('/game/liotodle/finish', [GameController::class, 'finishDaily']);
 
 Route::get('/check-username', [UserController::class, 'checkUsername']);
 Route::get('/check-email', [UserController::class, 'checkEmail']);
