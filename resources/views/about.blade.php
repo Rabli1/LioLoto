@@ -53,7 +53,7 @@
 
         <div class="row row-member left mb-4">
             <div class="col-md-4 img-side d-flex justify-content-start">
-                <img src="{{ asset('img/members/justin.png') }}" alt="Justin Lessard" class="img-fluid member-img">
+                <img src="{{ asset('img/members/justin.jpg') }}" alt="Justin Lessard" class="img-fluid member-img">
             </div>
             <div class="col-md-8">
                 <div class="member-info member-card">
