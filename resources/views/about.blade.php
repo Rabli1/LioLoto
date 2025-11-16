@@ -45,7 +45,7 @@
 
         <div class="row row-member left mb-4">
             <div class="col-md-4 img-side d-flex justify-content-start">
-                <img src="{{ asset('img/chicken.png') }}" alt="Justin Lessard" class="img-fluid member-img">
+                <img src="{{ asset('img/members/justin.png') }}" alt="Justin Lessard" class="img-fluid member-img">
             </div>
             <div class="col-md-8">
                 <div class="member-info member-card">
@@ -63,7 +63,7 @@
                 </div>
             </div>
             <div class="col-md-4 img-side d-flex justify-content-end order-1 order-md-2">
-                <img src="{{ asset('img/chicken.png') }}" alt="Émil Tittley" class="img-fluid member-img">
+                <img src="{{ asset('img/members/emil.png') }}" alt="Émil Tittley" class="img-fluid member-img">
             </div>
         </div>
     </div>
