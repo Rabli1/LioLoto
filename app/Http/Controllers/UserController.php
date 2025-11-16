@@ -157,21 +157,6 @@ class UserController extends Controller
 
     public function authenticate(Request $request)
     {
-        if (!session()->has('user') && $request->hasCookie('remember_user')) {
-            $cookieUser = json_decode($request->cookie('remember_user'), true);
-            if ($cookieUser) {
-                $userArray = $this->userService->findByUsername($cookieUser['username']);
-
-                if ($userArray && isset($cookieUser['password']) && password_verify($cookieUser['password'], $userArray['password'])) {
-                    $user = (object) $userArray;
-                    session(['user' => $user]);
-                    return redirect('/');
-                } else {
-                    return redirect('user/connection')
-                        ->withCookie(cookie()->forget('remember_user'));
-                }
-            }
-        }
 
         $userArray = $this->userService->verifyCredentials($request->username, $request->password);
         if (!$userArray) {
