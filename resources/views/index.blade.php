@@ -96,7 +96,6 @@
         </div>
     </div>
     <div class="container mt-5">
-        @if (session()->has('user') && session()->get('user')->daily)
         <h4 class="text-center mt-4">Jeux Quotidien</h4>
 
         <div class="row justify-content-center">
@@ -114,7 +113,6 @@
                 </div>
             </div>
         </div>
-        @endif
         
         <h1 style="text-align: center; margin-top: 20px;">Jeux disponibles</h1>
         <div class="row">

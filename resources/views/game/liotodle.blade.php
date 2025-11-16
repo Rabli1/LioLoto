@@ -91,9 +91,8 @@
             </div>
         </div>
 
-        <!-- ✅ Modal de résultat -->
         <div id="resultModal" class="result-modal">
-                <div id="resultPoints" class="result-points"></div>
+            <div id="resultPoints" class="result-points"></div>
         </div>
     </div>
 </body>

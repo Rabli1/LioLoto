@@ -200,17 +200,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 showResultModal(true, guessedWordCount, points);
-
+                
                 fetch('/game/liotodle/finish', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ finished: true })
+                    }
                 });
 
-                 const soundUrl = window.soundAssets?.rouletteWin || '../sounds/rouletteWin.wav';
+                const soundUrl = window.soundAssets?.rouletteWin || '../sounds/rouletteWin.wav';
                 wordleWinSoundBase = new Audio(soundUrl);
                 wordleWinSoundBase.preload = 'auto';
                 wordleWinSoundBase.volume = 0.5;
@@ -229,8 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ finished: true })
+                    }
                 });
 
                 const soundUrl = window.soundAssets?.rouletteWin || '../sounds/sadTrombone.mp3';
