@@ -5,11 +5,19 @@
 @vite(['resources/js/app.jsx'])
 
 <style>
-    .member-img {border-radius: .5rem;}
+    .member-img {
+        border-radius: .5rem;
+    }
 
     @media(min-width: 768px) {
-        .img-side { padding-left: 3rem; padding-right: 3rem; }
-        .row-member { align-items: center; }
+        .img-side {
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+
+        .row-member {
+            align-items: center;
+        }
     }
 </style>
 
@@ -65,6 +73,14 @@
             <div class="col-md-4 img-side d-flex justify-content-end order-1 order-md-2">
                 <img src="{{ asset('img/members/emil.png') }}" alt="Émil Tittley" class="img-fluid member-img">
             </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="ratio ratio-16x9" style="max-width: 900px; width: 100%;">
+            <video controls class="w-100 h-100">
+                <source src="{{ asset('video/lotolio.mp4') }}" type="video/mp4">
+                Votre navigateur ne supporte pas la vidéo.
+            </video>
         </div>
     </div>
 </main>
