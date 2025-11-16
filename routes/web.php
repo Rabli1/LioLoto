@@ -21,6 +21,9 @@ Route::get('/user/changePassword', [UserController::class, 'changePassword'])->n
 Route::post('/user/changePassword', [UserController::class, 'updatePassword'])->name('user.updatePassword');
 Route::get('user/support', [UserController::class, 'support']);
 Route::get('/leaderboard', [UserController::class, 'leaderboard']);
+Route::get('/about', function () {
+    return view('about');
+});
 Route::get('/game', function () {
     return view('game.index');
 });
