@@ -10,7 +10,30 @@
   <div class="container">
     <section class="game-outline text-center">
       <header class="mb-4">
-        <h1 class="mb-2">Crash</h1>
+        <div class="d-flex justify-content-center align-items-end gap-2">
+          <h1 class="mb-2">Crash</h1>
+          <div class="info-container">
+            <button id="infoBtn" class="btn btn-secondary p-2">
+              <i class="fa-solid fa-info"></i>
+            </button>
+
+            <div class="info-popup" id="infoBox">
+              <p class="mb-0">
+                Dans Crash, le multiplicateur augmente jusqu’à s’écraser. Retirez votre mise avant que la courbe
+                s'arrête pour gagner.
+                plus d'information <a href="/user/support?game=crash">ici</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <script>
+          const btn = document.getElementById("infoBtn");
+          const box = document.getElementById("infoBox");
+
+          btn.addEventListener("click", () => {
+            box.style.display = (box.style.display === "block") ? "none" : "block";
+          });
+        </script>
         <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
           Quittez le train avant que tout s'écroule!
         </p>
@@ -88,4 +111,5 @@
   });
 </script>
 @include('shared.footer')
+
 </html>

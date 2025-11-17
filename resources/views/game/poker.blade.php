@@ -6,7 +6,30 @@
     <div class="container">
         <section class="game-outline text-center">
             <header class="mb-4">
-                <h1 class="mb-2">Poker</h1>
+                <div class="d-flex justify-content-center align-items-end gap-2">
+                    <h1 class="mb-2">Poker</h1>
+                    <div class="info-container">
+                        <button id="infoBtn" class="btn btn-secondary p-2">
+                            <i class="fa-solid fa-info"></i>
+                        </button>
+
+                        <div class="info-popup" id="infoBox">
+                            <p class="mb-0">
+                                Le poker consiste à créer la meilleure main possible et à miser stratégiquement contre
+                                les autres joueurs.
+                                plus d'information <a href="/user/support?game=poker">ici</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    const btn = document.getElementById("infoBtn");
+                    const box = document.getElementById("infoBox");
+
+                    btn.addEventListener("click", () => {
+                        box.style.display = (box.style.display === "block") ? "none" : "block";
+                    });
+                </script>
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Doit avoir au moins 250 points pour jouer
                 </p>

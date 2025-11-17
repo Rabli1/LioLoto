@@ -162,7 +162,6 @@ Plinko.prototype.show = function () {
     };
     let totalGain = 0;
 
-    // Fonction pour ajouter une ligne de stats
     function ajouterStat(mise, multiplicateur, gain) {
         const statsList = document.getElementById('statsList');
         const totalSpan = document.getElementById('totalGain');
@@ -177,7 +176,7 @@ Plinko.prototype.show = function () {
         statsList.appendChild(div);
 
         totalGain += gain;
-        totalSpan.textContent = totalGain.toFixed(2);
+        totalSpan.textContent = totalGain;
     }
 
     function createAudioToolkit() {
@@ -375,7 +374,6 @@ Plinko.prototype.show = function () {
     const audio = createAudioToolkit();
     audio.preloadSounds();
 
-    // Exemple d’utilisation (à appeler à chaque fois qu’une boule termine)
     function onBouleTerminee(mise, multiplicateur) {
         if (multiplicateur <= 1) {
             audio.resume();

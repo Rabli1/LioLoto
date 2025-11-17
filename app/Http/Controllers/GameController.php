@@ -83,13 +83,13 @@ class GameController extends Controller
         ]);
     }
 
-    public function wordle(): View
+    public function liotodle(): View
     {
 
         $player = $this->resolvePlayer();
         $balance = $player?->points ?? 0;
 
-        return view('game.wordle', [
+        return view('game.liotodle', [
             'playerBalance' => $balance,
         ]);
     }
@@ -470,6 +470,9 @@ class GameController extends Controller
             $player['currentBet'] += $validatedAmount;
             $player['hasPlayed'] = true;
             $player['balance'] -= $validatedAmount;
+            if ($player['balance'] < 50) {
+                $player['isAllIn'] = true;
+            }
             $state['requiredBet'] = max((int) $state['requiredBet'], (int) $player['currentBet']);
             $state['pot'] += $validatedAmount;
 
@@ -505,8 +508,36 @@ class GameController extends Controller
 
         $activePlayers = array_filter($state['players'], fn($p) => !$p['hasFolded']);
         $roundEnd = count(array_filter($activePlayers, fn($p) => $p['currentBet'] === $state['requiredBet'] && $p['hasPlayed'])) === count($activePlayers);
-
+        $someoneAllIn = count(array_filter($activePlayers, fn($p) => $p['isAllIn'])) > 0;
         if ($roundEnd) {
+            if ($someoneAllIn) {
+                // If someone is all-in, skip to showdown
+                $state['roundStep'] = 'showdown';
+                foreach ($state['players'] as &$player) {
+                    $player['cards'] = array_map(function ($card) {
+                        return $this->gameServices->Decrypt($card);
+                    }, $player['cards']);
+                }
+                $newCards = array_slice($state['deck'], 0, 5 - count($state['communityCards']));
+
+                $newCards = array_map(
+                    fn($card) => $this->gameServices->Decrypt($card),
+                    $newCards
+                );
+
+                $state['communityCards'] = array_merge($state['communityCards'], $newCards);
+                $this->settleRound($state);
+                unset($player);
+                foreach ($state['players'] as &$player) {
+                    $player['currentBet'] = 0;
+                    $player['hasPlayed'] = false;
+                }
+                unset($player);
+                file_put_contents($pokerPath, json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                $Etag = ['Etag' => (string) Str::uuid()];
+                file_put_contents(base_path(self::ETAG_PATH), json_encode($Etag, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                return response()->json();
+            }
             $rounds = ['preFlop', 'flop', 'turn', 'river', 'showdown'];
             $currentIndex = array_search($state['roundStep'], $rounds);
             $state['roundStep'] = $rounds[$currentIndex + 1];
@@ -602,27 +633,35 @@ class GameController extends Controller
             }
         }
 
-        if (!empty($winnerSeatId)) {
-            $potShare = floor($state['pot'] / count($winnerSeatId));
+        $potShare = floor($state['pot'] / count($winnerSeatId));
 
-            foreach ($players as &$player) {
-                if (in_array($player['id'], $winnerSeatId)) {
-                    $player['hasWon'] = true;
-                    $player['balance'] += $potShare;
+        foreach ($players as &$player) {
+            if (in_array($player['id'], $winnerSeatId)) {
+                $player['hasWon'] = true;
+                $player['balance'] += $potShare;
+            }
+        }
+
+        $userPath = base_path(self::USERS_PATH);
+        $users = json_decode(@file_get_contents($userPath), true) ?? [];
+
+        foreach ($users as &$user) {
+            if (in_array($user['id'], $winnerSeatId)) {
+                $user['points'] += $potShare;
+                $user['points'] = (int) $user['points'];
+            }
+        }
+
+        file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        if (session()->has('user')) {
+            foreach ($users as $u) {
+                if ($u['id'] === session('user')->id) {
+                    $sessionUser = clone session('user');
+                    $sessionUser->points = (int) $u['points'];
+                    session(['user' => $sessionUser]);
+                    break;
                 }
             }
-
-            $userPath = base_path(self::USERS_PATH);
-            $users = json_decode(@file_get_contents($userPath), true) ?? [];
-
-            foreach ($users as &$user) {
-                if (in_array($user['id'], $winnerSeatId)) {
-                    $user['points'] += $potShare;
-                    $user['points'] = (int) $user['points'];
-                }
-            }
-
-            file_put_contents($userPath, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         }
 
         foreach ($players as &$player) {
@@ -850,8 +889,8 @@ class GameController extends Controller
 
     private function getWordList(): array
     {
-        return Cache::remember('wordle_words', 1000, function () { //temps de vie  de la cache 1000 sec
-            $wordsFile = storage_path('app/json/wordle.json');
+        return Cache::remember('liotodle_words', 1000, function () { //temps de vie  de la cache 1000 sec
+            $wordsFile = storage_path('app/json/liotodle.json');
             return array_map('strtoupper', json_decode(file_get_contents($wordsFile), true));
         });
     }
@@ -862,7 +901,7 @@ class GameController extends Controller
         ]);
 
         $inputWord = strtoupper($request->query('word'));
-        $secretWord = session('wordle_secret');
+        $secretWord = session('liotodle_secret');
 
         if (!$secretWord) {
             return response()->json(['error' => 'No game in progress'], 400);
@@ -889,13 +928,40 @@ class GameController extends Controller
         ]);
     }
 
-    public function wordleWord(): JsonResponse
+    public function liotodleWord(): JsonResponse
     {
         $words = $this->getWordList();
         $randomWord = $words[array_rand($words)];
 
-        session(['wordle_secret' => $randomWord]);
+        session(['liotodle_secret' => $randomWord]);
 
         return response()->json(['ready' => true]);
+    }
+
+    public function finishDaily(Request $request)
+    {
+        if (!session()->has('user')) {
+            return response()->json(['error' => 'No user'], 401);
+        }
+
+        $user = session()->get('user');
+        $user->daily = false;
+
+        session()->put('user', $user);
+
+        $path = base_path(self::USERS_PATH);
+
+        $users = json_decode(file_get_contents($path));
+
+        foreach ($users as $u) {
+            if ($u->id == $user->id) {
+                $u->daily = false;
+                break;
+            }
+        }
+
+        file_put_contents($path, json_encode($users, JSON_PRETTY_PRINT));
+
+        return response()->json(['status' => 'daily_disabled']);
     }
 }

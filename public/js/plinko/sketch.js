@@ -46,7 +46,7 @@ function setup() {
 
         for (var i = 0; i < numPlinkos; i++) {
             var x = centerX - totalWidth / 2 + i * spacing;
-            var p = new Plinko(x, y, 5.82
+            var p = new Plinko(x, y, 5.88
             );
             plinkos.push(p);
         }
@@ -60,14 +60,15 @@ function setup() {
     var y = height - cubeSize / 2 - 50;
 
     var multipliers = [
-        "500x", "90x", "30x", "12x", "5x", "2x", "1x",
-        "0.4x", "0.4x", "0.4x",
-        "1x", "2x", "5x", "12x", "30x", "90x", "500x"
+        "250x", "99x", "41x", "10x", "5x", "3x", "1.5x",
+        "0.5x", "0.3x", "0.5x",
+        "1.5x", "3x", "5x", "10x", "41x", "99x", "250x"
     ];
 
-    for (var k = 0; k < numCubes; k++) {
+     for (var k = 0; k < numCubes; k++) {
         var cubeX = startX + k * spacing;
-        var cube = new Boundary(cubeX, y, cubeSize, cubeSize);
+        var color = getColorForMultiplier(multipliers[k]);
+        var cube = new Boundary(cubeX, y, cubeSize, cubeSize, color);
         cube.body.label = "cube";
         cube.multiplier = multipliers[k];
         cube.body.plinkoMultiplierValue = parseFloat(multipliers[k]);
@@ -123,7 +124,7 @@ function newParticle() {
 }
 
 function draw() {
-    background(51);
+    background(40);
     Engine.update(engine);
 
     const state = gameState();
@@ -152,6 +153,7 @@ function draw() {
 
     for (var k = 0; k < bounds.length; k++) {
         bounds[k].show();
+        noStroke();
         fill(0);
         textAlign(CENTER, CENTER);
         textSize(k === 0 || k === bounds.length - 1 ? 11 : 13);
