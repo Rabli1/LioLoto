@@ -189,7 +189,7 @@
         playerHand = [];
         dealerHand = [];
         canHit = true;
-        if (window.Balance.get() < betAmount * 2)
+        if (window.Balance.get() < betAmount)
             document.getElementById('double').disabled = true;
         else
             document.getElementById('double').disabled = false;
@@ -206,7 +206,7 @@
         playCardDeal();
         afficheMains();
         updateScore();
-        if ((getCardValue(playerHand[0]) === getCardValue(playerHand[1])) && (window.Balance.get() >= betAmount * 2)) {
+        if ((getCardValue(playerHand[0]) === getCardValue(playerHand[1])) && (window.Balance.get() >= betAmount)) {
             document.getElementById('split').disabled = false;
         }
 
@@ -214,6 +214,7 @@
         if (betAmountLabel) {
             betAmountLabel.innerHTML = `<h2>Votre mise : ${betAmount}</h2>`;
         }
+
 
         if (dealerSum === 21 || playerSum === 21) {
             revealDealerHand();
