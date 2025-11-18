@@ -87,7 +87,6 @@ Plinko.prototype.show = function () {
 
         placeBetButton?.addEventListener('click', () => {
             if (state.active) {
-                alert('Une manche est déjà en cours.');
                 return;
             }
 

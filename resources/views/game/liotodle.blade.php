@@ -27,7 +27,7 @@
                             <i class="fa-solid fa-info"></i>
                         </button>
 
-                        <div class="info-popup" id="infoBox">
+                        <div class="info-popup" id="infoBox" style="z-index: 999;">
                             <p class="mb-0">
                                 Devinez le mot en un nombre limité d'essais. Les couleurs indiquent la justesse des
                                 lettres.

@@ -705,7 +705,7 @@
 
 @media (max-width: 450px) {
   #react-navbar {
-    margin-left: 2% !important;
+    margin-left: 0% !important;
     margin-bottom: 10% !important;
     position: relative;
     bottom: 5px !important;
