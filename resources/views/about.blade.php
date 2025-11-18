@@ -23,8 +23,16 @@
 
 <main class="container-fluid text-light my-5">
     <div class="container">
+        <div class="text-center mb-5" style="width: 70%; margin: auto;">
+            <h1>À propos</h1>
+            <p>
+                Loto Lio est une plateforme de jeux en ligne développée par une équipe passionnée de quatre étudiants en informatique.
+                Chaque membre de l'équipe a contribué à la création de différents jeux qui vous aideront (ou pas) à vous hisser en haut du classement.
+                Nous espérons que vous apprécierez jouer à nos jeux autant que nous avons apprécié les développer !
+            </p>
+        </div>
         <div class="text-center mb-5">
-            <h1 class="h3 text-light">À propos de l'équipe</h1>
+            <h2 class="text-light">L'équipe</h2>
         </div>
 
         <div class="row row-member left mb-4">
@@ -71,7 +79,7 @@
                 </div>
             </div>
             <div class="col-md-4 img-side d-flex justify-content-end order-1 order-md-2">
-                <img src="{{ asset('img/members/emil.png') }}" alt="Émil Tittley" class="img-fluid member-img">
+                <img src="{{ asset('img/members/emil.jpg') }}" alt="Émil Tittley" class="img-fluid member-img">
             </div>
         </div>
     </div>
