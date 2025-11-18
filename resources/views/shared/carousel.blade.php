@@ -2,17 +2,17 @@
     <div class="carousel-inner rounded-4 shadow-lg">
       <div class="carousel-item active">
         <a href="/game/blackjack">
-            <img src="{{ asset('img/blackjack.jpg') }}" class="d-block w-100" alt="Blackjack">
+            <img src="{{ asset('img/carousel/blackjackCarousel.png') }}" class="d-block w-100" alt="Blackjack">
         </a>
       </div>
       <div class="carousel-item">
-        <a href="/game/plinko">
-            <img src="{{ asset('img/plinko.webp') }}" class="d-block w-100" alt="Plinko">
+        <a href="/game/poker">
+            <img src="{{ asset('img/carousel/pokerCarousel.png') }}" class="d-block w-100" alt="Poker">
         </a>
       </div>
       <div class="carousel-item">
         <a href="/game/mines">
-            <img src="{{ asset('img/mines.webp') }}" class="d-block w-100" alt="Mines">
+            <img src="{{ asset('img/carousel/minesCarousel.png') }}" class="d-block w-100" alt="Mines">
         </a>
       </div>
     </div>
