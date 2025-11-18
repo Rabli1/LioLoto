@@ -79,7 +79,7 @@
                 </div>
             </div>
             <div class="col-md-4 img-side d-flex justify-content-end order-1 order-md-2">
-                <img src="{{ asset('img/members/emil.png') }}" alt="Émil Tittley" class="img-fluid member-img">
+                <img src="{{ asset('img/members/emil.jpg') }}" alt="Émil Tittley" class="img-fluid member-img">
             </div>
         </div>
     </div>
