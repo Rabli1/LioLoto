@@ -17,8 +17,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const keys = document.querySelectorAll(".keyboard-row button");
     const gameSession = window.gameSession || {};
-    const userId = (gameSession.userId !== undefined && gameSession.userId !== null) ? gameSession.userId : "guest";
-    const canPlayDaily = gameSession.dailyAvailable !== false;
+    const isAuthenticated = gameSession.userId !== undefined && gameSession.userId !== null;
+    const userId = isAuthenticated ? gameSession.userId : "guest";
+    const canPlayDaily = gameSession.dailyAvailable === true;
+    const configuredLockMessage = typeof gameSession.lockMessage === "string" ? gameSession.lockMessage.trim() : "";
+    const dailyLockMessages = {
+        completed: "Vous avez déjà complété le Liotodle du jour. Reviens après le prochain reset !",
+        guest: "Connecte-toi pour jouer au Liotodle du jour."
+    };
     const STATE_STORAGE_KEY = `liotodle_game_state_${userId}`;
     const TILE_COLORS = {
         correct: "rgb(83, 141, 78)",
@@ -62,7 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function lockGameForToday(message) {
         isGameLocked = true;
         setKeyboardEnabled(false);
-        showDailyLockMessage(message);
+
+        const fallbackMessage = isAuthenticated ? dailyLockMessages.completed : dailyLockMessages.guest;
+        const finalMessage = message || configuredLockMessage || fallbackMessage;
+
+        showDailyLockMessage(finalMessage);
     }
 
     function loadGameState() {
@@ -220,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 restoreGameFromState(savedState);
             }
 
-            lockGameForToday("Vous avez deja complete le Liotodle du jour. Reviens apres le prochain reset !");
+            lockGameForToday();
             return;
         }
 

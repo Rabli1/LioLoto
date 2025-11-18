@@ -102,7 +102,8 @@
     window.gameSession = {
         userId: {{ session('user')->id ?? 'null' }},
         balance: {{ (int) $playerBalance }},
-        dailyAvailable: @json(optional(session('user'))->daily ?? true),
+        dailyAvailable: @json($liotodleDailyAvailable ?? false),
+        lockMessage: @json($liotodleDailyLockMessage ?? ''),
         endpoints: { saveBalance: '{{ url('game/balance') }}' },
         csrfToken: '{{ csrf_token() }}'
     };

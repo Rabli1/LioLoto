@@ -61,6 +61,44 @@ class GameController extends Controller
 
         return $sessionUser;
     }
+
+    private function determineLiotodleAccess(?User $player): array
+    {
+        if (!$player) {
+            return [
+                'available' => false,
+                'lockMessage' => 'Connecte-toi pour jouer au Liotodle du jour.'
+            ];
+        }
+
+        $path = base_path(self::USERS_PATH);
+        $users = json_decode(@file_get_contents($path), true);
+
+        if (!is_array($users)) {
+            return [
+                'available' => false,
+                'lockMessage' => 'Impossible de vérifier l’état du Liotodle. Réessaie plus tard.'
+            ];
+        }
+
+        foreach ($users as $entry) {
+            if (($entry['id'] ?? null) === $player->id) {
+                $available = (bool) ($entry['daily'] ?? false);
+
+                return [
+                    'available' => $available,
+                    'lockMessage' => $available
+                        ? ''
+                        : 'Vous avez déjà complété le Liotodle du jour. Reviens après le prochain reset !'
+                ];
+            }
+        }
+
+        return [
+            'available' => false,
+            'lockMessage' => 'Impossible de vérifier l’état du Liotodle. Réessaie plus tard.'
+        ];
+    }
     public function blackjack(): View
     {
 
@@ -88,9 +126,12 @@ class GameController extends Controller
 
         $player = $this->resolvePlayer();
         $balance = $player?->points ?? 0;
+        $accessData = $this->determineLiotodleAccess($player);
 
         return view('game.liotodle', [
             'playerBalance' => $balance,
+            'liotodleDailyAvailable' => $accessData['available'],
+            'liotodleDailyLockMessage' => $accessData['lockMessage'],
         ]);
     }
 
