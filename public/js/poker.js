@@ -130,6 +130,10 @@ function updateUI() {
 
             const countdownInterval = setInterval(() => {
                 secondsLeft--;
+                if(secondsLeft < 0){
+                    gameMessage.text('En attente de joueurs pour démarrer la partie...');
+                    clearInterval(countdownInterval);
+                }
                 gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
             }, 1000);
 
