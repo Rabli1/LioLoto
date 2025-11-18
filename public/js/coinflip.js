@@ -13,6 +13,163 @@
     const chooseButtons = document.querySelectorAll('[data-choice]');
     const targetMarker = document.getElementById('targetMarker');
 
+    function createAudioToolkit() {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) {
+            return {
+                resume() { },
+            };
+        }
+
+        let context = null;
+
+        function ensureContext() {
+            if (!context) {
+                context = new AudioContextClass();
+            }
+            return context;
+        }
+
+        function resume() {
+            const ctx = ensureContext();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+        }
+
+        let coinFlipWinSoundBase = null;
+
+        function getCoinFlipWinSound() {
+            if (!coinFlipWinSoundBase) {
+                const soundUrl = window.soundAssets?.coinFlipWin || '../sounds/coinFlipWin.mp3';
+                coinFlipWinSoundBase = new Audio(soundUrl);
+                coinFlipWinSoundBase.preload = 'auto';
+                coinFlipWinSoundBase.volume = 0.5;
+                coinFlipWinSoundBase.load();
+            }
+            return coinFlipWinSoundBase;
+        }
+
+        function playCoinFlipWinSound() {
+            const base = getCoinFlipWinSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let coinFlipLoseSoundBase = null;
+
+        function getCoinFlipLoseSound() {
+            if (!coinFlipLoseSoundBase) {
+                const soundUrl = window.soundAssets?.coinFlipLose || '../sounds/rouletteLose.mp3';
+                coinFlipLoseSoundBase = new Audio(soundUrl);
+                coinFlipLoseSoundBase.preload = 'auto';
+                coinFlipLoseSoundBase.volume = 0.5;
+                coinFlipLoseSoundBase.load();
+            }
+            return coinFlipLoseSoundBase;
+        }
+
+        function playCoinFlipLoseSound() {
+            const base = getCoinFlipLoseSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        let coinFlipSoundBase = null;
+
+        function getCoinFlipSound() {
+            if (!coinFlipSoundBase) {
+                const soundUrl = window.soundAssets?.coinFlip || '../sounds/coinFlip.mp3';
+                coinFlipSoundBase = new Audio(soundUrl);
+                coinFlipSoundBase.preload = 'auto';
+                coinFlipSoundBase.volume = 0.5;
+                coinFlipSoundBase.load();
+            }
+            return coinFlipSoundBase;
+        }
+
+        function playCoinFlipSound() {
+            const base = getCoinFlipSound();
+            if (!base) return;
+
+            const play = (audioNode) => {
+                audioNode.currentTime = 0;
+                const promise = audioNode.play();
+                if (promise && typeof promise.catch === 'function') {
+                    promise.catch(() => { });
+                }
+            };
+
+            if (base.paused && base.readyState >= 3) {
+                play(base);
+            } else {
+                const clone = base.cloneNode(true);
+                clone.volume = base.volume;
+                if (clone.readyState >= 3) {
+                    play(clone);
+                } else {
+                    clone.addEventListener('canplaythrough', () => play(clone), { once: true });
+                }
+            }
+        }
+
+        return {
+            resume,
+            playCoinFlipLoseSound,
+            playCoinFlipSound,
+            playCoinFlipWinSound,
+            preloadSounds() {
+                getCoinFlipLoseSound();
+                getCoinFlipSound();
+                getCoinFlipWinSound();
+            }
+        };
+    }
+
+    const audio = createAudioToolkit();
+
+    audio.preloadSounds();
+
+
     if (!progressBar || !rolledValue || !startButton) {
         return;
     }
@@ -122,6 +279,8 @@
         state.pendingBet = 0;
         updateBetLabel();
         resetProgressBar();
+        audio.resume();
+        audio.playCoinFlipSound();
         resultMessage.textContent = 'Tirage en cours...';
         playAnotherButton.style.display = 'none';
         startButton.disabled = true;
@@ -167,7 +326,11 @@
         const win = state.choice === 'under' ? underWin : overWin;
 
         if (win) {
+            audio.resume();
+            audio.playCoinFlipWinSound();
             const payout = Math.round(state.bet * state.multiplier);
+            resultMessage.classList.remove('text-danger');
+            resultMessage.classList.add('text-success');
             resultMessage.textContent = 'Gagne ! Paiement : ' + format(payout) + ' (x' + formatMultiplier(state.multiplier) + ')';
             progressBar.classList.remove('bg-danger');
             progressBar.classList.add('bg-success');
@@ -175,6 +338,10 @@
                 window.Balance.gain(payout);
             }
         } else {
+            audio.resume();
+            audio.playCoinFlipLoseSound();
+            resultMessage.classList.remove('text-success');
+            resultMessage.classList.add('text-danger');
             resultMessage.textContent = 'Perdu...';
             progressBar.classList.remove('bg-success');
             progressBar.classList.add('bg-danger');
