@@ -31,12 +31,12 @@
                     });
                 </script>
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
-                    Doit avoir au moins 250 points pour jouer
+                    Doit avoir au moins 100 points pour jouer
                 </p>
             </header>
             <section id="gameMat" class="p-3 rounded bg-dark text-center">
                 @if(session()->has('user'))
-                    @if(session('user')->points > 250)
+                    @if(session('user')->points > 100)
                         <button class="btn btn-danger" id="join-button">Rejoindre</button>
                         <button class="btn btn-danger" id="quit-button">Quitter</button>
                     @endif
