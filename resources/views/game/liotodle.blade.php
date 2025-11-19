@@ -47,6 +47,8 @@
 
             </header>
 
+            <div id="dailyLockMessage" class="daily-lock-message"></div>
+
             <div id="board-container">
                 <div id="board"></div>
             </div>
@@ -100,6 +102,8 @@
     window.gameSession = {
         userId: {{ session('user')->id ?? 'null' }},
         balance: {{ (int) $playerBalance }},
+        dailyAvailable: @json($liotodleDailyAvailable ?? false),
+        lockMessage: @json($liotodleDailyLockMessage ?? ''),
         endpoints: { saveBalance: '{{ url('game/balance') }}' },
         csrfToken: '{{ csrf_token() }}'
     };

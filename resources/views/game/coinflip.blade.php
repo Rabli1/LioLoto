@@ -132,6 +132,11 @@
         endpoints: { saveBalance: '{{ url('game/balance') }}' },
         csrfToken: '{{ csrf_token() }}'
     };
+    window.soundAssets = {
+        coinFlipLose: '{{ asset('sounds/rouletteLose.mp3') }}',
+        coinFlip: '{{ asset('sounds/coinFlip.mp3') }}',
+        coinFlipWin: '{{ asset('sounds/coinFlipWin.mp3') }}',
+    };
 </script>
 <script defer src="{{ asset('js/coinflip.js') }}"></script>
 @include('shared.footer')

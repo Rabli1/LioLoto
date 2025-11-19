@@ -53,6 +53,7 @@
 
             <section id="betContainer" class="mb-4">
                 <h2 class="h5 mb-3">Sélectionnez votre mise</h2>
+                <div class="tokenWage" data-value="10">1</div>
                 <div class="tokenWage" data-value="10">10</div>
                 <div class="tokenWage" data-value="50">50</div>
                 <div class="tokenWage" data-value="100">100</div>

@@ -82,6 +82,7 @@ foreach ($sortedUsers as $entry) {
 
 foreach ($users as &$entry) {
     $entry['points'] = 1000;
+    $entry['daily'] = true;
 }
 unset($entry);
 

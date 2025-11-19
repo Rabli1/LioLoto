@@ -609,7 +609,7 @@
     const wageButton = document.querySelectorAll('.tokenWage');
     wageButton[0].classList.add('tokenWageSelected');
     const clearMat = document.getElementById('clearMat');
-    let tokenValue = 10;
+    let tokenValue = 1;
 
     if (window.Balance) {
         window.Balance.init({
