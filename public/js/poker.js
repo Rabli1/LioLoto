@@ -214,18 +214,16 @@ function updateUI() {
             callButton.toggleClass('disabled', false);
         }
         callAmount = gameState.requiredBet - gameState.players[gameState.playersTurn].currentBet
-        const playerBalance = gameState.players[gameState.playersTurn].balance;
-        const minCallAmount = Math.min(callAmount, playerBalance);
-         requiredCall.text(`(${callAmount} pour call)`);
-         betRange.attr('max', maxBet);
-         betAmount.attr('max', maxBet);
-         betRange.attr('min', Math.max(0, minCallAmount));
-         betAmount.attr('min', Math.max(0, minCallAmount));
-         betRange.val(Math.max(Math.max(0, minCallAmount), 50));
-         betAmount.val(Math.max(Math.max(0, minCallAmount), 50));
-         timeProgressBar.css("width", "0%")
-         startCountDown();
-         betSection.show();
+        requiredCall.text(`(${callAmount} pour call)`);
+        betRange.attr('max', maxBet);
+        betAmount.attr('max', maxBet);
+        betRange.attr('min', callAmount);
+        betAmount.attr('min', callAmount);
+        betRange.val(Math.max(callAmount, 50));
+        betAmount.val(Math.max(callAmount, 50));
+        timeProgressBar.css("width", "0%")
+        startCountDown();
+        betSection.show();
     }
     else {
         betSection.hide();
