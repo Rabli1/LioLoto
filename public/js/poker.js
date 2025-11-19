@@ -136,11 +136,14 @@ function updateUI() {
                 }
                 gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
             }, 1000);
-
+            
+            playerTostart = gameState.players.find(player => !player.toKick)?.id;
             restartTimeout = setTimeout(() => {
                 clearInterval(countdownInterval);
                 gameMessage.text("Démarrage d'une nouvelle partie...");
-                initRound();
+                if(window.gameSession.userId === playerTostart){
+                    initRound();
+                }
                 playGameStart();
                 restartTimeout = null;
             }, RESTART_DELAY);
