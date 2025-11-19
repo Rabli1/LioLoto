@@ -18,8 +18,8 @@
     <div class="container">
         <section class="game-outline text-center">
 
-            <div id="endContainer"></div>
-            <div id="endAmount"></div>
+            <div id="endContainer"><div id="endAmount"></div></div>
+            
 
             <header class="mb-4">
                 <div class="d-flex justify-content-center align-items-end gap-2">
