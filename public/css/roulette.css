@@ -420,57 +420,57 @@
 }
 
 .roulette-win {
+    display: flex;
     position: fixed;
-    background-color: rgb(14, 92, 11);
-    opacity: 0.3;
+    background-color: rgb(14, 92, 11, 0.3);
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
     z-index: 1000;
-    display: block;
-    transition: all 0.3s ease-out !important;
+    transition: 0.3s ease-out !important;
 }
 
 .roulette-lose {
+    display: flex;
     position: fixed;
-    background-color: rgb(104, 8, 8);
-    text-align: center;
-    opacity: 0.3;
+    background-color: rgb(104, 8, 8,0.3);
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
     z-index: 1000;
-    display: block;
-    transition: all 0.3s ease-out !important;
+    transition: 0.3s ease-out !important;
 }
 
+
 .loseAmount {
-    position: absolute;
-    top: 62%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #a80000;
-    font-size: 3em;
-    font-weight: bolder;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    z-index: 1001;
+    background: #a80000;
+    color: #000;
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 15px 30px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
 }
 
 .winAmount {
-    position: absolute;
-    top: 62%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #008b00;
-    font-size: 3em;
-    font-weight: bolder;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    z-index: 1001;
+    background: #008b00;
+    color: #000;
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 15px 30px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(9, 255, 0, 0.3);
 }
 
-#bettingMat > div.winnerBox{
+#bettingMat>div.winnerBox {
     border: 2px solid rgb(0, 223, 0, 1) !important;
 }
 
@@ -496,6 +496,7 @@
 
 /* Responsive Mobile Styles */
 @media (max-width: 768px) {
+
     /* Reduce roulette wheel size */
     .roulette {
         height: 250px;
@@ -589,7 +590,7 @@
         padding: 10px 0;
     }
 
-    #bettingMat > div {
+    #bettingMat>div {
         font-size: 16px;
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 2px;
@@ -638,6 +639,7 @@
 }
 
 @media (max-width: 480px) {
+
     /* Even smaller for very small screens */
     .roulette {
         height: 200px;
@@ -732,10 +734,10 @@
         padding: 10px 0;
     }
 
-    #bettingMat > div {
+    #bettingMat>div {
         font-size: 13px;
     }
-    
+
     /* Container adjustments for better fit */
     #betMat {
         padding: 15px 10px;
@@ -765,4 +767,3 @@
         font-size: 1.5em;
     }
 }
-
