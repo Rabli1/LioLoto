@@ -26,9 +26,20 @@
         <div class="text-center mb-5" style="width: 70%; margin: auto;">
             <h1>À propos</h1>
             <p>
-                Loto Lio est une plateforme de jeux en ligne développée par une équipe passionnée de quatre étudiants en informatique.
-                Chaque membre de l'équipe a contribué à la création de différents jeux qui vous aideront (ou pas) à vous hisser en haut du classement.
+                Loto Lio est une plateforme de jeux en ligne développée par une équipe passionnée de quatre étudiants en
+                informatique.
+                Chaque membre de l'équipe a contribué à la création de différents jeux qui vous aideront (ou pas) à vous
+                hisser en haut du classement.
                 Nous espérons que vous apprécierez jouer à nos jeux autant que nous avons apprécié les développer !
+            </p>
+        </div>
+
+        <div class="text-center mb-5" style="width: 70%; margin: auto;">
+            <h1>Pour résumer notre site</h1>
+            <p>
+                À chaque jour, vous avez 1000 points que vous pouvez miser sur nos différents jeux.
+                Vous perdez tout vos points? Pas de panique! Ils se réinitialisent chaque jour à minuit heure de l'est!
+                Bon jeu et bonne chance!
             </p>
         </div>
         <div class="text-center mb-5">
@@ -38,6 +49,9 @@
         <div class="row row-member left mb-4">
             <div class="col-md-4 img-side d-flex justify-content-start">
                 <img src="{{ asset('img/members/gab.png') }}" alt="Gabriel Massé" class="img-fluid member-img">
+                <img src="{{ asset('img/about/crash.png') }}" alt="crash" class="img-fluid member-img"
+                    style="width: 100%; margin-left: 100%;">
+                <img src="{{ asset('img/about/poker.png') }}" alt="poker" class="img-fluid member-img">
             </div>
             <div class="col-md-8">
                 <div class="member-info member-card">
