@@ -133,6 +133,7 @@ function updateUI() {
                 if(secondsLeft < 0){
                     gameMessage.text('En attente de joueurs pour démarrer la partie...');
                     clearInterval(countdownInterval);
+                    return;
                 }
                 gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
             }, 1000);
