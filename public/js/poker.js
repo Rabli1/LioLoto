@@ -223,8 +223,8 @@ function updateUI() {
         betAmount.attr('max', maxBet);
         betRange.attr('min', callAmount);
         betAmount.attr('min', callAmount);
-        betRange.val(Math.max(callAmount, 50));
-        betAmount.val(Math.max(callAmount, 50));
+        betRange.val(Math.max(callAmount, 20));
+        betAmount.val(Math.max(callAmount, 20));
         timeProgressBar.css("width", "0%")
         startCountDown();
         betSection.show();
