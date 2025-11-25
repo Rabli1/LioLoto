@@ -209,3 +209,139 @@ body {
   color: #fff;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
+
+/* Media queries pour les petits écrans en hauteur */
+@media (max-height: 820px) {
+  .title {
+    font-size: 1.8rem;
+    margin: 0.3rem 0;
+  }
+
+  .square {
+    min-width: 50px;
+    min-height: 50px;
+    font-size: 28px;
+  }
+
+  #board {
+    grid-gap: 4px;
+    padding: 8px;
+  }
+
+  #keyboard-container {
+    height: 160px;
+  }
+
+  .keyboard-row {
+    margin: 0 auto 6px;
+  }
+
+  .keyboard-row button {
+    height: 48px;
+    font-size: 14px;
+    margin-right: 4px;
+  }
+
+  .result-content {
+    padding: 30px;
+    max-width: 350px;
+  }
+
+  .result-points {
+    font-size: 1.6rem;
+    padding: 12px 24px;
+    margin: 15px 0;
+  }
+}
+
+@media (max-height: 700px) {
+  .title {
+    font-size: 1.5rem;
+    margin: 0.2rem 0;
+  }
+
+  .square {
+    min-width: 45px;
+    min-height: 45px;
+    font-size: 24px;
+    border: 1px solid rgb(58, 58, 60);
+  }
+
+  #board {
+    grid-gap: 3px;
+    padding: 6px;
+  }
+
+  #keyboard-container {
+    height: 140px;
+  }
+
+  .keyboard-row {
+    margin: 0 auto 4px;
+  }
+
+  .keyboard-row button {
+    height: 42px;
+    font-size: 12px;
+    margin-right: 3px;
+  }
+
+  .result-content {
+    padding: 25px;
+    max-width: 320px;
+  }
+
+  .result-points {
+    font-size: 1.4rem;
+    padding: 10px 20px;
+    margin: 12px 0;
+  }
+
+  .daily-lock-message {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .title {
+    font-size: 1.3rem;
+    margin: 0.15rem 0;
+  }
+
+  .square {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 20px;
+  }
+
+  #board {
+    grid-gap: 2px;
+    padding: 5px;
+  }
+
+  #keyboard-container {
+    height: 120px;
+  }
+
+  .keyboard-row {
+    margin: 0 auto 3px;
+  }
+
+  .keyboard-row button {
+    height: 38px;
+    font-size: 11px;
+    margin-right: 2px;
+  }
+
+  .result-content {
+    padding: 20px;
+    max-width: 300px;
+  }
+
+  .result-points {
+    font-size: 1.2rem;
+    padding: 8px 16px;
+    margin: 10px 0;
+  }
+}
