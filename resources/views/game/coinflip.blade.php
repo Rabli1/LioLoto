@@ -69,7 +69,7 @@
                 <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                     Choisissez votre pourcentage et pariez sur UNDER ou OVER.
                 </p>
-                <span class="balance">Solde : $<span id="coinflip-balance"
+                <span class="balance">Solde : <span id="coinflip-balance"
                         data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
             </header>
 

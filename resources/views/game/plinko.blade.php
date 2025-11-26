@@ -50,7 +50,7 @@
                     <p class="mb-3 text-uppercase" style="letter-spacing: 0.12em;">
                         Laissez tomber la balle et voyez où elle atterrit !
                     </p>
-                    <span class="balance">Solde : $<span id="plinko-balance"
+                    <span class="balance">Solde : <span id="plinko-balance"
                             data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
                 </header>
 

@@ -570,13 +570,13 @@
                 container.classList.add('roulette-win');
                 endAmount.classList.add('winAmount');
                 winnerBet.forEach(winner => {winner.classList.add('winnerBox');});
-                endAmount.textContent = `+${totalPayout}$`;
+                endAmount.textContent = `+${totalPayout}`;
             } else {
                 audio.resume();
                 audio.playRouletteLoseSound();
                 container.classList.add('roulette-lose');
                 endAmount.classList.add('loseAmount');
-                endAmount.textContent = `-${totalBet}$`;
+                endAmount.textContent = `-${totalBet}`;
             }
 
             setTimeout(() => {

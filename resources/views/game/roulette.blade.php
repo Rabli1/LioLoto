@@ -63,7 +63,7 @@
             </section>
 
             <section>
-                <span class="balance">Solde : $<span id="roulette-balance"
+                <span class="balance">Solde : <span id="roulette-balance"
                         data-balance>{{ number_format($playerBalance, 0, '', ' ') }}</span></span>
                 <div id="rouletteContainer"></div>
             </section>
