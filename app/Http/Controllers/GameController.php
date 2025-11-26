@@ -25,7 +25,7 @@ class GameController extends Controller
     private const USERS_PATH = 'database/json/users.json';
     private const POKER_STATE_PATH = 'database/json/pokerState.json';
     private const ETAG_PATH = 'database/json/Etag.json';
-
+    private const SMALL_BLIND = 10;
     private function resolvePlayer(): ?User
     {
         $sessionUser = session('user');
@@ -222,7 +222,7 @@ class GameController extends Controller
             return;
 
         $userPoints = is_object($user) ? ($user->points ?? 0) : ($user['points'] ?? 0);
-        if ((int) $userPoints < 250) {
+        if ((int) $userPoints < 100) {
             return;
         }
 
@@ -396,7 +396,7 @@ class GameController extends Controller
         $state['roundStep'] = 'preFlop';
         $state['communityCards'] = [];
         $state['pot'] = 0;
-        $state['requiredBet'] = 50;
+        $state['requiredBet'] = self::SMALL_BLIND * 2;
         $state['smallBlind'] = ($state['smallBlind'] + 1) % $playerCount;
         $state['deck'] = $deck;
 
@@ -417,15 +417,15 @@ class GameController extends Controller
         $bigBlindId = $state['players'][($state['smallBlind'] + 1) % $playerCount]['id'];
         foreach ($state['players'] as &$player) {
             if ($player['id'] === $smallBlindId) {
-                $player['balance'] -= 25;
-                $player['currentBet'] += 25;
-                $state['pot'] += 25;
+                $player['balance'] -= self::SMALL_BLIND;
+                $player['currentBet'] += self::SMALL_BLIND;
+                $state['pot'] += self::SMALL_BLIND;
                 $player['hasPlayed'] = true;
 
             } elseif ($player['id'] === $bigBlindId) {
-                $player['balance'] -= 50;
-                $player['currentBet'] += 50;
-                $state['pot'] += 50;
+                $player['balance'] -= self::SMALL_BLIND * 2;
+                $player['currentBet'] += self::SMALL_BLIND * 2;
+                $state['pot'] += self::SMALL_BLIND * 2;
                 $player['hasPlayed'] = true;
             }
         }
@@ -435,11 +435,11 @@ class GameController extends Controller
         // update users.json
         foreach ($users as &$user) {
             if ($smallBlindId === $user['id']) {
-                $user['points'] -= 25;
+                $user['points'] -= self::SMALL_BLIND;
                 $user['points'] = (int) $user['points'];
             }
             if ($bigBlindId === $user['id']) {
-                $user['points'] -= 50;
+                $user['points'] -= self::SMALL_BLIND * 2;
                 $user['points'] = (int) $user['points'];
             }
         }
@@ -496,7 +496,7 @@ class GameController extends Controller
                 unset($u);
 
                 foreach ($state['players'] as &$p) {
-                    $p['toKick'] = ((int) ($p['balance'] ?? 0) < 250);
+                    $p['toKick'] = ((int) ($p['balance'] ?? 0) < 100);
                 }
                 unset($p);
 
@@ -511,7 +511,7 @@ class GameController extends Controller
             $player['currentBet'] += $validatedAmount;
             $player['hasPlayed'] = true;
             $player['balance'] -= $validatedAmount;
-            if ($player['balance'] < 50) {
+            if ($player['balance'] < self::SMALL_BLIND * 2) {
                 $player['isAllIn'] = true;
             }
             $state['requiredBet'] = max((int) $state['requiredBet'], (int) $player['currentBet']);
@@ -707,7 +707,7 @@ class GameController extends Controller
 
         foreach ($players as &$player) {
             $playerBalance = (int) ($player['balance'] ?? 0);
-            if ($playerBalance < 250) {
+            if ($playerBalance < 100) {
                 $player['toKick'] = true;
             }
         }

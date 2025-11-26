@@ -26,9 +26,20 @@
         <div class="text-center mb-5" style="width: 70%; margin: auto;">
             <h1>À propos</h1>
             <p>
-                Loto Lio est une plateforme de jeux en ligne développée par une équipe passionnée de quatre étudiants en informatique.
-                Chaque membre de l'équipe a contribué à la création de différents jeux qui vous aideront (ou pas) à vous hisser en haut du classement.
+                Loto Lio est une plateforme de jeux en ligne développée par une équipe passionnée de quatre étudiants en
+                informatique.
+                Chaque membre de l'équipe a contribué à la création de différents jeux qui vous aideront (ou pas) à vous
+                hisser en haut du classement.
                 Nous espérons que vous apprécierez jouer à nos jeux autant que nous avons apprécié les développer !
+            </p>
+        </div>
+
+        <div class="text-center mb-5" style="width: 70%; margin: auto;">
+            <h1>Pour résumer notre site</h1>
+            <p>
+                À chaque jour, vous avez 1000 points que vous pouvez miser sur nos différents jeux.
+                Vous perdez tout vos points? Pas de panique! Ils se réinitialisent chaque jour à minuit heure de l'est!
+                Bon jeu et bonne chance!
             </p>
         </div>
         <div class="text-center mb-5">

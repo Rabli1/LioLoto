@@ -46,7 +46,7 @@ function setup() {
 
         for (var i = 0; i < numPlinkos; i++) {
             var x = centerX - totalWidth / 2 + i * spacing;
-            var p = new Plinko(x, y, 5.88
+            var p = new Plinko(x, y, 6
             );
             plinkos.push(p);
         }
@@ -61,7 +61,7 @@ function setup() {
 
     var multipliers = [
         "250x", "99x", "41x", "10x", "5x", "3x", "1.5x",
-        "0.5x", "0.3x", "0.5x",
+        "0.4x", "0.3x", "0.4x",
         "1.5x", "3x", "5x", "10x", "41x", "99x", "250x"
     ];
 

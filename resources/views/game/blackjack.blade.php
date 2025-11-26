@@ -48,6 +48,7 @@
             <section id="betContainer" class="mb-4">
                 <h2 class="h5 mb-3">Sélectionnez votre mise</h2>
                 <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <button class="betToken btn btn-outline-light" data-value="1">1</button>
                     <button class="betToken btn btn-outline-light" data-value="10">10</button>
                     <button class="betToken btn btn-outline-light" data-value="50">50</button>
                     <button class="betToken btn btn-outline-light" data-value="100">100</button>

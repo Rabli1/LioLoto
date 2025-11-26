@@ -716,18 +716,18 @@
   }
 
   .pill-nav {
-    --nav-h: 35px;
+    --nav-h: 30px;
   }
 
   .pill-list>li a,
   .pill {
-    font-size: 0.65rem !important;
+    font-size: 0.60rem !important;
     padding: 2px 4px !important;
   }
 
   .pill-logo {
-    width: 45px !important;
-    height: 45px !important;
+    width: 40px !important;
+    height: 40px !important;
     padding: 3px !important;
   }
 
@@ -744,7 +744,7 @@
 
 @media (max-width: 400px) {
   #react-navbar {
-    margin-left: 2% !important;
+    margin-left: 0% !important;
     margin-bottom: 10% !important;
     position: relative;
     bottom: 5px !important;

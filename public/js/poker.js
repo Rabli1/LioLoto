@@ -133,14 +133,18 @@ function updateUI() {
                 if(secondsLeft < 0){
                     gameMessage.text('En attente de joueurs pour démarrer la partie...');
                     clearInterval(countdownInterval);
+                    return;
                 }
                 gameMessage.text(`Nouvelle partie dans ${secondsLeft} secondes...`);
             }, 1000);
-
+            
+            playerTostart = gameState.players.find(player => !player.toKick)?.id;
             restartTimeout = setTimeout(() => {
                 clearInterval(countdownInterval);
                 gameMessage.text("Démarrage d'une nouvelle partie...");
-                initRound();
+                if(window.gameSession.userId === playerTostart){
+                    initRound();
+                }
                 playGameStart();
                 restartTimeout = null;
             }, RESTART_DELAY);
@@ -219,8 +223,8 @@ function updateUI() {
         betAmount.attr('max', maxBet);
         betRange.attr('min', callAmount);
         betAmount.attr('min', callAmount);
-        betRange.val(Math.max(callAmount, 50));
-        betAmount.val(Math.max(callAmount, 50));
+        betRange.val(Math.max(callAmount, 20));
+        betAmount.val(Math.max(callAmount, 20));
         timeProgressBar.css("width", "0%")
         startCountDown();
         betSection.show();
