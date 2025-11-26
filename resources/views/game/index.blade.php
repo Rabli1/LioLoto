@@ -77,7 +77,7 @@
             </div>
             <div class="col-lg-4 mb-4">
                 <div class="leaderboard-card text-center">
-                    <div class="row"><img style="height: 210px;" src='{{ asset("img/slot/card.svg") }}'
+                    <div class="row"><img style="height: 210px;" src='{{ asset("img/slots.png") }}'
                             alt="Machine à sous"></div>
                     <div class="row">
                         <h3>Machine à sous</h3>
