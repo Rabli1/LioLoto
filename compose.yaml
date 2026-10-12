@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        PHP_IMAGE: ${PHP_IMAGE:-php:8.4-apache-bookworm}
+        NODE_IMAGE: ${NODE_IMAGE:-node:24-bookworm-slim}
+        COMPOSER_IMAGE: ${COMPOSER_IMAGE:-composer:2}
+    image: lioloto:${RELEASE_TAG:-local}
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    ports:
+      - "${HTTP_BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8080}:80"
+    volumes:
+      - application_storage:/var/www/html/storage
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/up') === false ? 1 : 0);"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  application_storage:

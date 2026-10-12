@@ -54,6 +54,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'trusted_proxies' => env('TRUSTED_PROXIES', ''),
+    'render' => env('RENDER', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

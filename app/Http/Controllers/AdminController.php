@@ -1,114 +1,88 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
+use App\Models\GameRound;
+use App\Models\User;
 use App\Services\UserServices;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
-    private const USERS_PATH = 'database/json/users.json';
-    private UserServices $userService;
+    public function dashboard(UserServices $users)
+    {
+        return view('admin.dashboard', ['users' => $users->all()]);
+    }
 
-    public function __construct(UserServices $userService)
+    public function fixPoints(Request $request)
     {
-        $this->userService = $userService;
-    }
-    public function dashboard(): View | RedirectResponse
-    {
-        $this->userService->redirectIfNotConnected();
-        $this->userService->redirectIfNotAdmin();
-        $users = $this->userService->all();
-        return view('admin.dashboard', [
-            'users' => $users,
+        $validated = $request->validate([
+            'userId' => ['required', 'integer', 'exists:users,id'],
+            'points' => ['required', 'integer', 'min:0', 'max:1000000000'],
         ]);
-    }
-    public function fixPoints(Request $request):RedirectResponse
-    {
-        $userId = (int) $request->input('userId');
-        $newPoints = (int) $request->input('points');
-        $path = base_path(self::USERS_PATH);
-        $users = json_decode(@file_get_contents($path), true);
-        foreach ($users as &$user) {
-            if ($user['id'] === $userId) {
-                $user['points'] = $newPoints;
-                file_put_contents($path, json_encode($users));
-            }
-        }
-        return redirect('/admin/dashboard');
-    }
-    public function toggleBan(Request $request): RedirectResponse
-    {
-        $userId = (int) $request->input('userId');
-        $action = $request->input('action');
-        $path = base_path(self::USERS_PATH);
-        $users = json_decode(@file_get_contents($path), true);
-        foreach ($users as &$user) {
-            if ($user['id'] === $userId) {
-                if ($action === 'ban') {
-                    $user['banned'] = true;
-                } elseif ($action === 'unban') {
-                    $user['banned'] = false;
-                }
-                file_put_contents($path, json_encode($users));
-                break;
-            }
-        }
-        return redirect('/admin/dashboard');
-    }
-    public function toggleAdmin(Request $request): RedirectResponse
-    {
-        $userId = (int) $request->input('userId');
-        $action = $request->input('action');
-        $path = base_path(self::USERS_PATH);
-        $users = json_decode(@file_get_contents($path), true);
-        foreach ($users as &$user) {
-            if ($user['id'] === $userId) {
-                if ($action === 'admin') {
-                    $user['admin'] = true;
-                } elseif ($action === 'user') {
-                    $user['admin'] = false;
-                }
-                file_put_contents($path, json_encode($users));
-                break;
-            }
-        }
-        return redirect('/admin/dashboard');
-    }
-        public function deleteUser(Request $request): RedirectResponse
-    {
-        $this->userService->redirectIfNotConnected();
-        $this->userService->redirectIfNotAdmin();
-        $userId = (int) $request->input('userId');
-        $currentUser = session('user');
-        if ($currentUser && $currentUser->id === $userId) {
-            return redirect('/admin/dashboard');
-        }
-        $path = base_path(self::USERS_PATH);
-        $users = json_decode(@file_get_contents($path), true);
-        $users = array_filter($users, function ($user) use ($userId) {
-            return $user['id'] !== $userId;
+        $this->mutateUser($request, $validated['userId'], function (User $user) use ($validated) {
+            $user->points = $validated['points'];
         });
-        file_put_contents($path, json_encode(array_values($users)));
         return redirect('/admin/dashboard');
     }
-    public function killPoker(Request $request): RedirectResponse
+
+    public function toggleBan(Request $request)
     {
-        $this->userService->redirectIfNotAdmin();
-        $path = database_path('json/pokerState.json');
-        $initialState = [
-            "playersTurn" => 1,
-            "roundStep" => "waiting",
-            "communityCards" => [],
-            "pot" => 75,
-            "requiredBet" => 50,
-            "smallBlind" => 1,
-            "queue" => [],
-            "players" => [],
-            "deck" => []
-        ];
-        file_put_contents($path, json_encode($initialState));
+        $validated = $request->validate([
+            'userId' => ['required', 'integer', 'exists:users,id'],
+            'action' => ['required', Rule::in(['ban', 'unban'])],
+        ]);
+        $this->mutateUser($request, $validated['userId'], function (User $user) use ($validated) {
+            $user->banned = $validated['action'] === 'ban';
+        }, true);
         return redirect('/admin/dashboard');
+    }
+
+    public function toggleAdmin(Request $request)
+    {
+        $validated = $request->validate([
+            'userId' => ['required', 'integer', 'exists:users,id'],
+            'action' => ['required', Rule::in(['admin', 'user'])],
+        ]);
+        $this->mutateUser($request, $validated['userId'], function (User $user) use ($validated) {
+            $user->admin = $validated['action'] === 'admin';
+        }, true);
+        return redirect('/admin/dashboard');
+    }
+
+    public function deleteUser(Request $request)
+    {
+        $validated = $request->validate(['userId' => ['required', 'integer', 'exists:users,id']]);
+        $this->mutateUser($request, $validated['userId'], fn (User $user) => $user->delete(), true);
+        return redirect('/admin/dashboard');
+    }
+
+    public function killPoker(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            $actor = User::whereKey($request->attributes->get('player')->id)->lockForUpdate()->firstOrFail();
+            abort_unless($actor->admin && !$actor->banned, 403);
+            GameRound::where('game', 'poker')->where('status', 'active')
+                ->update(['status' => 'lost', 'updated_at' => now()]);
+        });
+        return redirect('/admin/dashboard');
+    }
+
+    private function mutateUser(Request $request, int $id, callable $change, bool $protectSelf = false): void
+    {
+        DB::transaction(function () use ($request, $id, $change, $protectSelf) {
+            // Lock administrators in a consistent order so simultaneous privilege changes cannot remove the final administrator.
+            $admins = User::where('admin', true)->orderBy('id')->lockForUpdate()->get();
+            $actor = $admins->firstWhere('id', $request->attributes->get('player')->id);
+            abort_unless($actor && !$actor->banned, 403);
+            abort_if($protectSelf && $id === $actor->id, 422, 'Ton propre compte est protégé.');
+            $user = User::whereKey($id)->lockForUpdate()->firstOrFail();
+            $change($user);
+            if ($user->exists) {
+                $user->save();
+            }
+        });
     }
 }

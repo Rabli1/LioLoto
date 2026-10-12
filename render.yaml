@@ -1,0 +1,55 @@
+# Deploy using Render's included HTTPS onrender.com URL.
+# The only manually supplied secret is a Neon Free PostgreSQL DIRECT connection URL.
+services:
+  - type: web
+    name: lioloto
+    runtime: docker
+    plan: free
+    region: ohio
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /up
+    autoDeployTrigger: "off"
+    envVars:
+      - key: APP_NAME
+        value: LioLoto
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY_MATERIAL
+        generateValue: true
+      - key: APP_LOCALE
+        value: fr
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DATABASE_URL
+        # In Neon's Connect panel, turn Connection pooling OFF before copying.
+        # Startup runs schema migrations: use the direct host, never a -pooler host.
+        sync: false
+      - key: DB_SSLMODE
+        value: require
+      - key: AUTH_REQUIRE_EMAIL_CONFIRMATION
+        value: "false"
+      - key: MAIL_MAILER
+        value: log
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: warning
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_ENCRYPT
+        value: "true"
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: SESSION_HTTP_ONLY
+        value: "true"
+      - key: SESSION_SAME_SITE
+        value: lax
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local

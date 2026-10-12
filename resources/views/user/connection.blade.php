@@ -1,58 +1,17 @@
-@include('shared.header')
-
-@include('shared.navbar')
-
-@viteReactRefresh
-@vite(['resources/js/app.jsx'])
-@if (session()->has('user'))
-    <script>
-        window.location.href = "/";
-    </script>
-
-
-@endif
-<div class="form-container mt-5">
-    <h3 class="text-center mb-4">Connexion</h3>
-    @php
-        if ($message == "Nom d'utilisateur ou mot de passe incorrect" || $message == "Votre compte a été banni" || $message == "Votre compte n'est pas confirmé. Veuillez vérifier votre email." || $message == "Lien de confirmation invalide ou expiré.") {
-            $textColor = "text-danger";
-        } else {
-            $textColor = "text-success";
-        }
-    @endphp
-    <span class="text-center {{$textColor}}" style="display: block;">{{$message}}</span>
-    <form action="{{ url('/user/connection') }}" method="post">
-        @csrf
-        <div class="mb-3">
-            <label for="username" class="form-label">Nom d'utilisateur</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="Nom d'utilisateur"
-                value="{{ $username }}">
-        </div>
-
-        <div class="mb-3">
-            <label for="password" class="form-label">Mot de passe</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe"
-                value="{{ $password }}">
-        </div>
-
-        <div class="mb-1 text-center">
-            <label class="form-check-label" for="remember">Se souvenir de moi</label>
-            <input type="checkbox" class="form-check-input" style="margin-left: 1%;" id="remember" name="remember" {{ $username ? 'checked' : '' }}>
-        </div>
-
-        <div class="d-flex justify-content-center">
-            <button type="submit" class="btn btn-danger mt-4 w-50" id="submit">
-                Connexion
-            </button>
-        </div>
-    </form>
-</div>
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-@include('shared.footer')
+@php($pageTitle = 'Connexion')
+@extends('layouts.app')
+@section('content')
+<main id="main-content" class="page-width auth-page">
+    <div class="auth-intro"><h1>Connexion</h1>@include('shared.game-art',['gameKey'=>'blackjack'])</div>
+    <div class="form-card">@include('shared.errors')
+        @if($message ?? null)<p class="form-message" role="status">{{ $message }}</p>@endif
+        <form method="post" action="{{ url('/user/connection') }}">@csrf
+            <label for="username">Nom d’utilisateur</label><input id="username" name="username" type="text" autocomplete="username" maxlength="255" value="{{ old('username', $username ?? '') }}" required>
+            <label for="password">Mot de passe</label><input id="password" name="password" type="password" autocomplete="current-password" required>
+            <div class="remember-row"><input id="remember" name="remember" type="checkbox" value="1"><label for="remember">Se souvenir de moi</label></div>
+            <button class="button" type="submit">Se connecter <span aria-hidden="true">↗</span></button>
+            @if(config('auth.require_email_confirmation'))<button class="button button-ghost" type="submit" formaction="{{ url('/user/resend-confirmation') }}">Renvoyer la confirmation</button>@endif
+        </form><div class="form-footnote">Première visite ? <a href="{{ url('/user/signIn') }}">Créer un compte</a></div>
+    </div>
+</main>
+@endsection
