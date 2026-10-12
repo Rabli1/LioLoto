@@ -1,5 +1,5 @@
 # Deploy using Render's included HTTPS onrender.com URL.
-# The only manually supplied secret is a Neon Free PostgreSQL connection URL.
+# The only manually supplied secret is a Neon Free PostgreSQL DIRECT connection URL.
 services:
   - type: web
     name: lioloto
@@ -24,6 +24,8 @@ services:
       - key: DB_CONNECTION
         value: pgsql
       - key: DATABASE_URL
+        # In Neon's Connect panel, turn Connection pooling OFF before copying.
+        # Startup runs schema migrations: use the direct host, never a -pooler host.
         sync: false
       - key: DB_SSLMODE
         value: require
