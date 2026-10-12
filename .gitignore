@@ -1,9 +1,9 @@
 *.log
 .DS_Store
 .env
-.env.backup
-.env.production
-.env.example
+.env.*
+!.env.example
+!.env.production.example
 .phpactor.json
 .phpunit.result.cache
 .vite.config.js
@@ -26,5 +26,8 @@ Thumbs.db
 blackjack_last_reset.txt
 /database/json/*.json
 /database/json/users.json
-node_modules/.vite/deps/_metadata.json
-node_modules/.vite/**
+/node_modules/
+/.tools/
+/artifacts/
+/database/*.sqlite*
+/reset_log.txt

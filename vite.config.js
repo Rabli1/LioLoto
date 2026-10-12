@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import react from '@vitejs/plugin-react';
 
 
 export default defineConfig({
@@ -9,12 +8,12 @@ export default defineConfig({
             input: ['resources/js/app.jsx', 'resources/css/app.css'],
             refresh: true,
         }),
-        react(),
     ],
     server: {
         host: 'localhost',
         port: 5173,
-        cors: true,
-        allowedHosts: ['localhost', 'lioto'],
+        strictPort: true,
+        cors: { origin: ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:8000'] },
+        allowedHosts: ['localhost', '127.0.0.1'],
     },
 });

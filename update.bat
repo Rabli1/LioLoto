@@ -1,6 +1,5 @@
 @echo off
-cd /d C:\xampp\htdocs\LioLoto
-git reset --hard origin/main
-git pull origin main
-npm install
-npm run build
+rem Compatibility entrypoint. Select the source release before running this script.
+rem Deployment preserves working files and applies only forward database migrations.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\deploy.ps1" %*
+exit /b %errorlevel%

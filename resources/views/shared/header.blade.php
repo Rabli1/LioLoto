@@ -1,44 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Loto Lio</title>
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <link rel="stylesheet" href="{{ asset('css/form.css') }}">
-  <link rel="stylesheet" href="{{ asset("css/user.css") }}">
-  <link rel="stylesheet" href="{{ asset('css/game.css') }}">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script defer src="{{ asset('js/balance.js') }}"></script>
-  <style>
-    body {
-      background-color: rgba(26, 26, 26, 1);
-      color: #FCF0F0;
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      overflow-x: hidden;
-    }
-
-    .leaderboard-card {
-      background: #111;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, .5);
-    }
-
-    .list-group-item {
-      border: none;
-    }
-
-    .carousel-inner img {
-      object-fit: cover;
-      height: 400px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#0c101b">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <meta name="description" content="LioLoto, votre arcade de dix jeux avec des points virtuels.">
+    <title>{{ $pageTitle ?? 'L’arcade' }} · LioLoto</title>
+    @vite(['resources/js/app.jsx', 'resources/css/app.css'])
 </head>
-
-<body class="d-flex flex-column min-vh-10">
+<body>
+<a class="skip-link" href="#main-content">Aller au contenu</a>

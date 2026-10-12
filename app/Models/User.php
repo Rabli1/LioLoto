@@ -2,37 +2,38 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    public $id;
-    public $name;
-    public $points;
-    public $profileImage;
-    public $profileColor;
-    public $admin;
-    public $gold;
-    public $silver;
-    public $bronze;
-    public $pointsLost;
-    public $banned;
-    public $lvl;
-    public $exp;
-    public $timestamps = false;
+    use HasFactory;
 
-    protected $table = null;
+    protected $fillable = ['name', 'email', 'password', 'bio', 'profileImage', 'profileColor'];
 
-    public function __construct(array $attributes = [])
+    protected $hidden = ['password', 'remember_token', 'confirmation_token'];
+
+    public function publicProfile(): array
     {
-        foreach ($attributes as $key => $value) {
-            $this->{$key} = $value;
-        }
+        return $this->only(['id', 'name', 'points', 'profileImage', 'profileColor', 'gold',
+            'silver', 'bronze', 'pointsLost', 'bio', 'lvl', 'exp']);
     }
 
-    // Return primary key attribute name
-    public function getKeyName()
+    protected function casts(): array
     {
-        return 'id';
+        return [
+            'password' => 'hashed',
+            'admin' => 'boolean',
+            'confirmed' => 'boolean',
+            'banned' => 'boolean',
+            'daily' => 'boolean',
+            'points' => 'integer',
+            'pointsLost' => 'integer',
+            'gold' => 'integer',
+            'silver' => 'integer',
+            'bronze' => 'integer',
+            'lvl' => 'integer',
+            'exp' => 'integer',
+        ];
     }
 }
