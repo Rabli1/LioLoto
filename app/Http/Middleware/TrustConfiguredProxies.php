@@ -24,6 +24,14 @@ class TrustConfiguredProxies extends TrustProxies
                 throw new \InvalidArgumentException('TRUSTED_PROXIES must contain explicit IP addresses or CIDR networks.');
             }
         }
+        // Render routes all public requests through its gateway. Its address is
+        // dynamic, so trust that immediate hop only in the explicit Render mode.
+        if ($proxies === [] && config('app.render')) {
+            $gateway = $request->server->get('REMOTE_ADDR');
+            if (filter_var($gateway, FILTER_VALIDATE_IP)) {
+                $proxies = [$gateway];
+            }
+        }
         $request::setTrustedProxies($proxies, $this->headers);
     }
 }

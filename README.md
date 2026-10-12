@@ -2,6 +2,21 @@
 
 A Laravel 12 game lounge using virtual points. Accounts and game rounds live in SQL; game outcomes and balance changes are handled by the server. The interface is built with Blade and Vite. Daily Liotodle access resets at midnight UTC (the application timezone).
 
+## Deploy free on Render with Neon
+
+`render.yaml` provisions one **Free Docker web service** using Render's included HTTPS `onrender.com` address. It requests no custom domain, persistent disk, paid worker or Render database. The app uses an external **Neon Free PostgreSQL** database for accounts, rounds, sessions and cache, so Render restarts preserve player data. Choose the Free plan in both dashboards. [Render Blueprint reference](https://render.com/docs/blueprint-spec), [Neon Free plan](https://neon.com/blog/neon-free-plan-1-gb-per-project).
+
+1. Make this patched source, including both lockfiles and `render.yaml`, available in a Git repository you control. The deployment must use these changes rather than the original upstream snapshot.
+2. Create a Neon project on its **Free** plan in **Ohio (AWS us-east-2)** to match the Render blueprint. From Neon's Connect panel, copy the PostgreSQL connection string, including `sslmode=require`. Use the direct connection for the startup migrations. Keep this password-bearing URL private. [Neon connection guide](https://neon.com/docs/connect/connect-from-any-app).
+3. In Render, create a new **Blueprint**, connect that repository, and select `render.yaml`. Verify the service plan remains **Free**. When prompted for `DATABASE_URL`, paste the Neon connection string.
+4. Render builds the Docker image and starts the app. Open the service's generated `https://…onrender.com` address once its `/up` health check passes. Automatic deployments are off in the blueprint; deploy the source commit you choose from Render's dashboard.
+
+Render generates `APP_KEY_MATERIAL` once. Startup prefixes this stable secret with `base64:` for Laravel, uses `RENDER_EXTERNAL_URL` as `APP_URL`, binds Apache to Render's numeric `PORT`, and runs forward migrations. Every restart retains the same encryption key and SQL data. Preserve the generated secret if recreating the service. Secrets are supplied in Render's dashboard, not committed. [Render generated secrets](https://render.com/docs/blueprint-spec#generating-random-secrets), [Render environment variables](https://render.com/docs/environment-variables).
+
+The free profile sets `AUTH_REQUIRE_EMAIL_CONFIRMATION=false` and `MAIL_MAILER=log`: newly registered players can sign in without an email round trip, and email ownership is not verified. This avoids dependence on the standard SMTP ports blocked by Render Free. Normal deployments keep email confirmation required unless explicitly configured otherwise. [Render Free limitations](https://render.com/docs/free).
+
+Render Free sleeps when idle and has usage limits; the next visit can take longer to start. Its filesystem is temporary, so the deployment rejects SQLite and keeps all durable state in Neon. Do not use Render's Free PostgreSQL offering for this setup, because it expires after 30 days. Monitor the included Render and Neon allowances to keep this deployment free. [Render Free limits](https://render.com/docs/free), [Neon Free allowances](https://neon.com/blog/neon-free-plan-1-gb-per-project).
+
 ## Reproduce a development installation
 
 Requirements: PHP 8.2 or later with PDO SQLite (or PDO MySQL), mbstring, openssl, tokenizer, XML, ctype, fileinfo and curl; Composer 2; Node.js 24 with npm. Commit both lockfiles and use `composer install` / `npm ci`, rather than updating dependencies during a release.
@@ -32,7 +47,7 @@ If a confirmation link expires or email delivery fails, enter the account creden
 
 ## Database migrations and an intentional rebuild
 
-SQLite is the development default at `database/database.sqlite`. Set an absolute `DB_DATABASE` to choose another file. MySQL and PostgreSQL can also be configured with `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD`; create the database and grant its application user migration permissions before running the script. The container includes SQLite and MySQL drivers; PostgreSQL deployments must add `pdo_pgsql` to their PHP image.
+SQLite is the development default at `database/database.sqlite`. Set an absolute `DB_DATABASE` to choose another file. MySQL and PostgreSQL can also be configured with `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD`; create the database and grant its application user migration permissions before running the script. The container includes SQLite, MySQL and PostgreSQL drivers. A private `DATABASE_URL` is supported for PostgreSQL; scripts parse it and print only the driver, host, port and database name, without its credentials.
 
 ```powershell
 ./scripts/database.ps1
@@ -61,7 +76,7 @@ php scripts/import-users.php /private/backup/users.json
 
 The importer validates the entire export, rejects plaintext passwords and conflicting identities, preserves IDs and password hashes, and imports within a transaction. Reruns skip existing matching identities without overwriting live passwords, balances or privileges. Legacy confirmation and remember tokens are invalidated, and the source file is preserved. Back up the original JSON file and SQL database before migration. Pending legacy accounts with an email can request a new confirmation from the login page using their existing credentials. Accounts without an email require operator verification before confirmation.
 
-## Deploy with Docker Compose
+## Optional deployment with Docker Compose
 
 Use one replica with the persistent SQLite volume, or configure an external MySQL database for a shared database. Docker Engine and Compose v2 are required. The container serves only `public/` through Apache; put it behind an HTTPS reverse proxy.
 
@@ -81,7 +96,7 @@ The named `application_storage` volume holds the SQLite database, sessions and a
 
 Composer and npm dependencies are fixed by their committed lockfiles. Base image tags receive upstream security fixes. For an exact reproduction of container bases, set `PHP_IMAGE`, `NODE_IMAGE` and `COMPOSER_IMAGE` in the deployment environment to approved immutable registry digests, and set a `RELEASE_TAG` for the resulting application image. Record the source commit and resulting application image digest for each release; deploying that image digest reproduces the built code and assets.
 
-## Deploy on an existing PHP host
+## Optional deployment on an existing PHP host
 
 Check out the desired source commit on the server, supply a production `.env` or environment variables using `.env.production.example` as a reference, and configure the web root as `public/`. Make `storage/` and `bootstrap/cache/` writable by the web worker. Configure HTTPS and SMTP before deployment.
 
@@ -99,7 +114,13 @@ The scripts do not provision a cloud account, public DNS, TLS certificates or an
 
 ## Bootstrap an administrator
 
-Register and confirm an account through the normal site flow, then have a trusted server operator promote that specific account. No deployment script grants admin privileges automatically.
+Register an account through the normal site flow (and confirm it when email confirmation is enabled), then have a trusted operator promote that specific account. No deployment script grants admin privileges automatically. Render Free has no interactive server shell; use Neon's SQL editor after verifying the account belongs to the intended administrator:
+
+```sql
+UPDATE users SET admin = TRUE WHERE name = 'your_username';
+```
+
+On an existing PHP host, the equivalent command is:
 
 ```sh
 php artisan tinker --execute="App\Models\User::where('name', 'your_username')->firstOrFail()->forceFill(['admin' => true])->save();"

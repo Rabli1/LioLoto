@@ -16,8 +16,8 @@ FROM ${COMPOSER_IMAGE} AS composer
 
 FROM ${PHP_IMAGE}
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libicu-dev libzip-dev \
-    && docker-php-ext-install -j"$(nproc)" bcmath intl pdo_mysql zip \
+    && apt-get install -y --no-install-recommends libicu-dev libpq-dev libzip-dev \
+    && docker-php-ext-install -j"$(nproc)" bcmath intl pdo_mysql pdo_pgsql zip \
     && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
@@ -30,6 +30,7 @@ RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoload
     && chmod +x deploy/entrypoint.sh
 COPY --from=frontend /build/public/build ./public/build
 COPY deploy/apache.conf /etc/apache2/sites-available/000-default.conf
+COPY deploy/ports.conf /etc/apache2/ports.conf
 COPY deploy/php.ini /usr/local/etc/php/conf.d/99-lioloto.ini
 ENTRYPOINT ["/var/www/html/deploy/entrypoint.sh"]
 CMD ["apache2-foreground"]

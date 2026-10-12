@@ -2,6 +2,9 @@
 
 return [
 
+    // Only an explicit false disables email confirmation; production remains verified by default.
+    'require_email_confirmation' => env('AUTH_REQUIRE_EMAIL_CONFIRMATION', true) !== false,
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults

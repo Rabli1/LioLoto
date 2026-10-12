@@ -34,7 +34,7 @@ class GameRoundService
             }
             if ($game === 'liotodle') {
                 if (GameRound::where('user_id', $userId)->where('game', 'liotodle')->whereDate('created_at', today())->exists()) {
-                    abort(409, 'Le Liotodle du jour est déjà joué. Reviens demain !');
+                    abort(409, 'Le Liotodle a déjà été joué aujourd’hui.');
                 }
             } elseif ($stake > $user->points) {
                 throw ValidationException::withMessages(['stake' => 'Solde insuffisant.']);
@@ -141,7 +141,7 @@ class GameRoundService
                 $unique = count(array_unique($reels));
                 $multiplier = $unique === 1 ? ['cherry' => 6, 'lemon' => 8, 'grape' => 10, 'bell' => 15, 'diamond' => 30, 'seven' => 50][$reels[0]] : ($unique === 2 ? 1 : 0);
                 $round->state = ['symbols' => $reels];
-                $this->settle($round, $user, $multiplier, $unique === 1 ? 'Trois symboles identiques !' : ($unique === 2 ? 'Paire : mise rendue.' : 'Essaie encore.'));
+                $this->settle($round, $user, $multiplier, $unique === 1 ? 'Trois symboles identiques.' : ($unique === 2 ? 'Paire : mise rendue.' : 'Aucune combinaison.'));
                 break;
             case 'blackjack':
                 $deck = $this->deck();
@@ -154,7 +154,7 @@ class GameRoundService
                 if ($this->cardTotal($state['playerCards']) === 21 || $this->cardTotal($state['dealerCards']) === 21) {
                     $playerTotal = $this->cardTotal($state['playerCards']);
                     $dealerTotal = $this->cardTotal($state['dealerCards']);
-                    $this->settle($round, $user, $playerTotal === $dealerTotal ? 1 : ($playerTotal === 21 ? 2.5 : 0), 'Blackjack !');
+                    $this->settle($round, $user, $playerTotal === $dealerTotal ? 1 : ($playerTotal === 21 ? 2.5 : 0), 'Blackjack.');
                 }
                 break;
             case 'mines':
@@ -194,7 +194,7 @@ class GameRoundService
             $round->state = $state;
             $total = $this->cardTotal($state['playerCards']);
             if ($total > 21) {
-                $this->settle($round, $user, 0, 'Tu dépasses 21.');
+                $this->settle($round, $user, 0, 'Main supérieure à 21.');
             } elseif ($total === 21) {
                 $this->blackjackAction($round, $user, ['action' => 'stand']);
             }
@@ -206,7 +206,7 @@ class GameRoundService
             $player = $this->cardTotal($state['playerCards']);
             $dealer = $this->cardTotal($state['dealerCards']);
             $multiplier = $dealer > 21 || $player > $dealer ? 2 : ($player === $dealer ? 1 : 0);
-            $this->settle($round, $user, $multiplier, $multiplier === 2 ? 'Tu gagnes !' : ($multiplier === 1 ? 'Égalité.' : 'Le croupier gagne.'));
+            $this->settle($round, $user, $multiplier, $multiplier === 2 ? 'Main gagnante.' : ($multiplier === 1 ? 'Égalité.' : 'Le croupier gagne.'));
         } else {
             $this->invalidAction();
         }
@@ -219,7 +219,7 @@ class GameRoundService
             if (count($state['revealed']) === 0) {
                 $this->invalidAction('Révèle au moins une case avant de retirer.');
             }
-            $this->settle($round, $user, $state['multiplier'], 'Retrait réussi !');
+            $this->settle($round, $user, $state['multiplier'], 'Retrait effectué.');
         } elseif ($input['action'] === 'reveal' && isset($input['cell'])) {
             $cell = (int) $input['cell'];
             if (in_array($cell, $state['revealed'], true)) {
@@ -228,7 +228,7 @@ class GameRoundService
             $state['revealed'][] = $cell;
             $round->state = $state;
             if (in_array($cell, $state['minesPositions'], true)) {
-                $this->settle($round, $user, 0, 'Une mine !');
+                $this->settle($round, $user, 0, 'Mine.');
                 return;
             }
             $probability = 1;
@@ -238,7 +238,7 @@ class GameRoundService
             $state['multiplier'] = min(1000, floor(.96 / $probability * 100) / 100);
             $round->state = $state;
             if (count($state['revealed']) === 25 - $state['mines']) {
-                $this->settle($round, $user, $state['multiplier'], 'Toutes les cases sûres trouvées !');
+                $this->settle($round, $user, $state['multiplier'], 'Toutes les cases sûres sont ouvertes.');
             }
         } else {
             $this->invalidAction();
@@ -252,19 +252,19 @@ class GameRoundService
             if ($state['steps'] === 0) {
                 $this->invalidAction('Avance au moins une fois avant de retirer.');
             }
-            $this->settle($round, $user, $state['multiplier'], 'Le poulet est en sécurité !');
+            $this->settle($round, $user, $state['multiplier'], 'Retrait effectué.');
         } elseif ($input['action'] === 'step') {
             $survival = ['easy' => 88, 'medium' => 76, 'hard' => 62][$state['difficulty']];
             $state['steps']++;
             $round->state = $state;
             if (random_int(1, 100) > $survival) {
-                $this->settle($round, $user, 0, 'Attention aux voitures !');
+                $this->settle($round, $user, 0, 'Collision.');
                 return;
             }
             $state['multiplier'] = floor(.96 / pow($survival / 100, $state['steps']) * 100) / 100;
             $round->state = $state;
             if ($state['steps'] >= $state['maxSteps']) {
-                $this->settle($round, $user, $state['multiplier'], 'La route est traversée !');
+                $this->settle($round, $user, $state['multiplier'], 'Route traversée.');
             }
         } else {
             $this->invalidAction();
@@ -280,7 +280,7 @@ class GameRoundService
         if ($multiplier >= $round->state['crashAt']) {
             $this->settle($round, $user, 0, 'Le vol est terminé.');
         } elseif ($input['action'] === 'cashout') {
-            $this->settle($round, $user, $multiplier, 'Retrait réussi !');
+            $this->settle($round, $user, $multiplier, 'Retrait effectué.');
         }
     }
 
@@ -363,7 +363,7 @@ class GameRoundService
         $state['guesses'][] = ['word' => $word, 'result' => $result, 'won' => $won];
         $round->state = $state;
         if ($won || count($state['guesses']) >= 6) {
-            $this->settle($round, $user, 0, $won ? 'Mot trouvé : +300 points !' : 'Le mot était '.$state['secret'], $won ? 300 : 0);
+            $this->settle($round, $user, 0, $won ? 'Mot trouvé : +300 points.' : 'Le mot était '.$state['secret'], $won ? 300 : 0);
         }
     }
 

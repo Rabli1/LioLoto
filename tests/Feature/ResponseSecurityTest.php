@@ -40,4 +40,22 @@ class ResponseSecurityTest extends TestCase
         }
         Request::setTrustedProxies([], 0);
     }
+
+    public function test_dynamic_gateway_trust_requires_render_mode(): void
+    {
+        config(['app.trusted_proxies' => '']);
+        foreach ([false, true] as $render) {
+            config(['app.render' => $render]);
+            $request = Request::create('http://lioloto.onrender.com/', 'GET', [], [], [], [
+                'REMOTE_ADDR' => '10.0.0.5', 'HTTP_X_FORWARDED_PROTO' => 'https',
+                'HTTP_X_FORWARDED_FOR' => '198.51.100.20',
+            ]);
+            (new TrustConfiguredProxies)->handle($request, function (Request $request) use ($render) {
+                $this->assertSame($render, $request->isSecure());
+                $this->assertSame($render ? '198.51.100.20' : '10.0.0.5', $request->ip());
+                return response('ok');
+            });
+        }
+        Request::setTrustedProxies([], 0);
+    }
 }

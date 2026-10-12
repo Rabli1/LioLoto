@@ -1,8 +1,8 @@
-@php($pageTitle = 'Modifier le mot de passe')
+@php($pageTitle = 'Mot de passe')
 @extends('layouts.app')
 @section('content')
 <main id="main-content" class="page-width auth-page">
-    <div class="auth-intro"><span class="eyebrow">VOTRE COMPTE</span><h1>Une nouvelle<br>phrase secrète<span class="brand-dot">.</span></h1><p>Choisissez un mot de passe unique d’au moins 12 caractères.</p><a class="small-link" href="{{ url('/user/profile') }}?id={{ session('user')->id }}">← Retour au profil</a></div>
+    <div class="auth-intro"><h1>Mot de passe</h1><p>Le nouveau mot de passe doit contenir au moins 12 caractères.</p><a class="small-link" href="{{ url('/user/profile') }}?id={{ session('user')->id }}">← Retour au profil</a></div>
     <div class="form-card"><h2>Modifier le mot de passe</h2>@include('shared.errors')
         <form action="{{ route('user.updatePassword') }}" method="post">@csrf
             <label for="current_password">Mot de passe actuel</label><input id="current_password" name="current_password" type="password" autocomplete="current-password" required>

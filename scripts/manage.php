@@ -125,7 +125,8 @@ if ($mode === 'deploy') {
     if (!config('session.secure') || !config('session.http_only')) {
         fail('Production deployment requires SESSION_SECURE_COOKIE=true and SESSION_HTTP_ONLY=true.');
     }
-    if (config('mail.default') !== 'smtp' || !config('mail.mailers.smtp.host') || !config('mail.from.address')) {
+    if (config('auth.require_email_confirmation', true)
+        && (config('mail.default') !== 'smtp' || !config('mail.mailers.smtp.host') || !config('mail.from.address'))) {
         fail('Production deployment requires a configured SMTP mailer for account confirmation.');
     }
 }
@@ -145,18 +146,35 @@ if ($applicationKey === '') {
 
 $connection = (string) config('database.default');
 $database = config('database.connections.'.$connection);
-if (!is_array($database) || !in_array($database['driver'] ?? '', ['sqlite', 'mysql', 'pgsql'], true)) {
+if (!is_array($database)) {
     fail('Configure a supported database connection: sqlite, mysql, or pgsql.');
 }
-if (!empty($database['url'])) {
-    fail('Deployment scripts use explicit DB_HOST/DB_DATABASE settings; remove DB_URL to make the reset target unambiguous.');
+try {
+    $database = (new Illuminate\Database\ConfigurationUrlParser)->parseConfiguration($database);
+} catch (Throwable) {
+    // Never print a connection URI, which contains a database password.
+    fail('The database connection URL is malformed.');
 }
+$driver = (string) ($database['driver'] ?? '');
+if (!in_array($driver, ['sqlite', 'mysql', 'pgsql'], true)) {
+    fail('Configure a supported database connection: sqlite, mysql, or pgsql.');
+}
+if (getenv('RENDER') === 'true') {
+    if ($driver !== 'pgsql' || !getenv('DATABASE_URL')) {
+        fail('Render requires a durable external PostgreSQL DATABASE_URL. Ephemeral SQLite is blocked.');
+    }
+    if (!in_array($database['sslmode'] ?? '', ['require', 'verify-ca', 'verify-full'], true)) {
+        fail('Render PostgreSQL requires TLS: use sslmode=require in DATABASE_URL.');
+    }
+}
+config(['database.connections.'.$connection => $database]);
+Illuminate\Support\Facades\DB::purge($connection);
 
 $databaseName = (string) ($database['database'] ?? '');
 if ($databaseName === '' || $databaseName === ':memory:') {
     fail('Use a persistent, named database. Automated tests should use a disposable SQLite file.');
 }
-if ($database['driver'] === 'sqlite') {
+if ($driver === 'sqlite') {
     $absolute = str_starts_with($databaseName, '/') || preg_match('/^[A-Za-z]:[\\\\\/]/', $databaseName) === 1;
     $databaseName = $absolute ? $databaseName : getcwd().DIRECTORY_SEPARATOR.$databaseName;
     $directory = dirname($databaseName);
@@ -171,9 +189,10 @@ if ($database['driver'] === 'sqlite') {
     }
     $databaseName = realpath($databaseName) ?: $databaseName;
     config(['database.connections.'.$connection.'.database' => $databaseName]);
-    $target = $connection.':'.$databaseName;
+    $target = $driver.':'.$databaseName;
 } else {
-    $target = $connection.':'.($database['host'] ?? 'localhost').':'.($database['port'] ?? '').':'.$databaseName;
+    $port = $database['port'] ?? ($driver === 'pgsql' ? 5432 : 3306);
+    $target = $driver.':'.($database['host'] ?? 'localhost').':'.$port.':'.$databaseName;
 }
 echo 'Database target: '.$target.PHP_EOL;
 

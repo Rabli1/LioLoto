@@ -29,29 +29,42 @@ class UserController extends Controller
 
     public function addUser(Request $request)
     {
-        $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+        $requiresConfirmation = $this->requiresEmailConfirmation();
+        $email = $request->input('email');
+        if (is_string($email)) {
+            $email = strtolower(trim($email));
+            $email = $email === '' ? null : $email;
+        }
+        $request->merge(['email' => $email]);
         $validated = $request->validate([
             'username' => ['required', 'string', 'min:4', 'max:20', 'regex:/^[A-Za-z0-9_-]+$/', Rule::unique('users', 'name')],
-            'email' => ['required', 'email', 'max:254', Rule::unique('users', 'email')],
+            'email' => ['bail', $requiresConfirmation ? 'required' : 'nullable', 'email', 'max:254', Rule::unique('users', 'email')],
             'password' => $this->passwordRules(true),
             'confirmPassword' => ['required', 'same:password'],
         ]);
-        $token = Str::random(64);
+        $token = $requiresConfirmation ? Str::random(64) : null;
 
         try {
             $user = new User([
                 'name' => $validated['username'],
-                'email' => $validated['email'],
+                'email' => $validated['email'] ?? null,
                 'password' => $validated['password'],
                 'profileImage' => 'fa-user',
                 'profileColor' => 'black',
             ]);
-            $user->forceFill(['confirmation_token' => hash('sha256', $token)])->save();
+            $user->forceFill([
+                'confirmed' => !$requiresConfirmation,
+                'confirmation_token' => $token === null ? null : hash('sha256', $token),
+            ])->save();
         } catch (QueryException $exception) {
             if (in_array((string) $exception->getCode(), ['23000', '23505'])) {
                 throw ValidationException::withMessages(['username' => 'Ce nom ou ce courriel est déjà utilisé.']);
             }
             throw $exception;
+        }
+
+        if (!$requiresConfirmation) {
+            return redirect('/user/connection')->with('success', 'Compte créé. Tu peux maintenant te connecter.');
         }
 
         $url = URL::temporarySignedRoute('user.confirm', now()->addDay(), ['token' => $token]);
@@ -78,6 +91,7 @@ class UserController extends Controller
 
     public function resendConfirmation(Request $request)
     {
+        abort_unless($this->requiresEmailConfirmation(), 404);
         $validated = $request->validate([
             'username' => ['required', 'string', 'max:255'],
             'password' => $this->passwordRules(),
@@ -118,6 +132,17 @@ class UserController extends Controller
             'remember' => ['sometimes', 'in:1,on,true'],
         ]);
         $user = $this->userService->verifyCredentials($validated['username'], $validated['password']);
+
+        if ($user && !$user->banned && !$user->confirmed && !$this->requiresEmailConfirmation()) {
+            $user = DB::transaction(function () use ($user, $validated) {
+                $freshUser = User::whereKey($user->id)->lockForUpdate()->first();
+                if (!$freshUser || $freshUser->banned || !password_verify($validated['password'], $freshUser->password)) {
+                    return null;
+                }
+                $freshUser->forceFill(['confirmed' => true, 'confirmation_token' => null])->save();
+                return $freshUser;
+            }, 5);
+        }
 
         if (!$user || $user->banned || !$user->confirmed) {
             return back()->withErrors(['username' => 'Connexion impossible. Vérifie tes identifiants et la confirmation du compte.'])
@@ -168,10 +193,12 @@ class UserController extends Controller
         });
         $request->session()->regenerate();
         $this->userService->rememberInSession($user);
-        try {
-            Mail::to($user->email)->send(new PasswordChangedMail($user));
-        } catch (\Throwable $exception) {
-            Log::warning('Password change notification could not be delivered.');
+        if ($this->requiresEmailConfirmation() && $user->email) {
+            try {
+                Mail::to($user->email)->send(new PasswordChangedMail($user));
+            } catch (\Throwable $exception) {
+                Log::warning('Password change notification could not be delivered.');
+            }
         }
 
         return redirect()->route('user.changePassword')->with('success', 'Mot de passe modifié.');
@@ -253,5 +280,10 @@ class UserController extends Controller
                     $fail('Le mot de passe doit contenir au plus 72 octets, sans caractère nul.');
                 }
             }]);
+    }
+
+    private function requiresEmailConfirmation(): bool
+    {
+        return config('auth.require_email_confirmation', true) !== false;
     }
 }
