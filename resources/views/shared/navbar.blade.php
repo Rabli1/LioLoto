@@ -3,7 +3,7 @@
     <nav class="site-nav page-width" aria-label="Navigation principale">
         <a class="brand" href="{{ url('/') }}" aria-label="LioLoto, accueil"><span class="brand-mark" aria-hidden="true">L<span>✦</span></span>Lio<span>Loto</span><span class="brand-dot">.</span></a>
         <div class="nav-links">
-            <a href="{{ url('/game') }}" @class(['is-current' => request()->is('game*')])>L’arcade</a>
+            <a href="{{ url('/game') }}" @class(['is-current' => request()->is('game*')])>Jeux</a>
             <a href="{{ url('/leaderboard') }}" @class(['is-current' => request()->is('leaderboard')])>Classement</a>
             <a href="{{ url('/user/support') }}" @class(['is-current' => request()->is('user/support')])>Comment jouer</a>
         </div>
