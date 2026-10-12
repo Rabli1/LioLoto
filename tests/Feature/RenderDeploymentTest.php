@@ -104,6 +104,17 @@ class RenderDeploymentTest extends TestCase
         $this->assertSecretWasNotPrinted($process);
     }
 
+    public function test_wrapped_url_with_unicode_whitespace_is_rejected_without_printing_it(): void
+    {
+        $process = $this->command([
+            'DATABASE_URL' => "postgresql://test-role:secret-sentinel@database\u{00A0}.example.invalid/neondb?sslmode=require",
+        ]);
+        $this->assertSame(1, $process->getExitCode());
+        $this->assertStringContainsString('database connection URL contains invalid whitespace', $process->getErrorOutput());
+        $this->assertStringNotContainsString('Database target:', $process->getOutput());
+        $this->assertSecretWasNotPrinted($process);
+    }
+
     public function test_free_profile_allows_log_mail_but_normal_confirmation_keeps_the_smtp_guard(): void
     {
         $free = $this->command(['DB_CONNECTION' => 'sqlite', 'DB_DATABASE' => ':memory:'], ['deploy', '--skip-install', '--skip-build']);

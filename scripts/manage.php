@@ -49,6 +49,22 @@ function npmCommand(): array
     return PHP_OS_FAMILY === 'Windows' ? ['cmd.exe', '/d', '/c', 'npm.cmd'] : ['npm'];
 }
 
+function databaseCommand(Illuminate\Contracts\Console\Kernel $kernel, string $command, string $failure): void
+{
+    try {
+        $exit = $kernel->call($command, ['--force' => true, '--no-interaction' => true]);
+    } catch (Throwable) {
+        // The bootstrap exception handler can otherwise render an error and exit 0.
+        // Connection exceptions may include credentials, so keep failure output neutral.
+        fail($failure);
+    }
+    if ($exit !== 0) {
+        fail($failure);
+    }
+    echo $kernel->output();
+}
+
+try {
 $mode = $argv[1] ?? '';
 $flags = array_slice($argv, 2);
 $allowed = ['--skip-install', '--skip-build', '--demo', '--seed', '--fresh'];
@@ -149,6 +165,9 @@ $database = config('database.connections.'.$connection);
 if (!is_array($database)) {
     fail('Configure a supported database connection: sqlite, mysql, or pgsql.');
 }
+if (isset($database['url']) && is_string($database['url']) && preg_match('/[\s\p{Z}]/u', $database['url']) !== 0) {
+    fail('The database connection URL contains invalid whitespace. Copy the unwrapped connection string.');
+}
 try {
     $database = (new Illuminate\Database\ConfigurationUrlParser)->parseConfiguration($database);
 } catch (Throwable) {
@@ -213,17 +232,9 @@ if ($mode === 'deploy' && !file_exists('public/build/manifest.json')) {
 if ($mode === 'deploy') {
     run([PHP_BINARY, 'artisan', 'down', '--retry=60', '--no-interaction']);
 }
-$exit = $kernel->call($fresh ? 'migrate:fresh' : 'migrate', ['--force' => true, '--no-interaction' => true]);
-echo $kernel->output();
-if ($exit !== 0) {
-    fail('Database migration failed.');
-}
+databaseCommand($kernel, $fresh ? 'migrate:fresh' : 'migrate', 'Database migration failed. Verify database connectivity and migration permissions.');
 if (in_array('--seed', $flags, true)) {
-    $exit = $kernel->call('db:seed', ['--force' => true, '--no-interaction' => true]);
-    echo $kernel->output();
-    if ($exit !== 0) {
-        fail('Database seeding failed.');
-    }
+    databaseCommand($kernel, 'db:seed', 'Database seeding failed.');
 }
 if (in_array('--demo', $flags, true)) {
     if (Illuminate\Support\Facades\DB::table('users')->where('name', 'demo')->exists()) {
@@ -241,7 +252,14 @@ if (in_array('--demo', $flags, true)) {
     }
 }
 if ($mode === 'deploy') {
-    run([PHP_BINARY, 'artisan', 'optimize', '--no-interaction']);
+    // optimize does not propagate every nested cache command's failure status.
+    foreach (['config:cache', 'event:cache', 'route:cache', 'view:cache'] as $command) {
+        run([PHP_BINARY, 'artisan', $command, '--no-interaction']);
+    }
     run([PHP_BINARY, 'artisan', 'up', '--no-interaction']);
 }
 echo ucfirst($mode).' complete.'.PHP_EOL;
+} catch (Throwable) {
+    // Unexpected bootstrap/setup errors must also stop the container entrypoint.
+    fail('Application setup failed. Verify deployment configuration.');
+}
